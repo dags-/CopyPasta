@@ -51,11 +51,8 @@ public class Commands {
     @Permission("toolkit.copy")
     @Command(alias = "reset", parent = "copy")
     public void reset(@Caller Player player) {
-        FMT.info("Resetting copy wand").tell(player);
-        PlayerData data = new PlayerData();
-        data.setSelector(null);
-        data.setClipboard(null);
-        data.setOptions(null);
+        FMT.info("Resetting copy wand").tell(CopyPasta.CHAT_TYPE, player);
+        CopyPasta.getInstance().dropData(player);
     }
 
     @Permission("toolkit.copy")

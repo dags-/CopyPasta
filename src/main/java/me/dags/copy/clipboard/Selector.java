@@ -11,7 +11,7 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public class Selector {
 
-    private static final int defaultSize = 20000;
+    private static final int defaultSize = 25000;
     private static final int extendedSize = 100000;
 
     private int range = 5;

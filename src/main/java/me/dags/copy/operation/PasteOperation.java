@@ -111,11 +111,13 @@ public class PasteOperation implements Operation {
             if (transaction.isValid()) {
                 Location<World> location = transaction.getLocation();
                 record.add(location.createSnapshot());
-                location.setBlock(transaction.getEndState(), BlockChangeFlag.NONE, cause);
+                world.setBlock(location.getBlockPosition(), transaction.getEndState(), BlockChangeFlag.NONE, cause);
+                world.setCreator(location.getBlockPosition(), owner);
+                world.setNotifier(location.getBlockPosition(), owner);
             }
         }
 
-        FMT.stress("Paste complete").tell(CopyPasta.CHAT_TYPE, player.get());
+        FMT.stress("Paste complete").tell(CopyPasta.NOTICE_TYPE, player.get());
     }
 
     @Override

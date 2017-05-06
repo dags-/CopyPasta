@@ -23,27 +23,6 @@ import java.util.Optional;
  */
 public class EventListener {
 
-//    @Listener
-//    public void change(ChangeBlockEvent event) {
-//        System.out.println("##########################################################");
-//        System.out.println("change");
-//        System.out.println(event.getCause());
-//    }
-//
-//    @Listener
-//    public void place0(ChangeBlockEvent.Place event) {
-//        System.out.println("##########################################################");
-//        System.out.println("place0");
-//        System.out.println(event.getCause());
-//    }
-//
-//    @Listener
-//    public void place1(ChangeBlockEvent.Place event, @First Player player) {
-//        System.out.println("##########################################################");
-//        System.out.println("place1");
-//        System.out.println(event.getCause());
-//    }
-
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
         Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);

@@ -17,7 +17,7 @@ public class ClipboardOptions {
     private Facing playerHorizontalFacing = Facing.north;
     private Facing playerVerticalFacing = Facing.up;
     private boolean autoRotate = true;
-    private boolean autoFlip = false;
+    private boolean autoFlip = true;
     private boolean flipX = false;
     private boolean flipY = false;
     private boolean flipZ = false;

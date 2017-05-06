@@ -37,6 +37,10 @@ public class Clipboard {
         this.horizontalFacing = horizontalFacing;
     }
 
+    public History getHistory() {
+        return history;
+    }
+
     public void paste(Player player, Vector3i pos, Cause cause) {
         ClipboardOptions options = CopyPasta.getInstance().getData(player).ensureOptions();
         options.setClipboardFacingH(horizontalFacing, verticalFacing);
@@ -54,10 +58,10 @@ public class Clipboard {
     public void undo(Player player) {
         if (history.hasNext()) {
             List<BlockSnapshot> record = history.popRecord();
-            UndoOperation operation = new UndoOperation(record);
+            UndoOperation operation = new UndoOperation(record, player.getUniqueId());
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
-            FMT.error("No more history to undo!").tell(player);
+            FMT.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
         }
     }
 

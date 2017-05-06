@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class CopyPasta {
 
     public static final ChatType CHAT_TYPE = ChatTypes.CHAT;
+    public static final ChatType NOTICE_TYPE = ChatTypes.ACTION_BAR;
     private static CopyPasta instance;
 
     private final PluginContainer container;
