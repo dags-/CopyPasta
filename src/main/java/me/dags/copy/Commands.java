@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 public class Commands {
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "copy")
     public void copy(@Caller Player player) {
         Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
@@ -38,7 +38,7 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "range", parent = "copy")
     public void range(@Caller Player player, @One("range") int range) {
         Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
@@ -48,14 +48,14 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "reset", parent = "copy")
     public void reset(@Caller Player player) {
         FMT.info("Resetting copy wand").tell(CopyPasta.CHAT_TYPE, player);
         CopyPasta.getInstance().dropData(player);
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "rotate", parent = "copy auto")
     public void autoRotate(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
@@ -65,7 +65,7 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy auto")
     public void autoFlip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
@@ -75,7 +75,7 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy")
     public void flip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
@@ -94,7 +94,7 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy random")
     public void randomFlip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
@@ -110,7 +110,7 @@ public class Commands {
         }
     }
 
-    @Permission("toolkit.copy")
+    @Permission("copypasta.copy")
     @Command(alias = "rotate", parent = "copy random")
     public void randomRotate(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();

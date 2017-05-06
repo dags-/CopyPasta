@@ -25,19 +25,21 @@ public class EventListener {
 
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
-        Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
-        if (inHand.isPresent()) {
-            Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
-            if (wand.isPresent() && wand.get() == inHand.get()) {
-                event.setCancelled(true);
+        if (player.hasPermission("copypasta.use")) {
+            Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
+            if (inHand.isPresent()) {
+                Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
+                if (wand.isPresent() && wand.get() == inHand.get()) {
+                    event.setCancelled(true);
 
-                Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
-                if (clipBoard.isPresent()) {
-                    if (player.get(Keys.IS_SNEAKING).orElse(false)) {
-                        Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
-                        selector.ifPresent(s -> s.reset(player));
-                    } else {
-                        clipBoard.get().undo(player);
+                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
+                    if (clipBoard.isPresent()) {
+                        if (player.get(Keys.IS_SNEAKING).orElse(false)) {
+                            Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
+                            selector.ifPresent(s -> s.reset(player));
+                        } else {
+                            clipBoard.get().undo(player);
+                        }
                     }
                 }
             }
@@ -46,22 +48,24 @@ public class EventListener {
 
     @Listener
     public void interactSecondary(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
-        Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
+        if (player.hasPermission("copypasta.use")) {
+            Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
 
-        if (inHand.isPresent()) {
-            Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
+            if (inHand.isPresent()) {
+                Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
 
-            if (wand.isPresent() && wand.get() == inHand.get()) {
-                event.setCancelled(true);
+                if (wand.isPresent() && wand.get() == inHand.get()) {
+                    event.setCancelled(true);
 
-                Selector selector = CopyPasta.getInstance().getData(player).ensureSelector();
-                Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
-                Vector3i target = targetPosition(player, selector.getRange());
+                    Selector selector = CopyPasta.getInstance().getData(player).ensureSelector();
+                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
+                    Vector3i target = targetPosition(player, selector.getRange());
 
-                if (clipBoard.isPresent()) {
-                    clipBoard.get().paste(player, target, CopyPasta.getInstance().getCause(player));
-                } else {
-                    selector.pos(player, target);
+                    if (clipBoard.isPresent()) {
+                        clipBoard.get().paste(player, target, CopyPasta.getInstance().getCause(player));
+                    } else {
+                        selector.pos(player, target);
+                    }
                 }
             }
         }
