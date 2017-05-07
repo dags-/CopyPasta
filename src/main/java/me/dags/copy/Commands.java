@@ -1,9 +1,6 @@
 package me.dags.copy;
 
-import me.dags.commandbus.annotation.Caller;
-import me.dags.commandbus.annotation.Command;
-import me.dags.commandbus.annotation.One;
-import me.dags.commandbus.annotation.Permission;
+import me.dags.commandbus.annotation.*;
 import me.dags.commandbus.format.FMT;
 import me.dags.copy.block.Axis;
 import me.dags.copy.block.Facing;
@@ -21,8 +18,9 @@ import java.util.Optional;
  */
 public class Commands {
 
-    @Permission("copypasta.copy")
     @Command(alias = "copy")
+    @Permission("copypasta.copy")
+    @Description("Set your copy  wand to the current item")
     public void copy(@Caller Player player) {
         Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
         PlayerData data = CopyPasta.getInstance().getData(player);
@@ -40,6 +38,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "range", parent = "copy")
+    @Description("Set the range of your copy wand")
     public void range(@Caller Player player, @One("range") int range) {
         Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
         if (selector.isPresent()) {
@@ -50,6 +49,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "reset", parent = "copy")
+    @Description("Clear your clipboard, history, selection and wand")
     public void reset(@Caller Player player) {
         FMT.info("Resetting copy wand").tell(CopyPasta.CHAT_TYPE, player);
         CopyPasta.getInstance().dropData(player);
@@ -57,6 +57,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "rotate", parent = "copy auto")
+    @Description("Toggle auto-rotation of your clipboard")
     public void autoRotate(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {
@@ -67,6 +68,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy auto")
+    @Description("Toggle the auto-flipping of your clipboard (when looking up/down)")
     public void autoFlip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {
@@ -77,6 +79,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy")
+    @Description("Toggle flipping of your clipboard in the direction you are looking")
     public void flip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {
@@ -96,6 +99,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "flip", parent = "copy random")
+    @Description("Toggle random flipping of your clipboard for each paste")
     public void randomFlip(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {
@@ -112,6 +116,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "rotate", parent = "copy random")
+    @Description("Toggle random rotation of your clipboard for each paste")
     public void randomRotate(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {

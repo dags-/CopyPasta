@@ -3,18 +3,23 @@ package me.dags.copy.clipboard;
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.commandbus.format.FMT;
 import me.dags.copy.CopyPasta;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.service.permission.PermissionService;
+
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class Selector {
 
-    private static final int defaultSize = 25000;
-    private static final int extendedSize = 100000;
+    private static final int LIMIT = 50000;
 
-    private int range = 5;
+    private int range = 4;
     private Vector3i pos1 = Vector3i.ZERO;
     private Vector3i pos2 = Vector3i.ZERO;
 
@@ -59,6 +64,27 @@ public class Selector {
         }
     }
 
+    private int getLimit(Player player) {
+        Optional<?> permissionService = Sponge.getServiceManager().getRegistration(PermissionService.class)
+                .map(ProviderRegistration::getPlugin)
+                .map(PluginContainer::getId)
+                .filter(name -> !name.equals("sponge"));
+
+        if (permissionService.isPresent()) {
+            Optional<String> size = player.getOption("copypasta.limit");
+            if (size.isPresent()) {
+                try {
+                    return Integer.parseInt(size.get());
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            }
+            return 0;
+        }
+
+        return LIMIT;
+    }
+
     private int getSize(Vector3i pos1, Vector3i pos2) {
         Vector3i min = pos1.min(pos2);
         Vector3i max = pos1.max(pos2);
@@ -66,9 +92,5 @@ public class Selector {
         int ly = max.getY() - min.getY() + 1;
         int lz = max.getZ() - min.getZ() + 1;
         return lx * ly * lz;
-    }
-
-    private int getLimit(Player player) {
-        return player.hasPermission("toolkit.wand.select.limit.expanded") ? extendedSize : defaultSize;
     }
 }
