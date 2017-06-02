@@ -28,7 +28,7 @@ shadowJar {
         include dependency('com.github.dags-:CommandBus')
     }
 
-    relocate 'me.dags.copypasta', 'me.dags.plots.libs.commandbus'
+    relocate 'me.dags.commandbus', 'me.dags.plots.libs.commandbus'
 
     archiveName = "${baseName}-${version}-SpongeAPI-${spongeAPI}.jar"
 }
