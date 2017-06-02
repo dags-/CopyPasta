@@ -13,7 +13,6 @@ public class OperationManager implements Runnable {
     private final LinkedList<Operation> apply = new LinkedList<>();
 
     private boolean finishing = false;
-    private int operationsPerTick = 3;
 
     public void reset() {
         finishing = false;
@@ -31,19 +30,18 @@ public class OperationManager implements Runnable {
 
     @Override
     public void run() {
-        for (int i = operationsPerTick; i > 0; i--) {
-            Operation calculate;
-            synchronized (lock) {
-                calculate = this.calculate.pollFirst();
-            }
-            compute(calculate);
+        // drain queues in reverse order so that operations are spread across ticks
+        Operation apply = this.apply.pollFirst();
+        apply(apply);
 
-            Operation test = this.test.pollFirst();
-            test(test);
+        Operation test = this.test.pollFirst();
+        test(test);
 
-            Operation apply = this.apply.pollFirst();
-            apply(apply);
+        Operation calculate;
+        synchronized (lock) {
+            calculate = this.calculate.pollFirst();
         }
+        compute(calculate);
     }
 
     public void finish() {
@@ -75,9 +73,15 @@ public class OperationManager implements Runnable {
         if (operation != null) {
             if (operation.isCancelled()) {
                 operation.dispose();
-            } else {
+                return;
+            }
+
+            try {
                 operation.calculate();
                 test.addLast(operation);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                operation.dispose();
             }
         }
     }
@@ -86,19 +90,32 @@ public class OperationManager implements Runnable {
         if (operation != null) {
             if (operation.isCancelled()) {
                 operation.dispose();
-            } else {
+                return;
+            }
+
+            try {
                 operation.test();
                 apply.addLast(operation);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                operation.dispose();
             }
         }
     }
 
     private void apply(Operation operation) {
         if (operation != null) {
-            if (!operation.isCancelled()) {
-                operation.apply();
+            if (operation.isCancelled()) {
+                operation.dispose();
+                return;
             }
-            operation.dispose();
+
+            try {
+                operation.apply();
+            } catch (Throwable t) {
+                t.printStackTrace();
+                operation.dispose();
+            }
         }
     }
 }
