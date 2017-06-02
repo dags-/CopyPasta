@@ -1,5 +1,7 @@
 package me.dags.copy.operation;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -22,6 +24,7 @@ public class TestPlaceEvent extends AbstractEvent implements ChangeBlockEvent.Pl
     private final List<LocatableBlockChange> changes;
 
     private boolean cancelled = false;
+    private List<Transaction<BlockSnapshot>> transactions;
 
     public TestPlaceEvent(List<LocatableBlockChange> changes, World world, Cause cause) {
         this.changes = changes;
@@ -31,22 +34,40 @@ public class TestPlaceEvent extends AbstractEvent implements ChangeBlockEvent.Pl
 
     @Override
     public List<Transaction<BlockSnapshot>> filter(Predicate<Location<World>> predicate) {
+        List<Transaction<BlockSnapshot>> filtered = null;
         for (LocatableBlockChange change : changes) {
             if (!predicate.test(change.getLocation())) {
+                if (filtered == null) {
+                    filtered = Lists.newLinkedList();
+                }
+                filtered.add(change.getTransaction());
                 change.setValid(false);
             }
         }
-        return getTransactions();
+        return filtered != null ? filtered : Collections.emptyList();
     }
 
     @Override
     public void filterAll() {
-        setCancelled(true);
+        if (!cancelled) {
+            cancelled = true;
+
+            for (LocatableBlockChange change : changes) {
+                change.setValid(false);
+            }
+        }
     }
 
     @Override
     public List<Transaction<BlockSnapshot>> getTransactions() {
-        return Collections.emptyList();
+        if (transactions == null) {
+            ImmutableList.Builder<Transaction<BlockSnapshot>> builder = ImmutableList.builder();
+            for (LocatableBlockChange change : changes) {
+                builder.add(change.getTransaction());
+            }
+            transactions = builder.build();
+        }
+        return transactions;
     }
 
     @Override

@@ -56,6 +56,17 @@ public class Commands {
     }
 
     @Permission("copypasta.copy")
+    @Command(alias = "air", parent = "copy")
+    @Description("Toggle auto-rotation of your clipboard")
+    public void pasteAir(@Caller Player player) {
+        Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
+        if (options.isPresent()) {
+            options.get().setPasteAir(!options.get().pasteAir());
+            FMT.info("Paste air: ").stress(options.get().pasteAir()).tell(CopyPasta.CHAT_TYPE, player);
+        }
+    }
+
+    @Permission("copypasta.copy")
     @Command(alias = "rotate", parent = "copy auto")
     @Description("Toggle auto-rotation of your clipboard")
     public void autoRotate(@Caller Player player) {

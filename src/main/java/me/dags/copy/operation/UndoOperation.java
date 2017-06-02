@@ -56,6 +56,6 @@ public class UndoOperation implements Operation {
 
     @Override
     public void dispose() {
-
+        CopyPasta.getInstance().getData(owner).ifPresent(data -> data.setOperating(false));
     }
 }

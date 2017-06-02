@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.commandbus.format.FMT;
 import me.dags.copy.CopyPasta;
+import me.dags.copy.PlayerData;
 import me.dags.copy.block.Facing;
 import me.dags.copy.operation.PasteOperation;
 import me.dags.copy.operation.UndoOperation;
@@ -42,7 +43,16 @@ public class Clipboard {
     }
 
     public void paste(Player player, Vector3i pos, Cause cause) {
-        ClipboardOptions options = CopyPasta.getInstance().getData(player).ensureOptions();
+        PlayerData data = CopyPasta.getInstance().getData(player);
+
+        if (data.isOperating()) {
+            FMT.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+
+        data.setOperating(true);
+
+        ClipboardOptions options = data.ensureOptions();
         options.setClipboardFacingH(horizontalFacing, verticalFacing);
         options.setPlayerFacing(player);
 
@@ -50,13 +60,21 @@ public class Clipboard {
         Vector3i volumeOffset = transform.volumeOffset(source);
         Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);
 
-        FutureCallback<BlockVolume> callback = callback(player, pastePosition, cause);
+        FutureCallback<BlockVolume> callback = callback(player, pastePosition, options.pasteAir(), cause);
         Runnable asyncTransform = transform.createTask(source, cause, callback);
         CopyPasta.getInstance().submitAsync(asyncTransform);
     }
 
     public void undo(Player player) {
+        PlayerData data = CopyPasta.getInstance().getData(player);
+
+        if (data.isOperating()) {
+            FMT.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+
         if (history.hasNext()) {
+            data.setOperating(true);
             List<BlockSnapshot> record = history.popRecord();
             UndoOperation operation = new UndoOperation(record, player.getUniqueId());
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
@@ -65,7 +83,7 @@ public class Clipboard {
         }
     }
 
-    private FutureCallback<BlockVolume> callback(Player player, Vector3i position, Cause cause) {
+    private FutureCallback<BlockVolume> callback(Player player, Vector3i position, boolean air, Cause cause) {
         final UUID uuid = player.getUniqueId();
         final WeakReference<World> worldRef = new WeakReference<>(player.getWorld());
 
@@ -73,7 +91,7 @@ public class Clipboard {
             @Override
             public void onSuccess(@Nullable BlockVolume result) {
                 if (result != null) {
-                    PasteOperation operation = new PasteOperation(cause, worldRef, uuid, result, position, history);
+                    PasteOperation operation = new PasteOperation(cause, worldRef, uuid, result, position, history, air);
                     CopyPasta.getInstance().getOperationManager().queueOperation(operation);
                 }
             }

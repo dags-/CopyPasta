@@ -16,6 +16,7 @@ public class ClipboardOptions {
     private Facing clipboardFacingV = Facing.north;
     private Facing playerHorizontalFacing = Facing.north;
     private Facing playerVerticalFacing = Facing.up;
+    private boolean pasteAir = false;
     private boolean autoRotate = true;
     private boolean autoFlip = true;
     private boolean flipX = false;
@@ -24,6 +25,10 @@ public class ClipboardOptions {
     private boolean randomRotate = false;
     private boolean randomFlipH = false;
     private boolean randomFlipV = false;
+
+    public boolean pasteAir() {
+        return pasteAir;
+    }
 
     public boolean autoRotate() {
         return autoRotate;
@@ -55,6 +60,10 @@ public class ClipboardOptions {
 
     public boolean randomFlipV() {
         return randomFlipV;
+    }
+
+    public void setPasteAir(boolean pasteAir) {
+        this.pasteAir = pasteAir;
     }
 
     public void setAutoFlip(boolean autoFlip) {

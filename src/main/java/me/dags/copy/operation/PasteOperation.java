@@ -27,6 +27,7 @@ import java.util.UUID;
  */
 public class PasteOperation implements Operation {
 
+    private final boolean air;
     private final UUID owner;
     private final Cause cause;
     private final History history;
@@ -38,13 +39,14 @@ public class PasteOperation implements Operation {
 
     private boolean cancelled = false;
 
-    public PasteOperation(Cause cause, WeakReference<World> world, UUID uuid, BlockVolume source, Vector3i position, History history) {
+    public PasteOperation(Cause cause, WeakReference<World> world, UUID uuid, BlockVolume source, Vector3i position, History history, boolean air) {
+        this.air = air;
         this.cause = cause;
         this.owner = uuid;
         this.world = world;
+        this.source = source;
         this.history = history;
         this.position = position;
-        this.source = source;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class PasteOperation implements Operation {
 
         source.getBlockWorker(cause).iterate((v, x, y, z) -> {
             BlockState state = v.getBlock(x, y, z);
-            if (state.getType() == BlockTypes.AIR) {
+            if (state.getType() == BlockTypes.AIR && !air) {
                 return;
             }
 

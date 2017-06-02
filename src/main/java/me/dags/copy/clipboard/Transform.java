@@ -3,17 +3,13 @@ package me.dags.copy.clipboard;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.block.Axis;
-import me.dags.copy.block.Half;
 import me.dags.copy.block.TraitUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
