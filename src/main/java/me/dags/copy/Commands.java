@@ -57,7 +57,7 @@ public class Commands {
 
     @Permission("copypasta.copy")
     @Command(alias = "air", parent = "copy")
-    @Description("Toggle auto-rotation of your clipboard")
+    @Description("Toggle pasting of air blocks for your clipboard")
     public void pasteAir(@Caller Player player) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().getData(player).getOptions();
         if (options.isPresent()) {
