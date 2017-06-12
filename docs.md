@@ -19,7 +19,7 @@ Once you have copied a volume of blocks to your clipboard, subsequent right-clic
 clipboard relative to the block that you target.
 
 #### Auto rotate
-Your clipboard will automatically rotate to the nearest cardinal direction (NSEW) as your change your facing direction.  
+Your clipboard will automatically rotate to the nearest cardinal direction (NSEW) as you change your facing direction.  
 You can toggle this functionality by entering the command `/copy auto rotate`.
 
 #### Auto flip
