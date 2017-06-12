@@ -10,7 +10,8 @@ If a solid block is not found within the range, the position _at_ the limit will
 ### Copying a volume of blocks
 1. Select an item to use as your wand, hold it, and enter `/copy`
 2. Right-click two points containing the volume of blocks you want to copy
-3. Sneak-click a third point to copy the volume - this third point becomes your clipboards 'origin'
+3.  1. Sneak-click a third point to copy the volume - this third point becomes your clipboards 'origin'
+    2. Click without sneaking to reset the points in order to start the selection again
 
 Note - the direction you are facing is also recorded during step 3
 
