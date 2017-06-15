@@ -1,7 +1,7 @@
 package me.dags.copy.operation;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.commandbus.format.FMT;
+import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.clipboard.History;
 import org.spongepowered.api.Sponge;
@@ -119,7 +119,7 @@ public class PasteOperation implements Operation {
             }
         }
 
-        FMT.stress("Paste complete").tell(CopyPasta.NOTICE_TYPE, player.get());
+        Fmt.stress("Paste complete").tell(CopyPasta.NOTICE_TYPE, player.get());
     }
 
     @Override

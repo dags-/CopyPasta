@@ -1,6 +1,6 @@
 package me.dags.copy.operation;
 
-import me.dags.commandbus.format.FMT;
+import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import org.spongepowered.api.Sponge;
@@ -49,7 +49,7 @@ public class UndoOperation implements Operation {
             data.getClipboard().ifPresent(clipboard -> {
                 int size = clipboard.getHistory().getSize();
                 int max = clipboard.getHistory().getMax();
-                FMT.subdued("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
+                Fmt.subdued("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
             });
         });
     }

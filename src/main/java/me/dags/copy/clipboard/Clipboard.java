@@ -2,7 +2,7 @@ package me.dags.copy.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
-import me.dags.commandbus.format.FMT;
+import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.block.Facing;
@@ -46,7 +46,7 @@ public class Clipboard {
         PlayerData data = CopyPasta.getInstance().getData(player);
 
         if (data.isOperating()) {
-            FMT.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
 
@@ -69,7 +69,7 @@ public class Clipboard {
         PlayerData data = CopyPasta.getInstance().getData(player);
 
         if (data.isOperating()) {
-            FMT.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
 
@@ -79,7 +79,7 @@ public class Clipboard {
             UndoOperation operation = new UndoOperation(record, player.getUniqueId());
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
-            FMT.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
+            Fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
         }
     }
 
@@ -98,7 +98,7 @@ public class Clipboard {
 
             @Override
             public void onFailure(Throwable t) {
-                FMT.warn("Unable to transform the clipboard! See the console").tell(player);
+                Fmt.warn("Unable to transform the clipboard! See the console").tell(player);
                 t.printStackTrace();
             }
         };

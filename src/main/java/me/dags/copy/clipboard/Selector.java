@@ -1,7 +1,7 @@
 package me.dags.copy.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.commandbus.format.FMT;
+import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -34,18 +34,18 @@ public class Selector {
     public void reset(Player player) {
         pos1 = Vector3i.ZERO;
         pos2 = Vector3i.ZERO;
-        FMT.subdued("Reset clipboard").tell(player);
+        Fmt.subdued("Reset clipboard").tell(player);
         CopyPasta.getInstance().getData(player).setClipboard(null);
     }
 
     public void pos(Player player, Vector3i pos) {
         if (pos1 == Vector3i.ZERO) {
             pos1 = pos;
-            FMT.info("Set pos1 ").stress(pos).tell(player);
+            Fmt.info("Set pos1 ").stress(pos).tell(player);
         } else if (pos2 == Vector3i.ZERO) {
             pos2 = pos;
             int size = getSize(pos1, pos2);
-            FMT.info("Set pos2 ").stress(pos).info(" (%s blocks)", size).tell(player);
+            Fmt.info("Set pos2 ").stress(pos).info(" (%s blocks)", size).tell(player);
         } else if (player.get(Keys.IS_SNEAKING).orElse(false)) {
             int size = getSize(pos1, pos2);
             int limit = getLimit(player);
@@ -55,9 +55,9 @@ public class Selector {
 
                 Clipboard clipboard = Clipboard.of(player, min, max, pos);
                 CopyPasta.getInstance().getData(player).setClipboard(clipboard);
-                FMT.info("Copied ").stress(size).info(" blocks").tell(player);
+                Fmt.info("Copied ").stress(size).info(" blocks").tell(player);
             } else {
-                FMT.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);
+                Fmt.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);
             }
         } else {
             reset(player);
