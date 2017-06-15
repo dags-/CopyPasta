@@ -5,7 +5,7 @@ plugins {
 
 group 'me.dags'
 version '0.3-SNAPSHOT'
-def spongeAPI = '5.1.0'
+def spongeAPI = '5.2.0'
 def spongeChannel = 'SNAPSHOT'
 
 configurations {
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow ('com.github.dags-:CommandBus:master-SNAPSHOT') { transitive = false }
+    shadow ('com.github.dags-:CommandBus:1.8.0-SNAPSHOT') { transitive = false }
 }
 
 shadowJar {
