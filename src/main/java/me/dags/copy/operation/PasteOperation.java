@@ -78,7 +78,9 @@ public class PasteOperation implements Operation {
             }
 
             Location<World> location = world.getLocation(x, y, z);
-            transactions.add(new LocatableBlockChange(location, state));
+            if (location.getBlock() != state) {
+                transactions.add(new LocatableBlockChange(location, state));
+            }
         });
     }
 
