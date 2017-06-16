@@ -107,7 +107,7 @@ public class Clipboard {
         Vector3i offset = min.sub(origin);
         Facing verticalFacing = Facing.verticalFacing(player);
         Facing horizontalFacing = Facing.horizontalFacing(player);
-        BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView();
+        BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView().getImmutableBlockCopy();
         return new Clipboard(backing, offset, horizontalFacing, verticalFacing);
     }
 }
