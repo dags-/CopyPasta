@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import me.dags.commandbus.fmt.Fmt;
+import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import org.spongepowered.api.block.BlockState;
@@ -13,9 +14,13 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.item.inventory.type.Inventory2D;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeMapper;
 
@@ -51,11 +56,11 @@ public class ReMapper implements BlockVolumeMapper {
         return map(volume.getBlock(x, y, z));
     }
 
-    public static Builder builder() {
+    private static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder {
+    private static class Builder {
 
         private final Multimap<BlockType, StateMapper> mappers = ArrayListMultimap.create();
 
@@ -78,7 +83,7 @@ public class ReMapper implements BlockVolumeMapper {
             return this;
         }
 
-        public ReMapper build() {
+        ReMapper build() {
             return new ReMapper(this);
         }
     }
@@ -127,27 +132,33 @@ public class ReMapper implements BlockVolumeMapper {
 
         Inventory.Builder builder = Inventory.builder();
         builder.of(InventoryArchetypes.CHEST);
+        builder.property("title", new InventoryTitle(Text.of("Replacements")));
         builder.listener(InteractInventoryEvent.Close.class, close -> {
             Player p = playerRef.get();
             if (p == null) {
                 return;
             }
 
-            GridInventory inventory = (GridInventory) close.getTargetInventory();
-            ReMapper.Builder remapper = ReMapper.builder();
+            Container container = close.getTargetInventory();
+            GridInventory inventory = container.query(Inventory2D.class);
 
-            for (int col = 0; col < inventory.getColumns(); col ++) {
-                Optional<BlockState> from = inventory.peek(col, 0).flatMap(s -> s.get(Keys.ITEM_BLOCKSTATE));
-                Optional<BlockState> to = inventory.peek(col, 1).flatMap(s -> s.get(Keys.ITEM_BLOCKSTATE));
+            ReMapper.Builder mapper = ReMapper.builder();
+            Formatter fmt = Fmt.info("Replacements:");
 
-                if (from.isPresent() && to.isPresent()) {
-                    remapper.block(from.get(), to.get(), traits);
+            for (int y = 0; y + 1 < inventory.getRows(); y += 2) {
+                for (int x = 0; x < inventory.getColumns(); x++) {
+                    Optional<BlockState> from = inventory.peek(x, y).flatMap(s -> s.get(Keys.ITEM_BLOCKSTATE));
+                    Optional<BlockState> to = inventory.peek(x, y + 1).flatMap(s -> s.get(Keys.ITEM_BLOCKSTATE));
+                    if (from.isPresent() && to.isPresent()) {
+                        mapper.block(from.get(), to.get(), traits);
+                        fmt.line().stress(from.get().getName()).info(" -> ").stress(to.get().getName());
+                    }
                 }
             }
 
             PlayerData data = CopyPasta.getInstance().getData(p);
-            data.ensureOptions().setMapper(remapper.build());
-            Fmt.info("Set your block remaps").tell(p);
+            data.ensureOptions().setMapper(mapper.build());
+            fmt.tell(p);
         });
 
         Inventory inventory = builder.build(CopyPasta.getInstance());
