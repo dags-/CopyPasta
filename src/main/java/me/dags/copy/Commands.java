@@ -5,6 +5,7 @@ import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.block.Axis;
 import me.dags.copy.block.Facing;
 import me.dags.copy.clipboard.ClipboardOptions;
+import me.dags.copy.clipboard.ReMapper;
 import me.dags.copy.clipboard.Selector;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -134,5 +135,19 @@ public class Commands {
             options.get().setRandomRotate(!options.get().randomRotate());
             Fmt.info("Set random rotation: ").stress(options.get().randomRotate()).tell(CopyPasta.CHAT_TYPE, player);
         }
+    }
+
+    @Permission("copypasta.copy")
+    @Command(alias = "replace", parent = "copy")
+    @Description("Set the blocks that should be replaced during each paste")
+    public void replace(@Src Player player) {
+        ReMapper.showMenu(player, "variant");
+    }
+
+    @Permission("copypasta.copy")
+    @Command(alias = "replace", parent = "copy")
+    @Description("Set the blocks that should be replaced during each paste")
+    public void replace(@Src Player player, @Var("traits") String... traits) {
+        ReMapper.showMenu(player, traits);
     }
 }

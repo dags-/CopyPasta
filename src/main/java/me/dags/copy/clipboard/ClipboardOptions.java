@@ -3,6 +3,8 @@ package me.dags.copy.clipboard;
 import me.dags.copy.block.Facing;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -25,6 +27,7 @@ public class ClipboardOptions {
     private boolean randomRotate = false;
     private boolean randomFlipH = false;
     private boolean randomFlipV = false;
+    private ReMapper mapper = null;
 
     public boolean pasteAir() {
         return pasteAir;
@@ -60,6 +63,10 @@ public class ClipboardOptions {
 
     public boolean randomFlipV() {
         return randomFlipV;
+    }
+
+    public void setMapper(ReMapper mapper) {
+        this.mapper = mapper;
     }
 
     public void setPasteAir(boolean pasteAir) {
@@ -113,6 +120,7 @@ public class ClipboardOptions {
         boolean flipX = this.flipX;
         boolean flipY = this.flipY;
         boolean flipZ = this.flipZ;
+        Collection<ReMapper> mappers = Collections.emptyList();
 
         if (autoRotate) {
             int from = clipboardFacingH.getAngle();
@@ -138,6 +146,10 @@ public class ClipboardOptions {
             flipY = RANDOM.nextBoolean();
         }
 
-        return new Transform(angle, flipX, flipY, flipZ);
+        if (this.mapper != null) {
+            mappers = Collections.singletonList(mapper);
+        }
+
+        return new Transform(angle, flipX, flipY, flipZ, mappers);
     }
 }

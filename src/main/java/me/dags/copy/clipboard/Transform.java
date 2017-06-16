@@ -11,6 +11,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
+import java.util.Collection;
+
 /**
  * @author dags <dags@dags.me>
  */
@@ -21,13 +23,15 @@ public class Transform {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
+    private final Collection<ReMapper> mappers;
 
-    Transform(int angle, boolean x, boolean y, boolean z) {
+    Transform(int angle, boolean x, boolean y, boolean z, Collection<ReMapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
         this.flipZ = z;
+        this.mappers = mappers;
     }
 
     public Runnable createTask(BlockVolume source, Cause cause, FutureCallback<BlockVolume> callback) {
@@ -62,6 +66,11 @@ public class Transform {
 
     private void visit(BlockVolume src, MutableBlockVolume buffer, Vector3i offset, int x, int y, int z, Cause cause) {
         BlockState state = src.getBlock(x, y, z);
+
+        for (ReMapper mapper : mappers) {
+            state = mapper.map(state);
+        }
+
         if (state.getType() == BlockTypes.AIR) {
             return;
         }

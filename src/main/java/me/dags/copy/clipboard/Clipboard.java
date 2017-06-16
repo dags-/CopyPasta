@@ -13,7 +13,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.BlockVolume;
-import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -108,7 +107,7 @@ public class Clipboard {
         Vector3i offset = min.sub(origin);
         Facing verticalFacing = Facing.verticalFacing(player);
         Facing horizontalFacing = Facing.horizontalFacing(player);
-        MutableBlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView();
+        BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView();
         return new Clipboard(backing, offset, horizontalFacing, verticalFacing);
     }
 }
