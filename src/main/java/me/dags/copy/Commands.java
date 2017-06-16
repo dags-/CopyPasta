@@ -7,6 +7,9 @@ import me.dags.copy.block.Facing;
 import me.dags.copy.clipboard.ClipboardOptions;
 import me.dags.copy.clipboard.ReMapper;
 import me.dags.copy.clipboard.Selector;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -37,7 +40,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.range")
     @Command(alias = "range", parent = "copy")
     @Description("Set the range of your copy wand")
     public void range(@Src Player player, @One("range") int range) {
@@ -48,7 +51,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.reset")
     @Command(alias = "reset", parent = "copy")
     @Description("Clear your clipboard, history, selection and wand")
     public void reset(@Src Player player) {
@@ -56,7 +59,7 @@ public class Commands {
         CopyPasta.getInstance().dropData(player);
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.air")
     @Command(alias = "air", parent = "copy")
     @Description("Toggle pasting of air blocks for your clipboard")
     public void pasteAir(@Src Player player) {
@@ -67,7 +70,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.rotate")
     @Command(alias = "rotate", parent = "copy auto")
     @Description("Toggle auto-rotation of your clipboard")
     public void autoRotate(@Src Player player) {
@@ -78,7 +81,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.flip")
     @Command(alias = "flip", parent = "copy auto")
     @Description("Toggle the auto-flipping of your clipboard (when looking up/down)")
     public void autoFlip(@Src Player player) {
@@ -89,7 +92,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.flip")
     @Command(alias = "flip", parent = "copy")
     @Description("Toggle flipping of your clipboard in the direction you are looking")
     public void flip(@Src Player player) {
@@ -109,7 +112,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.flip")
     @Command(alias = "flip", parent = "copy random")
     @Description("Toggle random flipping of your clipboard for each paste")
     public void randomFlip(@Src Player player) {
@@ -126,7 +129,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
+    @Permission("copypasta.copy.rotate")
     @Command(alias = "rotate", parent = "copy random")
     @Description("Toggle random rotation of your clipboard for each paste")
     public void randomRotate(@Src Player player) {
@@ -137,17 +140,27 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy")
-    @Command(alias = "replace", parent = "copy")
+    @Permission("copypasta.copy.remap")
+    @Command(alias = "remap", parent = "copy")
     @Description("Set the blocks that should be replaced during each paste")
-    public void replace(@Src Player player) {
-        ReMapper.showMenu(player, "variant");
+    public void remap(@Src Player player, @Var("traits") BlockTrait... traits) {
+        if (traits.length == 0) {
+            Optional<BlockTrait> variant = Sponge.getRegistry().getType(BlockTrait.class, "variant");
+            if (variant.isPresent()) {
+                ReMapper.showMenu(player, variant.get());
+            } else {
+                Fmt.error("Something went wrong! Cannot create remapper menu :[").tell(player).log();
+            }
+        } else {
+            ReMapper.showMenu(player, traits);
+        }
     }
 
-    @Permission("copypasta.copy")
-    @Command(alias = "replace", parent = "copy")
+    @Permission("copypasta.copy.remap")
+    @Command(alias = "none", parent = "copy remap")
     @Description("Set the blocks that should be replaced during each paste")
-    public void replace(@Src Player player, @Var("traits") String... traits) {
-        ReMapper.showMenu(player, traits);
+    public void remapNone(@Src Player player) {
+        CopyPasta.getInstance().getData(player).ensureOptions().setMapper(null);
+        Fmt.info("Cleared block re-mappers").tell(player);
     }
 }

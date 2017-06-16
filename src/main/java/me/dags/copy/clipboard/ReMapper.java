@@ -64,17 +64,14 @@ public class ReMapper implements BlockVolumeMapper {
 
         private final Multimap<BlockType, StateMapper> mappers = ArrayListMultimap.create();
 
-        public Builder block(BlockState from, BlockState to, String... trait) {
+        public Builder block(BlockState from, BlockState to, BlockTrait<?>... traits) {
             BlockType matchType = from.getType();
             ImmutableMap.Builder<BlockTrait, Object> matchTraits = ImmutableMap.builder();
 
-            for (String name : trait) {
-                Optional<BlockTrait<? extends Comparable<?>>> t = from.getTrait(name);
-                if (t.isPresent() && to.getTrait(name).isPresent()) {
-                    Optional<?> v = from.getTraitValue(t.get());
-                    if (v.isPresent() && to.getTraitValue(t.get()).isPresent()) {
-                        matchTraits.put(t.get(), v.get());
-                    }
+            for (BlockTrait<?> trait : traits) {
+                Optional<?> v = from.getTraitValue(trait);
+                if (v.isPresent() && to.getTraitValue(trait).isPresent()) {
+                    matchTraits.put(trait, v.get());
                 }
             }
 
@@ -127,7 +124,7 @@ public class ReMapper implements BlockVolumeMapper {
         }
     }
 
-    public static void showMenu(Player player, final String... traits) {
+    public static void showMenu(Player player, final BlockTrait<?>... traits) {
         final WeakReference<Player> playerRef = new WeakReference<>(player);
 
         Inventory.Builder builder = Inventory.builder();
