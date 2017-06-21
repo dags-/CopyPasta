@@ -5,15 +5,14 @@ import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.block.Axis;
 import me.dags.copy.block.Facing;
 import me.dags.copy.clipboard.ClipboardOptions;
-import me.dags.copy.clipboard.ReMapper;
 import me.dags.copy.clipboard.Selector;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.BlockTrait;
+import me.dags.copy.clipboard.StateMapper;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.Optional;
 
@@ -37,13 +36,16 @@ public class Commands {
         } else {
             Fmt.info("Removed copy wand").tell(player);
             data.clear();
+
+            MessageChannel channel = MessageChannel.permission("my.chat.channel");
+            channel.send(Text.of("For your eyes only"));
         }
     }
 
     @Permission("copypasta.copy.range")
     @Command(alias = "range", parent = "copy")
     @Description("Set the range of your copy wand")
-    public void range(@Src Player player, @One("range") int range) {
+    public void range(@Src Player player, @Arg("range") int range) {
         Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
         if (selector.isPresent()) {
             selector.get().setRange(Math.max(1, Math.min(range, 25)));
@@ -143,17 +145,15 @@ public class Commands {
     @Permission("copypasta.copy.remap")
     @Command(alias = "remap", parent = "copy")
     @Description("Set the blocks that should be replaced during each paste")
-    public void remap(@Src Player player, @Var("traits") BlockTrait... traits) {
-        if (traits.length == 0) {
-            Optional<BlockTrait> variant = Sponge.getRegistry().getType(BlockTrait.class, "variant");
-            if (variant.isPresent()) {
-                ReMapper.showMenu(player, variant.get());
-            } else {
-                Fmt.error("Something went wrong! Cannot create remapper menu :[").tell(player).log();
-            }
-        } else {
-            ReMapper.showMenu(player, traits);
-        }
+    public void remap(@Src Player player) {
+        remap(player, "variant");
+    }
+
+    @Permission("copypasta.copy.remap")
+    @Command(alias = "remap", parent = "copy")
+    @Description("Set the blocks that should be replaced during each paste")
+    public void remap(@Src Player player, @Arg("traits") String... traits) {
+        StateMapper.showMenu(player, traits);
     }
 
     @Permission("copypasta.copy.remap")
@@ -161,6 +161,6 @@ public class Commands {
     @Description("Set the blocks that should be replaced during each paste")
     public void remapNone(@Src Player player) {
         CopyPasta.getInstance().getData(player).ensureOptions().setMapper(null);
-        Fmt.info("Cleared block re-mappers").tell(player);
+        Fmt.info("Cleared map re-mappers").tell(player);
     }
 }

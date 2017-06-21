@@ -10,6 +10,24 @@ import java.util.Optional;
  */
 public class TraitUtils {
 
+    public static Object getTraitValue(BlockState state, String traitId) {
+        Optional<BlockTrait<?>> trait = state.getTrait(traitId);
+        if (trait.isPresent()) {
+            Optional<?> value = state.getTraitValue(trait.get());
+            if (value.isPresent()) {
+                return value.get();
+            }
+        }
+        return null;
+    }
+
+    public static boolean equals(Object val1, Object val2) {
+        if (val1 == null) {
+            return val2 == null;
+        }
+        return val2 != null && (val1.equals(val2) || val1.toString().equals(val2.toString()));
+    }
+
     public static BlockState rotateFacing(BlockState state, Axis rotationAxis, int angle) {
         Optional<BlockTrait<?>> trait = state.getTrait("facing");
         if (trait.isPresent()) {
@@ -106,6 +124,17 @@ public class TraitUtils {
                 if (hinge != null) {
                     Hinge flipped = hinge.flip(direction);
                     state = withTrait(state, trait.get(), flipped);
+                }
+            }
+        }
+        return state;
+    }
+
+    public static BlockState withTrait(BlockState state, BlockTrait<?> trait, Object value) {
+        if (value != null) {
+            for (Object val : trait.getPossibleValues()) {
+                if (TraitUtils.equals(val, value)) {
+                    return state.withTrait(trait, val).orElse(state);
                 }
             }
         }

@@ -11,8 +11,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
-import java.util.Collection;
-
 /**
  * @author dags <dags@dags.me>
  */
@@ -23,15 +21,15 @@ public class Transform {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
-    private final Collection<ReMapper> mappers;
+    private final StateMapper mapper;
 
-    Transform(int angle, boolean x, boolean y, boolean z, Collection<ReMapper> mappers) {
+    Transform(int angle, boolean x, boolean y, boolean z, StateMapper mapper) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
         this.flipZ = z;
-        this.mappers = mappers;
+        this.mapper = mapper;
     }
 
     public Runnable createTask(BlockVolume source, Cause cause, FutureCallback<BlockVolume> callback) {
@@ -52,7 +50,7 @@ public class Transform {
         Vector3i size = max.sub(min).add(Vector3i.ONE);
         MutableBlockVolume buffer = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
 
-        // can't use block-worker off the main thread!
+        // can't use map-worker off the main thread!
         for (int y = source.getBlockMin().getY(); y <= source.getBlockMax().getY(); y++) {
             for (int z = source.getBlockMin().getZ(); z <= source.getBlockMax().getZ(); z++) {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {
@@ -66,10 +64,7 @@ public class Transform {
 
     private void visit(BlockVolume src, MutableBlockVolume buffer, Vector3i offset, int x, int y, int z, Cause cause) {
         BlockState state = src.getBlock(x, y, z);
-
-        for (ReMapper mapper : mappers) {
-            state = mapper.map(state);
-        }
+        state = mapper.map(state);
 
         if (state.getType() == BlockTypes.AIR) {
             return;
