@@ -55,13 +55,13 @@ public class Clipboard {
         options.setClipboardFacingH(horizontalFacing, verticalFacing);
         options.setPlayerFacing(player);
 
-        Transform transform = options.createTransform();
-        Vector3i volumeOffset = transform.volumeOffset(source);
-        Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);
+        VolumeMapper mapper = options.createMapper();
+        Vector3i volumeOffset = mapper.volumeOffset(source);
+        Vector3i pastePosition = mapper.transformPosition(origin).add(pos).add(volumeOffset);
 
         FutureCallback<BlockVolume> callback = callback(player, pastePosition, options.pasteAir(), cause);
-        Runnable asyncTransform = transform.createTask(source, cause, callback);
-        CopyPasta.getInstance().submitAsync(asyncTransform);
+        Runnable asyncMapper = mapper.createTask(source, cause, callback);
+        CopyPasta.getInstance().submitAsync(asyncMapper);
     }
 
     public void undo(Player player) {

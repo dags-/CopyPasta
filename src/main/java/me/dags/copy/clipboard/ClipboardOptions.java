@@ -25,7 +25,7 @@ public class ClipboardOptions {
     private boolean randomRotate = false;
     private boolean randomFlipH = false;
     private boolean randomFlipV = false;
-    private StateMapper mapper = StateMapper.EMPTY;
+    private StateMapper stateMapper = StateMapper.EMPTY;
 
     public boolean pasteAir() {
         return pasteAir;
@@ -63,11 +63,11 @@ public class ClipboardOptions {
         return randomFlipV;
     }
 
-    public void setMapper(StateMapper mapper) {
-        if (mapper == null) {
-            mapper = StateMapper.EMPTY;
+    public void setStateMapper(StateMapper stateMapper) {
+        if (stateMapper == null) {
+            stateMapper = StateMapper.EMPTY;
         }
-        this.mapper = mapper;
+        this.stateMapper = stateMapper;
     }
 
     public void setPasteAir(boolean pasteAir) {
@@ -116,7 +116,7 @@ public class ClipboardOptions {
         this.playerVerticalFacing = Facing.verticalFacing(player);
     }
 
-    public Transform createTransform() {
+    public VolumeMapper createMapper() {
         int angle = 0;
         boolean flipX = this.flipX;
         boolean flipY = this.flipY;
@@ -146,6 +146,6 @@ public class ClipboardOptions {
             flipY = RANDOM.nextBoolean();
         }
 
-        return new Transform(angle, flipX, flipY, flipZ, mapper);
+        return new VolumeMapper(angle, flipX, flipY, flipZ, stateMapper);
     }
 }

@@ -21,9 +21,9 @@ import java.util.Optional;
  */
 public class Commands {
 
+    @Permission
     @Command(alias = "copy")
-    @Permission("copypasta.copy")
-    @Description("Set your copy  wand to the current item")
+    @Description("Set your copy wand to the current item")
     public void copy(@Src Player player) {
         Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
         PlayerData data = CopyPasta.getInstance().getData(player);
@@ -42,7 +42,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.range")
+    @Permission
     @Command(alias = "range", parent = "copy")
     @Description("Set the range of your copy wand")
     public void range(@Src Player player, @Arg("range") int range) {
@@ -53,7 +53,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.reset")
+    @Permission
     @Command(alias = "reset", parent = "copy")
     @Description("Clear your clipboard, history, selection and wand")
     public void reset(@Src Player player) {
@@ -61,7 +61,7 @@ public class Commands {
         CopyPasta.getInstance().dropData(player);
     }
 
-    @Permission("copypasta.copy.air")
+    @Permission
     @Command(alias = "air", parent = "copy")
     @Description("Toggle pasting of air blocks for your clipboard")
     public void pasteAir(@Src Player player) {
@@ -72,7 +72,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.rotate")
+    @Permission
     @Command(alias = "rotate", parent = "copy auto")
     @Description("Toggle auto-rotation of your clipboard")
     public void autoRotate(@Src Player player) {
@@ -83,7 +83,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.flip")
+    @Permission
     @Command(alias = "flip", parent = "copy auto")
     @Description("Toggle the auto-flipping of your clipboard (when looking up/down)")
     public void autoFlip(@Src Player player) {
@@ -94,7 +94,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.flip")
+    @Permission
     @Command(alias = "flip", parent = "copy")
     @Description("Toggle flipping of your clipboard in the direction you are looking")
     public void flip(@Src Player player) {
@@ -114,7 +114,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.flip")
+    @Permission
     @Command(alias = "flip", parent = "copy random")
     @Description("Toggle random flipping of your clipboard for each paste")
     public void randomFlip(@Src Player player) {
@@ -131,7 +131,7 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.rotate")
+    @Permission
     @Command(alias = "rotate", parent = "copy random")
     @Description("Toggle random rotation of your clipboard for each paste")
     public void randomRotate(@Src Player player) {
@@ -142,25 +142,25 @@ public class Commands {
         }
     }
 
-    @Permission("copypasta.copy.remap")
+    @Permission
     @Command(alias = "remap", parent = "copy")
     @Description("Set the blocks that should be replaced during each paste")
     public void remap(@Src Player player) {
         remap(player, "variant");
     }
 
-    @Permission("copypasta.copy.remap")
+    @Permission
     @Command(alias = "remap", parent = "copy")
     @Description("Set the blocks that should be replaced during each paste")
     public void remap(@Src Player player, @Arg("traits") String... traits) {
         StateMapper.showMenu(player, traits);
     }
 
-    @Permission("copypasta.copy.remap")
+    @Permission
     @Command(alias = "none", parent = "copy remap")
     @Description("Set the blocks that should be replaced during each paste")
     public void remapNone(@Src Player player) {
-        CopyPasta.getInstance().getData(player).ensureOptions().setMapper(null);
+        CopyPasta.getInstance().getData(player).ensureOptions().setStateMapper(null);
         Fmt.info("Cleared map re-mappers").tell(player);
     }
 }

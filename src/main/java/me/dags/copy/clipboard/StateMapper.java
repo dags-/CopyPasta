@@ -167,7 +167,7 @@ public class StateMapper implements BlockVolumeMapper {
             }
 
             PlayerData data = CopyPasta.getInstance().getData(p);
-            data.ensureOptions().setMapper(mapper.build());
+            data.ensureOptions().setStateMapper(mapper.build());
             fmt.tell(p);
         });
 

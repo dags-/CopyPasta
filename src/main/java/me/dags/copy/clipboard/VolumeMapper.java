@@ -9,12 +9,13 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
+import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class Transform {
+public class VolumeMapper {
 
     private final int angle;
     private final double radians;
@@ -23,7 +24,7 @@ public class Transform {
     private final boolean flipZ;
     private final StateMapper mapper;
 
-    Transform(int angle, boolean x, boolean y, boolean z, StateMapper mapper) {
+    VolumeMapper(int angle, boolean x, boolean y, boolean z, StateMapper mapper) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
@@ -37,17 +38,18 @@ public class Transform {
     }
 
     public Vector3i volumeOffset(BlockVolume volume) {
-        Vector3i pos1 = apply(volume.getBlockMin());
-        Vector3i pos2 = apply(volume.getBlockMax());
+        Vector3i pos1 = transformPosition(volume.getBlockMin());
+        Vector3i pos2 = transformPosition(volume.getBlockMax());
         return pos1.min(pos2);
     }
 
-    public BlockVolume apply(BlockVolume source, Cause cause) {
-        Vector3i pos1 = apply(source.getBlockMin());
-        Vector3i pos2 = apply(source.getBlockMax());
+    public ImmutableBlockVolume map(BlockVolume source, Cause cause) {
+        Vector3i pos1 = transformPosition(source.getBlockMin());
+        Vector3i pos2 = transformPosition(source.getBlockMax());
         Vector3i min = pos1.min(pos2);
         Vector3i max = pos1.max(pos2);
         Vector3i size = max.sub(min).add(Vector3i.ONE);
+
         MutableBlockVolume buffer = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
 
         // can't use map-worker off the main thread!
@@ -109,7 +111,7 @@ public class Transform {
         }
     }
 
-    public Vector3i apply(Vector3i pos) {
+    public Vector3i transformPosition(Vector3i pos) {
         int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 
         if (angle != 0) {
@@ -141,8 +143,8 @@ public class Transform {
         @Override
         public void run() {
             try {
-                BlockVolume transformed = apply(source, cause);
-                callback.onSuccess(transformed);
+                BlockVolume result = map(source, cause);
+                callback.onSuccess(result);
             } catch (Exception e) {
                 callback.onFailure(e);
             }
