@@ -35,7 +35,7 @@ public class Selector {
         pos1 = Vector3i.ZERO;
         pos2 = Vector3i.ZERO;
         Fmt.subdued("Reset clipboard").tell(player);
-        CopyPasta.getInstance().getData(player).setClipboard(null);
+        CopyPasta.getInstance().ensureData(player).setClipboard(null);
     }
 
     public void pos(Player player, Vector3i pos) {
@@ -54,7 +54,7 @@ public class Selector {
                 Vector3i max = pos1.max(pos2);
 
                 Clipboard clipboard = Clipboard.of(player, min, max, pos);
-                CopyPasta.getInstance().getData(player).setClipboard(clipboard);
+                CopyPasta.getInstance().ensureData(player).setClipboard(clipboard);
                 Fmt.info("Copied ").stress(size).info(" blocks").tell(player);
             } else {
                 Fmt.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);

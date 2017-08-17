@@ -5,9 +5,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
-import me.dags.copy.block.Facing;
 import me.dags.copy.operation.PasteOperation;
 import me.dags.copy.operation.UndoOperation;
+import me.dags.copy.property.Facing;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -42,7 +42,7 @@ public class Clipboard {
     }
 
     public void paste(Player player, Vector3i pos, Cause cause) {
-        PlayerData data = CopyPasta.getInstance().getData(player);
+        PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
             Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
@@ -65,7 +65,7 @@ public class Clipboard {
     }
 
     public void undo(Player player) {
-        PlayerData data = CopyPasta.getInstance().getData(player);
+        PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
             Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
@@ -105,8 +105,8 @@ public class Clipboard {
 
     public static Clipboard of(Player player, Vector3i min, Vector3i max, Vector3i origin) {
         Vector3i offset = min.sub(origin);
-        Facing verticalFacing = Facing.verticalFacing(player);
-        Facing horizontalFacing = Facing.horizontalFacing(player);
+        Facing verticalFacing = Facing.getVertical(player);
+        Facing horizontalFacing = Facing.getHorizontal(player);
         BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView().getImmutableBlockCopy();
         return new Clipboard(backing, offset, horizontalFacing, verticalFacing);
     }

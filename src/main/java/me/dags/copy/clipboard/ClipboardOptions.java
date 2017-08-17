@@ -1,10 +1,14 @@
 package me.dags.copy.clipboard;
 
-import me.dags.copy.block.Facing;
+import com.google.common.collect.ImmutableList;
+import me.dags.copy.Mappers;
+import me.dags.copy.property.Axis;
+import me.dags.copy.property.Facing;
+import me.dags.copy.state.State;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -27,7 +31,7 @@ public class ClipboardOptions {
     private boolean randomRotate = false;
     private boolean randomFlipH = false;
     private boolean randomFlipV = false;
-    private ReMapper mapper = null;
+    private Collection<State.Mapper> mappers = new LinkedList<>();
 
     public boolean pasteAir() {
         return pasteAir;
@@ -63,10 +67,6 @@ public class ClipboardOptions {
 
     public boolean randomFlipV() {
         return randomFlipV;
-    }
-
-    public void setMapper(ReMapper mapper) {
-        this.mapper = mapper;
     }
 
     public void setPasteAir(boolean pasteAir) {
@@ -111,8 +111,16 @@ public class ClipboardOptions {
     }
 
     public void setPlayerFacing(Player player) {
-        this.playerHorizontalFacing = Facing.horizontalFacing(player);
-        this.playerVerticalFacing = Facing.verticalFacing(player);
+        this.playerHorizontalFacing = Facing.getHorizontal(player);
+        this.playerVerticalFacing = Facing.getVertical(player);
+    }
+
+    public void addMapper(State.Mapper mapper) {
+        mappers.add(mapper);
+    }
+
+    public void clearMappers() {
+        mappers = new LinkedList<>();
     }
 
     public Transform createTransform() {
@@ -120,12 +128,9 @@ public class ClipboardOptions {
         boolean flipX = this.flipX;
         boolean flipY = this.flipY;
         boolean flipZ = this.flipZ;
-        Collection<ReMapper> mappers = Collections.emptyList();
 
         if (autoRotate) {
-            int from = clipboardFacingH.getAngle();
-            int to = playerHorizontalFacing.getAngle();
-            angle = Facing.clampAngle(to - from);
+            angle = clipboardFacingH.angle(playerHorizontalFacing, Axis.y);
         }
 
         if (randomRotate) {
@@ -133,7 +138,7 @@ public class ClipboardOptions {
             angle = turns * 90;
         }
 
-        if (autoFlip && playerVerticalFacing != Facing.horizontal && clipboardFacingV != Facing.horizontal) {
+        if (autoFlip && playerVerticalFacing != Facing.none && clipboardFacingV != Facing.none) {
             flipY = playerVerticalFacing != clipboardFacingV;
         }
 
@@ -146,10 +151,25 @@ public class ClipboardOptions {
             flipY = RANDOM.nextBoolean();
         }
 
-        if (this.mapper != null) {
-            mappers = Collections.singletonList(mapper);
+        ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
+        mappers.addAll(this.mappers);
+
+        if (angle != 0) {
+            mappers.add(Mappers.getRotationY(angle));
         }
 
-        return new Transform(angle, flipX, flipY, flipZ, mappers);
+        if (flipX) {
+            mappers.add(Mappers.getFlipX());
+        }
+
+        if (flipY) {
+            mappers.add(Mappers.getFlipY());
+        }
+
+        if (flipZ) {
+            mappers.add(Mappers.getFlipZ());
+        }
+
+        return new Transform(angle, flipX, flipY, flipZ, mappers.build());
     }
 }

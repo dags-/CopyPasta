@@ -28,14 +28,14 @@ public class EventListener {
         if (player.hasPermission("copypasta.use")) {
             Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
             if (inHand.isPresent()) {
-                Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
+                Optional<ItemType> wand = CopyPasta.getInstance().ensureData(player).getWand();
                 if (wand.isPresent() && wand.get() == inHand.get()) {
                     event.setCancelled(true);
 
-                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
+                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().ensureData(player).getClipboard();
                     if (clipBoard.isPresent()) {
                         if (player.get(Keys.IS_SNEAKING).orElse(false)) {
-                            Optional<Selector> selector = CopyPasta.getInstance().getData(player).getSelector();
+                            Optional<Selector> selector = CopyPasta.getInstance().ensureData(player).getSelector();
                             selector.ifPresent(s -> s.reset(player));
                         } else {
                             clipBoard.get().undo(player);
@@ -52,13 +52,18 @@ public class EventListener {
             Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
 
             if (inHand.isPresent()) {
-                Optional<ItemType> wand = CopyPasta.getInstance().getData(player).getWand();
+                Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
 
+                if (!data.isPresent() || data.get().isRateLimited()) {
+                    return;
+                }
+
+                Optional<ItemType> wand = data.flatMap(PlayerData::getWand);
                 if (wand.isPresent() && wand.get() == inHand.get()) {
                     event.setCancelled(true);
 
-                    Selector selector = CopyPasta.getInstance().getData(player).ensureSelector();
-                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().getData(player).getClipboard();
+                    Selector selector = data.get().ensureSelector();
+                    Optional<Clipboard> clipBoard = data.get().getClipboard();
                     Vector3i target = targetPosition(player, selector.getRange());
 
                     if (clipBoard.isPresent()) {

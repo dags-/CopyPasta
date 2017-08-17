@@ -45,7 +45,7 @@ public class UndoOperation implements Operation {
         }
 
         Sponge.getServer().getPlayer(owner).ifPresent(player -> {
-            PlayerData data = CopyPasta.getInstance().getData(player);
+            PlayerData data = CopyPasta.getInstance().ensureData(player);
             data.getClipboard().ifPresent(clipboard -> {
                 int size = clipboard.getHistory().getSize();
                 int max = clipboard.getHistory().getMax();

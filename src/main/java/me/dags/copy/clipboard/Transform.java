@@ -2,16 +2,17 @@ package me.dags.copy.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
-import me.dags.copy.block.Axis;
-import me.dags.copy.block.TraitUtils;
+import me.dags.copy.state.State;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
@@ -23,9 +24,9 @@ public class Transform {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
-    private final Collection<ReMapper> mappers;
+    private final Collection<State.Mapper> mappers;
 
-    Transform(int angle, boolean x, boolean y, boolean z, Collection<ReMapper> mappers) {
+    Transform(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
@@ -67,12 +68,12 @@ public class Transform {
     private void visit(BlockVolume src, MutableBlockVolume buffer, Vector3i offset, int x, int y, int z, Cause cause) {
         BlockState state = src.getBlock(x, y, z);
 
-        for (ReMapper mapper : mappers) {
-            state = mapper.map(state);
-        }
-
         if (state.getType() == BlockTypes.AIR) {
             return;
+        }
+
+        for (State.Mapper mapper : mappers) {
+            state = mapper.map(state);
         }
 
         if (angle != 0) {
@@ -80,33 +81,19 @@ public class Transform {
             int rz = rotateY(z, x, radians, 1);
             x = rx - offset.getX();
             z = rz - offset.getZ();
-            state = TraitUtils.rotateFacing(state, Axis.y, angle);
-            state = TraitUtils.rotateAxis(state, Axis.y, angle);
         }
 
         if (flipY) {
             y = buffer.getBlockMax().getY() - y;
-
-            int adjustment = TraitUtils.flipDoorY(state);
-            y += adjustment;
-
-            // not a door, so flip normally
-            if (adjustment == 0) {
-                state = TraitUtils.flipHalf(state, Axis.y);
-                state = TraitUtils.flipFacing(state, Axis.y);
-            }
+            y += getFlipYOffset(state);
         }
 
         if (flipX) {
             x = buffer.getBlockMax().getX() - x;
-            state = TraitUtils.flipFacing(state, Axis.x);
-            state = TraitUtils.flipHinge(state, Axis.x);
         }
 
         if (flipZ) {
             z = buffer.getBlockMax().getZ() - z;
-            state = TraitUtils.flipFacing(state, Axis.z);
-            state = TraitUtils.flipHinge(state, Axis.z);
         }
 
         if (buffer.containsBlock(x, y, z)) {
@@ -129,6 +116,23 @@ public class Transform {
 
     private static int rotateY(int a, int b, double rads, int sign) {
         return (int) Math.round(a * Math.cos(rads) + (sign * b) * Math.sin(rads));
+    }
+
+    private static int getFlipYOffset(BlockState state) {
+        Optional<BlockTrait<?>> trait = state.getTrait("half");
+        if (trait.isPresent()) {
+            Optional<?> value = state.getTraitValue(trait.get());
+            if (value.isPresent()) {
+                String half = value.get().toString();
+                if (half.equals("upper")) {
+                    return 1;
+                }
+                if (half.equals("lower")) {
+                    return -1;
+                }
+            }
+        }
+        return 0;
     }
 
     private class Task implements Runnable {

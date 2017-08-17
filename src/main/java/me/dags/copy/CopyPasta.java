@@ -51,7 +51,7 @@ public class CopyPasta {
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
 
         reload(null);
-        CommandBus.create().register(Commands.class).submit(this);
+        CommandBus.create(this).register(Commands.class).submit();
     }
 
     @Listener
@@ -81,8 +81,12 @@ public class CopyPasta {
         return operationManager;
     }
 
-    public PlayerData getData(Player player) {
+    public PlayerData ensureData(Player player) {
         return data.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData());
+    }
+
+    public Optional<PlayerData> getData(Player player) {
+        return getData(player.getUniqueId());
     }
 
     public Optional<PlayerData> getData(UUID uuid) {
