@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(id = "copypasta", name = "CopyPasta", version = "0.3", description = ".")
+@Plugin(id = "copypasta", name = "CopyPasta", version = "0.2", description = ".")
 public class CopyPasta {
 
     public static final ChatType CHAT_TYPE = ChatTypes.CHAT;
@@ -49,7 +49,6 @@ public class CopyPasta {
     @Listener
     public void init(GameInitializationEvent event) {
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
-
         reload(null);
         CommandBus.create(this).register(Commands.class).submit();
     }

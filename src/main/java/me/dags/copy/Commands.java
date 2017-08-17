@@ -40,7 +40,7 @@ public class Commands {
     @Permission
     @Command(alias = "range", parent = "copy")
     @Description("Set the range of your copy wand")
-    public void range(@Src Player player, @One("range") int range) {
+    public void range(@Src Player player, @Arg("range") int range) {
         Optional<Selector> selector = CopyPasta.getInstance().ensureData(player).getSelector();
         if (selector.isPresent()) {
             selector.get().setRange(Math.max(1, Math.min(range, 25)));
@@ -140,7 +140,7 @@ public class Commands {
     @Permission
     @Command(alias = {"map", "replace"}, parent = "copy")
     @Description("Remap matching blocks/variants")
-    public void replace(@Src Player player, String match, String replace) {
+    public void replace(@Src Player player, @Arg("match") String match, @Arg("replace") String replace) {
         Optional<ClipboardOptions> options = CopyPasta.getInstance().ensureData(player).getOptions();
         if (options.isPresent()) {
             State.Mapper mapper = State.mapper(match, replace);
