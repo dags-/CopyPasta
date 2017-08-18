@@ -1,7 +1,7 @@
 package me.dags.copy;
 
-import me.dags.copy.property.Axis;
-import me.dags.copy.state.State;
+import me.dags.copy.block.property.Axis;
+import me.dags.copy.block.state.State;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,4 +1,4 @@
-package me.dags.copy.state;
+package me.dags.copy.block.state;
 
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.Sponge;

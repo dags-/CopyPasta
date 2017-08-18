@@ -1,4 +1,4 @@
-package me.dags.copy.state;
+package me.dags.copy.block.state;
 
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
@@ -30,7 +30,7 @@ class BlockAny implements BlockType {
 
     @Override
     public String getId() {
-        return "toolkit:any";
+        return "copy:any";
     }
 
     @Override

@@ -2,7 +2,7 @@ package me.dags.copy.operation;
 
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
-import me.dags.copy.PlayerData;
+import me.dags.copy.brush.History;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -16,10 +16,12 @@ import java.util.UUID;
 public class UndoOperation implements Operation {
 
     private final List<BlockSnapshot> snapshots;
+    private final History history;
     private final UUID owner;
 
-    public UndoOperation(List<BlockSnapshot> snapshots, UUID owner) {
+    public UndoOperation(List<BlockSnapshot> snapshots, UUID owner, History history) {
         this.snapshots = snapshots;
+        this.history = history;
         this.owner = owner;
     }
 
@@ -45,12 +47,9 @@ public class UndoOperation implements Operation {
         }
 
         Sponge.getServer().getPlayer(owner).ifPresent(player -> {
-            PlayerData data = CopyPasta.getInstance().ensureData(player);
-            data.getClipboard().ifPresent(clipboard -> {
-                int size = clipboard.getHistory().getSize();
-                int max = clipboard.getHistory().getMax();
-                Fmt.subdued("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
-            });
+            int size = history.getSize();
+            int max = history.getMax();
+            Fmt.subdued("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
         });
     }
 

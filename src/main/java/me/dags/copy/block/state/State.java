@@ -1,9 +1,9 @@
-package me.dags.copy.state;
+package me.dags.copy.block.state;
 
-import me.dags.copy.property.Axis;
-import me.dags.copy.property.Facing;
-import me.dags.copy.property.Half;
-import me.dags.copy.property.Property;
+import me.dags.copy.block.property.Axis;
+import me.dags.copy.block.property.Facing;
+import me.dags.copy.block.property.Half;
+import me.dags.copy.block.property.Property;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;

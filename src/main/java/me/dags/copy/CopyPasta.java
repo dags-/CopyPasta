@@ -2,13 +2,19 @@ package me.dags.copy;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
+import me.dags.copy.command.BrushCommands;
 import me.dags.copy.operation.OperationManager;
+import me.dags.copy.registry.brush.BrushRegistry;
+import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.registry.option.BrushOption;
+import me.dags.copy.registry.option.BrushOptionRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -47,10 +53,16 @@ public class CopyPasta {
     }
 
     @Listener
+    public void pre(GamePreInitializationEvent event) {
+        Sponge.getRegistry().registerModule(BrushType.class, BrushRegistry.getInstance());
+        Sponge.getRegistry().registerModule(BrushOption.class, BrushOptionRegistry.getInstance());
+    }
+
+    @Listener
     public void init(GameInitializationEvent event) {
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
         reload(null);
-        CommandBus.create(this).register(Commands.class).submit();
+        CommandBus.create(this).register(BrushCommands.class).submit();
     }
 
     @Listener

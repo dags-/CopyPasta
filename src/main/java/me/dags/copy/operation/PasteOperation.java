@@ -3,13 +3,15 @@ package me.dags.copy.operation;
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
-import me.dags.copy.clipboard.History;
+import me.dags.copy.block.LocatableBlockChange;
+import me.dags.copy.brush.History;
+import me.dags.copy.event.BrushEvent;
+import me.dags.copy.event.BrushPlaceEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
@@ -92,7 +94,7 @@ public class PasteOperation implements Operation {
             return;
         }
 
-        ChangeBlockEvent.Place place = new TestPlaceEvent(transactions, world, cause);
+        BrushEvent place = new BrushPlaceEvent(transactions, world, cause);
         Sponge.getEventManager().post(place);
 
         if (place.isCancelled()) {

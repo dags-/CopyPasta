@@ -1,6 +1,6 @@
-package me.dags.copy.property;
+package me.dags.copy.block.property;
 
-import me.dags.copy.state.State;
+import me.dags.copy.block.state.State;
 
 import java.util.Collection;
 

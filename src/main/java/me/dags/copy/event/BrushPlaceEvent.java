@@ -1,10 +1,10 @@
-package me.dags.copy.operation;
+package me.dags.copy.event;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import me.dags.copy.block.LocatableBlockChange;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.Location;
@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 /**
  * @author dags <dags@dags.me>
  */
-public class TestPlaceEvent extends AbstractEvent implements ChangeBlockEvent.Place {
+public class BrushPlaceEvent extends AbstractEvent implements BrushEvent {
 
     private final World world;
     private final Cause cause;
@@ -26,7 +26,7 @@ public class TestPlaceEvent extends AbstractEvent implements ChangeBlockEvent.Pl
     private boolean cancelled = false;
     private List<Transaction<BlockSnapshot>> transactions;
 
-    public TestPlaceEvent(List<LocatableBlockChange> changes, World world, Cause cause) {
+    public BrushPlaceEvent(List<LocatableBlockChange> changes, World world, Cause cause) {
         this.changes = changes;
         this.world = world;
         this.cause = cause;

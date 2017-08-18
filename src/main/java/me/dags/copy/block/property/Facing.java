@@ -1,4 +1,4 @@
-package me.dags.copy.property;
+package me.dags.copy.block.property;
 
 import com.flowpowered.math.imaginary.Quaterniond;
 import com.flowpowered.math.vector.Vector3d;

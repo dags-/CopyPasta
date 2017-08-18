@@ -1,4 +1,4 @@
-package me.dags.copy.operation;
+package me.dags.copy.block;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;

@@ -1,13 +1,15 @@
-package me.dags.copy.clipboard;
+package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
+import me.dags.copy.brush.History;
+import me.dags.copy.operation.VolumeMapper;
 import me.dags.copy.operation.PasteOperation;
 import me.dags.copy.operation.UndoOperation;
-import me.dags.copy.property.Facing;
+import me.dags.copy.block.property.Facing;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -37,11 +39,19 @@ public class Clipboard {
         this.horizontalFacing = horizontalFacing;
     }
 
+    public Facing getHorizontalFacing() {
+        return horizontalFacing;
+    }
+
+    public Facing getVerticalFacing() {
+        return verticalFacing;
+    }
+
     public History getHistory() {
         return history;
     }
 
-    public void paste(Player player, Vector3i pos, Cause cause) {
+    public void paste(Player player, Vector3i pos, VolumeMapper transform, boolean air, Cause cause) {
         PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
@@ -51,15 +61,10 @@ public class Clipboard {
 
         data.setOperating(true);
 
-        ClipboardOptions options = data.ensureOptions();
-        options.setClipboardFacingH(horizontalFacing, verticalFacing);
-        options.setPlayerFacing(player);
-
-        Transform transform = options.createTransform();
         Vector3i volumeOffset = transform.volumeOffset(source);
         Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);
 
-        FutureCallback<BlockVolume> callback = callback(player, pastePosition, options.pasteAir(), cause);
+        FutureCallback<BlockVolume> callback = callback(player, pastePosition, air, cause);
         Runnable asyncTransform = transform.createTask(source, cause, callback);
         CopyPasta.getInstance().submitAsync(asyncTransform);
     }
@@ -75,7 +80,7 @@ public class Clipboard {
         if (history.hasNext()) {
             data.setOperating(true);
             List<BlockSnapshot> record = history.popRecord();
-            UndoOperation operation = new UndoOperation(record, player.getUniqueId());
+            UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
             Fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);

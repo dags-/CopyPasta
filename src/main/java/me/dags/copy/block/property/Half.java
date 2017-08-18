@@ -1,4 +1,4 @@
-package me.dags.copy.property;
+package me.dags.copy.block.property;
 
 /**
  * @author dags <dags@dags.me>

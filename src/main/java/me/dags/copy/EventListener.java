@@ -1,9 +1,7 @@
 package me.dags.copy;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.copy.clipboard.Clipboard;
-import me.dags.copy.clipboard.Selector;
-import org.spongepowered.api.data.key.Keys;
+import me.dags.copy.brush.Brush;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -11,6 +9,7 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
@@ -25,54 +24,23 @@ public class EventListener {
 
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
-        if (player.hasPermission("copypasta.use")) {
-            Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
-            if (inHand.isPresent()) {
-                Optional<ItemType> wand = CopyPasta.getInstance().ensureData(player).getWand();
-                if (wand.isPresent() && wand.get() == inHand.get()) {
-                    event.setCancelled(true);
-
-                    Optional<Clipboard> clipBoard = CopyPasta.getInstance().ensureData(player).getClipboard();
-                    if (clipBoard.isPresent()) {
-                        if (player.get(Keys.IS_SNEAKING).orElse(false)) {
-                            Optional<Selector> selector = CopyPasta.getInstance().ensureData(player).getSelector();
-                            selector.ifPresent(s -> s.reset(player));
-                        } else {
-                            clipBoard.get().undo(player);
-                        }
-                    }
-                }
-            }
+        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
+        Optional<Brush> brush = CopyPasta.getInstance().getData(player).flatMap(data -> data.getBrush(item));
+        if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
+            Vector3i target = targetPosition(player, brush.get().getRange());
+            brush.get().primary(player, target);
+            event.setCancelled(true);
         }
     }
 
     @Listener
     public void interactSecondary(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
-        if (player.hasPermission("copypasta.use")) {
-            Optional<ItemType> inHand = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
-
-            if (inHand.isPresent()) {
-                Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
-
-                if (!data.isPresent() || data.get().isRateLimited()) {
-                    return;
-                }
-
-                Optional<ItemType> wand = data.flatMap(PlayerData::getWand);
-                if (wand.isPresent() && wand.get() == inHand.get()) {
-                    event.setCancelled(true);
-
-                    Selector selector = data.get().ensureSelector();
-                    Optional<Clipboard> clipBoard = data.get().getClipboard();
-                    Vector3i target = targetPosition(player, selector.getRange());
-
-                    if (clipBoard.isPresent()) {
-                        clipBoard.get().paste(player, target, CopyPasta.getInstance().getCause(player));
-                    } else {
-                        selector.pos(player, target);
-                    }
-                }
-            }
+        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
+        Optional<Brush> brush = CopyPasta.getInstance().getData(player).flatMap(data -> data.getBrush(item));
+        if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
+            Vector3i target = targetPosition(player, brush.get().getRange());
+            brush.get().secondary(player, target);
+            event.setCancelled(true);
         }
     }
 

@@ -1,4 +1,4 @@
-package me.dags.copy.clipboard;
+package me.dags.copy.brush;
 
 import org.spongepowered.api.block.BlockSnapshot;
 

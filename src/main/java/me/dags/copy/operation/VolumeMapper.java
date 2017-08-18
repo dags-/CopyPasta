@@ -1,8 +1,8 @@
-package me.dags.copy.clipboard;
+package me.dags.copy.operation;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
-import me.dags.copy.state.State;
+import me.dags.copy.block.state.State;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * @author dags <dags@dags.me>
  */
-public class Transform {
+public class VolumeMapper {
 
     private final int angle;
     private final double radians;
@@ -26,7 +26,7 @@ public class Transform {
     private final boolean flipZ;
     private final Collection<State.Mapper> mappers;
 
-    Transform(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
+    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
