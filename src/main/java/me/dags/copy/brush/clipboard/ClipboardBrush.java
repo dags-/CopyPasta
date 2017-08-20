@@ -4,15 +4,18 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.Mappers;
-import me.dags.copy.brush.AbstractBrush;
-import me.dags.copy.registry.option.BrushOption;
-import me.dags.copy.registry.option.BrushOptionRegistry;
-import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.block.BlockUtils;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
-import me.dags.copy.brush.Action;
 import me.dags.copy.block.state.State;
-import org.spongepowered.api.data.key.Keys;
+import me.dags.copy.brush.AbstractBrush;
+import me.dags.copy.brush.Action;
+import me.dags.copy.brush.BrushId;
+import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.registry.brush.BrushRegistry;
+import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.registry.option.BrushOption;
+import me.dags.copy.registry.option.BrushOptionRegistry;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collections;
@@ -23,6 +26,7 @@ import java.util.Random;
 /**
  * @author dags <dags@dags.me>
  */
+@BrushId({"clipboard", "cb"})
 public class ClipboardBrush extends AbstractBrush {
 
     private static final Random RANDOM = new Random();
@@ -36,19 +40,22 @@ public class ClipboardBrush extends AbstractBrush {
     public static final BrushOption RANDOM_FLIPH = BrushOption.of("clipboard.fliph.random");
     public static final BrushOption RANDOM_FLIPV = BrushOption.of("clipboard.flipv.random");
     public static final BrushOption AIR = BrushOption.of("clipboard.air");
+    public static final BrushOption SOLID_FOUNDATION = BrushOption.of("clipboard.foundation");
     public static final BrushOption MAPPERS = BrushOption.of("clipboard.mappers");
 
     static {
-        BrushOptionRegistry.getInstance().register(FLIPX);
-        BrushOptionRegistry.getInstance().register(FLIPY);
-        BrushOptionRegistry.getInstance().register(FLIPZ);
-        BrushOptionRegistry.getInstance().register(AUTO_ROTATE);
-        BrushOptionRegistry.getInstance().register(RANDOM_ROTATE);
-        BrushOptionRegistry.getInstance().register(AUTO_FLIP);
-        BrushOptionRegistry.getInstance().register(RANDOM_FLIPH);
-        BrushOptionRegistry.getInstance().register(RANDOM_FLIPV);
-        BrushOptionRegistry.getInstance().register(AIR);
-        BrushOptionRegistry.getInstance().register(MAPPERS);
+        BrushType type = BrushRegistry.forClass(ClipboardBrush.class);
+        BrushOptionRegistry.getInstance().register(type, FLIPX);
+        BrushOptionRegistry.getInstance().register(type, FLIPY);
+        BrushOptionRegistry.getInstance().register(type, FLIPZ);
+        BrushOptionRegistry.getInstance().register(type, AUTO_ROTATE);
+        BrushOptionRegistry.getInstance().register(type, RANDOM_ROTATE);
+        BrushOptionRegistry.getInstance().register(type, AUTO_FLIP);
+        BrushOptionRegistry.getInstance().register(type, RANDOM_FLIPH);
+        BrushOptionRegistry.getInstance().register(type, RANDOM_FLIPV);
+        BrushOptionRegistry.getInstance().register(type, AIR);
+        BrushOptionRegistry.getInstance().register(type, MAPPERS);
+        BrushOptionRegistry.getInstance().register(type, SOLID_FOUNDATION);
     }
 
     private SelectorBrush selector = new SelectorBrush(this);
@@ -63,19 +70,23 @@ public class ClipboardBrush extends AbstractBrush {
     public void primary(Player player, Vector3i pos, Action action) {
         Optional<Clipboard> clipBoard = getClipboard();
         if (clipBoard.isPresent()) {
-            if (player.get(Keys.IS_SNEAKING).orElse(false)) {
-                selector.primary(player, pos);
-            } else {
-                clipBoard.get().undo(player);
-            }
+            clipBoard.get().undo(player);
+        } else {
+            selector.primary(player, pos);
         }
     }
 
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         Optional<Clipboard> clipBoard = getClipboard();
-
         if (clipBoard.isPresent()) {
+            if (getOption(SOLID_FOUNDATION, false)) {
+                pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
+                if (pos == Vector3i.ZERO) {
+                    return;
+                }
+            }
+
             VolumeMapper mapper = getMapper(clipBoard.get(), player);
             clipBoard.get().paste(player, pos, mapper, getOption(AIR, false), CopyPasta.getInstance().getCause(player));
         } else {
@@ -96,7 +107,7 @@ public class ClipboardBrush extends AbstractBrush {
         boolean flipY = getOption(FLIPY, false);
         boolean flipZ = getOption(FLIPZ, false);
 
-        if (getOption(AUTO_ROTATE, false)) {
+        if (getOption(AUTO_ROTATE, true)) {
             angle = clipboard.getHorizontalFacing().angle(phFacing, Axis.y);
         }
 
@@ -105,7 +116,7 @@ public class ClipboardBrush extends AbstractBrush {
             angle = turns * 90;
         }
 
-        if (getOption(AUTO_FLIP, false) && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
+        if (getOption(AUTO_FLIP, true) && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
             flipY = pvFacing != clipboard.getVerticalFacing();
         }
 

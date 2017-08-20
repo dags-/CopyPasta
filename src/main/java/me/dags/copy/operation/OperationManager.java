@@ -114,6 +114,7 @@ public class OperationManager implements Runnable {
                 operation.apply();
             } catch (Throwable t) {
                 t.printStackTrace();
+            } finally {
                 operation.dispose();
             }
         }

@@ -2,7 +2,6 @@ package me.dags.copy.event;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import me.dags.copy.block.LocatableBlockChange;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.cause.Cause;

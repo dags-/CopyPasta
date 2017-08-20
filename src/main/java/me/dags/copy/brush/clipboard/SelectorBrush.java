@@ -1,10 +1,11 @@
 package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.copy.brush.AbstractBrush;
-import me.dags.copy.registry.option.BrushOptions;
-import me.dags.copy.brush.Action;
 import me.dags.commandbus.fmt.Fmt;
+import me.dags.commandbus.fmt.Formatter;
+import me.dags.copy.brush.AbstractBrush;
+import me.dags.copy.brush.Action;
+import me.dags.copy.registry.option.BrushOptions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -50,7 +51,7 @@ public class SelectorBrush extends AbstractBrush {
             reset(player);
         } else {
             pos1 = pos;
-            Fmt.info("Set pos1 %s", pos).tell(player);
+            tellPos(player, "pos1", pos);
         }
     }
 
@@ -81,9 +82,18 @@ public class SelectorBrush extends AbstractBrush {
 
         } else {
             pos2 = pos;
-            int size = getSize(pos1, pos2);
-            Fmt.info("Set pos2 ").stress(pos).info(" (%s blocks)", size).tell(player);
+            tellPos(player, "pos2", pos);
         }
+    }
+
+    private void tellPos(Player player, String posName, Vector3i pos) {
+        Formatter fmt = Fmt.info("Set %s ", posName).stress(pos);
+
+        if (pos1 != Vector3i.ZERO && pos2 != Vector3i.ZERO) {
+            fmt.info(" (%s blocks)", getSize(pos1, pos2));
+        }
+
+        fmt.tell(player);
     }
 
     private static int getSize(Vector3i pos1, Vector3i pos2) {

@@ -1,5 +1,6 @@
 package me.dags.copy;
 
+import com.google.common.base.Stopwatch;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.registry.brush.BrushType;
 import org.spongepowered.api.item.ItemType;
@@ -7,6 +8,7 @@ import org.spongepowered.api.item.ItemType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dags <dags@dags.me>
@@ -17,6 +19,15 @@ public class PlayerData {
     private final Map<Class<?>, ItemType> wands = new HashMap<>();
 
     private boolean operating = false;
+    private Stopwatch cooldown = Stopwatch.createStarted();
+
+    public boolean isCoolingDown() {
+        if (cooldown.elapsed(TimeUnit.MILLISECONDS) > 250) {
+            cooldown.reset().start();
+            return false;
+        }
+        return true;
+    }
 
     public boolean isOperating() {
         return operating;

@@ -1,5 +1,6 @@
 package me.dags.copy.command;
 
+import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Src;
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
@@ -7,6 +8,7 @@ import me.dags.copy.PlayerData;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.registry.brush.BrushType;
 import me.dags.copy.registry.option.BrushOption;
+import me.dags.copy.registry.option.BrushOptionRegistry;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -36,6 +38,7 @@ public class BrushCommands {
         return brush;
     }
 
+    @Command(alias = "br")
     public void setBrush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
         PlayerData data = CopyPasta.getInstance().ensureData(player);
@@ -52,6 +55,7 @@ public class BrushCommands {
         }
     }
 
+    @Command(alias = "range", parent = "br")
     public void setRange(@Src Player player, int range) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
@@ -61,10 +65,12 @@ public class BrushCommands {
         }
     }
 
+    @Command(alias = "toggle", parent = "br")
     public void toggleOption(@Src Player player, BrushOption option) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
-            if (!brush.get().getOptions().isValid(option)) {
+            BrushType type = brush.get().getType();
+            if (!BrushOptionRegistry.getInstance().isValid(type, option)) {
                 Fmt.error("Option %s is not valid for brush %s", option.getId(), brush.get().getType().getName()).tell(player);
                 return;
             }

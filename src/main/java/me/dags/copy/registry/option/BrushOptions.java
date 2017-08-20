@@ -1,9 +1,7 @@
 package me.dags.copy.registry.option;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author dags <dags@dags.me>
@@ -11,18 +9,17 @@ import java.util.Set;
 public class BrushOptions {
 
     private final Map<String, Object> options = new HashMap<>();
-    private final Set<String> validOptions = new HashSet<>();
 
-    public void register(BrushOption option) {
-        this.validOptions.add(option.getId());
+    public <T> T get(BrushOption option, T def) {
+        return get(option.getId(), def);
     }
 
-    public boolean isValid(String option) {
-        return validOptions.contains(option);
+    public <T> T ensure(BrushOption option, T def) {
+        return ensure(option.getId(), def);
     }
 
-    public boolean isValid(BrushOption option) {
-        return isValid(option.getId());
+    public void set(BrushOption option, Object value) {
+        set(option.getId(), value);
     }
 
     @SuppressWarnings("unchecked")

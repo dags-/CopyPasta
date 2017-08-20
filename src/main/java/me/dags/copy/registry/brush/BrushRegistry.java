@@ -23,7 +23,7 @@ public class BrushRegistry implements CatalogRegistryModule<BrushType> {
     private BrushRegistry(){}
 
     public <T extends Brush> void register(Class<T> type, Supplier<T> supplier) {
-        BrushType brushType = BrushType.of(type, supplier);
+        BrushType brushType = BrushType.of(type.getSimpleName().toLowerCase(), type, supplier);
         registry.put(brushType.getId(), brushType);
         types.put(type, brushType);
     }

@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  */
 public class BrushType implements CatalogType {
 
-    public static BrushType NONE = BrushType.of(null, null);
+    public static BrushType NONE = new BrushType();
 
     private final String name;
     private final Class<? extends Brush> type;
@@ -23,8 +23,8 @@ public class BrushType implements CatalogType {
         supplier = () -> null;
     }
 
-    private BrushType(Class<? extends Brush> type, Supplier<? extends Brush> supplier) {
-        this.name = type.getSimpleName().toLowerCase();
+    private BrushType(String name, Class<? extends Brush> type, Supplier<? extends Brush> supplier) {
+        this.name = name;
         this.type = type;
         this.supplier = supplier;
     }
@@ -47,7 +47,7 @@ public class BrushType implements CatalogType {
         return name;
     }
 
-    public static <T extends Brush> BrushType of(Class<T> type, Supplier<T> supplier) {
-        return new BrushType(type, supplier);
+    public static <T extends Brush> BrushType of(String name, Class<T> type, Supplier<T> supplier) {
+        return new BrushType(name, type, supplier);
     }
 }

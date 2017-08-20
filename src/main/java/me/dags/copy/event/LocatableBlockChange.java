@@ -1,4 +1,4 @@
-package me.dags.copy.block;
+package me.dags.copy.event;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;

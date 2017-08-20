@@ -2,6 +2,7 @@ package me.dags.copy;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
+import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.command.BrushCommands;
 import me.dags.copy.operation.OperationManager;
 import me.dags.copy.registry.brush.BrushRegistry;
@@ -56,6 +57,7 @@ public class CopyPasta {
     public void pre(GamePreInitializationEvent event) {
         Sponge.getRegistry().registerModule(BrushType.class, BrushRegistry.getInstance());
         Sponge.getRegistry().registerModule(BrushOption.class, BrushOptionRegistry.getInstance());
+        BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush::new);
     }
 
     @Listener
@@ -93,7 +95,7 @@ public class CopyPasta {
     }
 
     public PlayerData ensureData(Player player) {
-        return data.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData());
+        return data.computeIfAbsent(player.getUniqueId(), k -> new PlayerData());
     }
 
     public Optional<PlayerData> getData(Player player) {

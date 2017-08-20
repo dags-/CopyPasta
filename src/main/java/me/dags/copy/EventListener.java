@@ -25,22 +25,28 @@ public class EventListener {
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-        Optional<Brush> brush = CopyPasta.getInstance().getData(player).flatMap(data -> data.getBrush(item));
-        if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
-            Vector3i target = targetPosition(player, brush.get().getRange());
-            brush.get().primary(player, target);
-            event.setCancelled(true);
+        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
+        if (data.isPresent() && !data.get().isCoolingDown()) {
+            Optional<Brush> brush = data.get().getBrush(item);
+            if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
+                Vector3i target = targetPosition(player, brush.get().getRange());
+                brush.get().primary(player, target);
+                event.setCancelled(true);
+            }
         }
     }
 
     @Listener
     public void interactSecondary(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-        Optional<Brush> brush = CopyPasta.getInstance().getData(player).flatMap(data -> data.getBrush(item));
-        if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
-            Vector3i target = targetPosition(player, brush.get().getRange());
-            brush.get().secondary(player, target);
-            event.setCancelled(true);
+        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
+        if (data.isPresent() && !data.get().isCoolingDown()) {
+            Optional<Brush> brush = data.get().getBrush(item);
+            if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
+                Vector3i target = targetPosition(player, brush.get().getRange());
+                brush.get().secondary(player, target);
+                event.setCancelled(true);
+            }
         }
     }
 
