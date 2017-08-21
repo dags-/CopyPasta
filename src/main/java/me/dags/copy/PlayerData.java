@@ -3,8 +3,14 @@ package me.dags.copy;
 import com.google.common.base.Stopwatch;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.registry.option.Options;
+import me.dags.copy.util.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.item.ItemType;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,11 +21,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class PlayerData {
 
+    private static final ConfigurationOptions options = ConfigurationOptions.defaults().setShouldCopyDefaults(true);
+
     private final Map<ItemType, Brush> brushes = new HashMap<>();
     private final Map<Class<?>, ItemType> wands = new HashMap<>();
+    private final HoconConfigurationLoader loader;
+    private final ConfigurationNode rootNode;
 
     private boolean operating = false;
     private Stopwatch cooldown = Stopwatch.createStarted();
+
+    public PlayerData(Path path) {
+        loader = HoconConfigurationLoader.builder()
+                .setDefaultOptions(options)
+                .setPath(path)
+                .build();
+
+        rootNode = Utils.getRootNode(loader);
+    }
 
     public boolean isCoolingDown() {
         if (cooldown.elapsed(TimeUnit.MILLISECONDS) > 250) {
@@ -56,9 +75,15 @@ public class PlayerData {
         return Optional.empty();
     }
 
-    public void assignBrush(Brush brush, ItemType type) {
+    public boolean resetBrush(Brush brush) {
+        ItemType item = wands.get(brush.getClass());
+        return item != null && resetBrush(brush, item);
+    }
+
+    public boolean resetBrush(Brush brush, ItemType type) {
         brushes.put(type, brush);
         wands.put(brush.getClass(), type);
+        return true;
     }
 
     public void removeBrush(ItemType type) {
@@ -73,5 +98,17 @@ public class PlayerData {
         if (item != null) {
             brushes.remove(item);
         }
+    }
+
+    public void save() {
+        Utils.writeNode(loader, rootNode);
+    }
+
+    private Options getOptions(BrushType brushType) {
+        return new Options(getNode(brushType.getId()));
+    }
+
+    private ConfigurationNode getNode(String path) {
+        return rootNode.getNode(path);
     }
 }

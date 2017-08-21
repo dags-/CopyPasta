@@ -7,8 +7,6 @@ import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.registry.brush.BrushType;
-import me.dags.copy.registry.option.BrushOption;
-import me.dags.copy.registry.option.BrushOptionRegistry;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -38,7 +36,7 @@ public class BrushCommands {
         return brush;
     }
 
-    @Command(alias = "br")
+    @Command("br <brush>")
     public void setBrush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
         PlayerData data = CopyPasta.getInstance().ensureData(player);
@@ -49,35 +47,38 @@ public class BrushCommands {
         } else {
             Optional<Brush> brush = type.create();
             if (brush.isPresent()) {
-                data.assignBrush(brush.get(), item);
+                data.resetBrush(brush.get(), item);
                 Fmt.info("Assigned %s brush to %s", type.getName(), item.getName()).tell(player);
             }
         }
     }
 
-    @Command(alias = "range", parent = "br")
+    @Command("br reset")
+    public void reset(@Src Player player) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            reset(player, brush.get().getType());
+        }
+    }
+
+    @Command("br reset <brush>")
+    public void reset(@Src Player player, BrushType type) {
+        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
+        if (data.isPresent()) {
+            Optional<Brush> brush = type.create();
+            if (brush.isPresent() && data.get().resetBrush(brush.get())) {
+                Fmt.info("Reset brush %s", type.getId()).tell(player);
+            }
+        }
+    }
+
+    @Command("br <range>")
     public void setRange(@Src Player player, int range) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
             int value = Math.min(50, Math.max(1, range));
             brush.get().setRange(value);
             Fmt.info("Set brush %s range to %s", brush.get().getType().getName(), range).tell(player);
-        }
-    }
-
-    @Command(alias = "toggle", parent = "br")
-    public void toggleOption(@Src Player player, BrushOption option) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            BrushType type = brush.get().getType();
-            if (!BrushOptionRegistry.getInstance().isValid(type, option)) {
-                Fmt.error("Option %s is not valid for brush %s", option.getId(), brush.get().getType().getName()).tell(player);
-                return;
-            }
-
-            boolean value = !brush.get().getOption(option, false);
-            brush.get().setOption(option, value);
-            Fmt.info("Set %s = %s", option.getName(), value).tell(player);
         }
     }
 }

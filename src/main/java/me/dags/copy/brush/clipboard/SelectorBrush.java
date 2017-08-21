@@ -22,17 +22,12 @@ public class SelectorBrush extends AbstractBrush {
     private static final int LIMIT = 50000;
 
     private final ClipboardBrush clipboardBrush;
+
     private Vector3i pos1 = Vector3i.ZERO;
     private Vector3i pos2 = Vector3i.ZERO;
 
     SelectorBrush(ClipboardBrush clipboardBrush) {
         this.clipboardBrush = clipboardBrush;
-    }
-
-    public void reset(Player player) {
-        pos1 = Vector3i.ZERO;
-        pos2 = Vector3i.ZERO;
-        Fmt.info("Reset points").tell(player);
     }
 
     @Override
@@ -73,17 +68,20 @@ public class SelectorBrush extends AbstractBrush {
             if (size <= limit) {
                 Vector3i min = pos1.min(pos2);
                 Vector3i max = pos1.max(pos2);
-                Clipboard clipboard = Clipboard.of(player, min, max, pos);
-                clipboardBrush.setClipboard(clipboard);
-                Fmt.info("Copied ").stress(size).info(" blocks").tell(player);
+                clipboardBrush.commitSelection(player, min, max, pos, size);
             } else {
                 Fmt.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);
             }
-
         } else {
             pos2 = pos;
             tellPos(player, "pos2", pos);
         }
+    }
+
+    private void reset(Player player) {
+        pos1 = Vector3i.ZERO;
+        pos2 = Vector3i.ZERO;
+        Fmt.info("Reset points").tell(player);
     }
 
     private void tellPos(Player player, String posName, Vector3i pos) {

@@ -3,7 +3,7 @@ package me.dags.copy.brush;
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
-import me.dags.copy.registry.option.BrushOption;
+import me.dags.copy.registry.option.Option;
 import me.dags.copy.registry.option.BrushOptions;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -12,7 +12,7 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public interface Brush {
 
-    BrushOption RANGE = BrushOption.of("range");
+    Option RANGE = Option.of("range");
 
     BrushOptions getOptions();
 
@@ -35,18 +35,18 @@ public interface Brush {
     }
 
     default int getRange() {
-        return getOptions().ensure(RANGE.getId(), 5);
+        return getOptions().ensure(RANGE, 5);
     }
 
-    default <T> T getOption(BrushOption option, T def) {
-        return getOptions().get(option.getId(), def);
+    default <T> T getOption(Option option, T def) {
+        return getOptions().get(option, def);
     }
 
-    default void setOption(BrushOption option, Object value) {
-        getOptions().set(option.getId(), value);
+    default void setOption(Option option, Object value) {
+        getOptions().set(option, value);
     }
 
     default void setRange(int range) {
-        getOptions().set(RANGE.getId(), range);
+        getOptions().set(RANGE, range);
     }
 }

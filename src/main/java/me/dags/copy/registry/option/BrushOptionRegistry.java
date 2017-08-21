@@ -1,44 +1,39 @@
 package me.dags.copy.registry.option;
 
 import com.google.common.collect.ImmutableList;
-import me.dags.copy.registry.brush.BrushType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class BrushOptionRegistry implements CatalogRegistryModule<BrushOption> {
+public class BrushOptionRegistry implements CatalogRegistryModule<Option> {
 
     private static final BrushOptionRegistry instance = new BrushOptionRegistry();
 
-    private final Map<BrushType, Set<String>> options = new HashMap<>();
-    private final Map<String, BrushOption> registry = new HashMap<>();
+    private final Map<String, Option> registry = new HashMap<>();
 
     private BrushOptionRegistry() {}
 
     @Override
-    public Optional<BrushOption> getById(String id) {
+    public Optional<Option> getById(String id) {
         return Optional.ofNullable(registry.get(id));
     }
 
     @Override
-    public Collection<BrushOption> getAll() {
+    public Collection<Option> getAll() {
         return ImmutableList.copyOf(registry.values());
     }
 
-    public boolean isValid(BrushType type, BrushOption option) {
-        return options.getOrDefault(type, Collections.emptySet()).contains(option.getId());
+    public void register(Option option) {
+        registry.put(option.getId(), option);
     }
 
     public static BrushOptionRegistry getInstance() {
         return instance;
-    }
-
-    public void register(BrushType type, BrushOption option) {
-        registry.put(option.getId(), option);
-        Set<String> options = this.options.computeIfAbsent(type, t -> new HashSet<>());
-        options.add(option.getId());
     }
 }

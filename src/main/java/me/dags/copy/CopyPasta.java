@@ -2,14 +2,17 @@ package me.dags.copy;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
+import me.dags.commandbus.command.Command;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
+import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.command.BrushCommands;
 import me.dags.copy.operation.OperationManager;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
-import me.dags.copy.registry.option.BrushOption;
 import me.dags.copy.registry.option.BrushOptionRegistry;
+import me.dags.copy.registry.option.Option;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
@@ -24,6 +27,7 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +44,7 @@ public class CopyPasta {
     public static final ChatType NOTICE_TYPE = ChatTypes.ACTION_BAR;
     private static CopyPasta instance;
 
+    private final Path configDir;
     private final PluginContainer container;
     private final Map<UUID, PlayerData> data = new HashMap<>();
     private final EventListener eventListener = new EventListener();
@@ -48,16 +53,18 @@ public class CopyPasta {
     private SpongeExecutorService asyncExecutor;
 
     @Inject
-    public CopyPasta(PluginContainer container) {
+    public CopyPasta(PluginContainer container, @ConfigDir(sharedRoot = false) Path configDir) {
         CopyPasta.instance = this;
+        this.configDir = configDir;
         this.container = container;
     }
 
     @Listener
     public void pre(GamePreInitializationEvent event) {
         Sponge.getRegistry().registerModule(BrushType.class, BrushRegistry.getInstance());
-        Sponge.getRegistry().registerModule(BrushOption.class, BrushOptionRegistry.getInstance());
+        Sponge.getRegistry().registerModule(Option.class, BrushOptionRegistry.getInstance());
         BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush::new);
+        BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush::new);
     }
 
     @Listener
@@ -90,12 +97,16 @@ public class CopyPasta {
         operationManager.reset();
     }
 
+    public Path getConfigDir() {
+        return configDir;
+    }
+
     public OperationManager getOperationManager() {
         return operationManager;
     }
 
     public PlayerData ensureData(Player player) {
-        return data.computeIfAbsent(player.getUniqueId(), k -> new PlayerData());
+        return data.computeIfAbsent(player.getUniqueId(), k -> new PlayerData(configDir.resolve("todo.conf")));
     }
 
     public Optional<PlayerData> getData(Player player) {

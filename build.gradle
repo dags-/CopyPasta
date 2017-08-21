@@ -12,6 +12,10 @@ configurations {
     compile.extendsFrom shadow
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -24,12 +28,12 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow 'com.github.dags-:CommandBus:1.8.1-RC1'
+    shadow 'com.github.dags-:CommandBus:2.0.0-SNAPSHOT'
 }
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    relocate 'me.dags.commandbus', 'me.dags.copy.commandbus'
+    relocate 'me.dags.commandbus.', 'me.dags.copy.commandbus.'
     archiveName = "${baseName}-${version}-SpongeAPI-${spongeAPI}.jar"
 }
 

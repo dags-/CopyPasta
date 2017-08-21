@@ -5,11 +5,11 @@ import org.spongepowered.api.CatalogType;
 /**
  * @author dags <dags@dags.me>
  */
-public class BrushOption implements CatalogType {
+public class Option implements CatalogType {
 
     private final String key;
 
-    private BrushOption(String key) {
+    private Option(String key) {
         this.key = key;
     }
 
@@ -28,7 +28,12 @@ public class BrushOption implements CatalogType {
         return key != null ? key.hashCode() : 0;
     }
 
-    public static BrushOption of(String key) {
-        return new BrushOption(key);
+    @Override
+    public String toString() {
+        return key;
+    }
+
+    public static Option of(String key) {
+        return new Option(key);
     }
 }

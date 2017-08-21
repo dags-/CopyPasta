@@ -26,17 +26,27 @@ import java.util.UUID;
  */
 public class Clipboard {
 
-    private final Vector3i origin;
-    private final BlockVolume source;
     private final Facing verticalFacing;
     private final Facing horizontalFacing;
     private final History history = new History(5);
+
+    private BlockVolume source;
+    private Vector3i origin;
+
+    private Clipboard() {
+        this.verticalFacing = Facing.none;
+        this.horizontalFacing = Facing.none;
+    }
 
     private Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
         this.source = source.getImmutableBlockCopy();
         this.origin = origin;
         this.verticalFacing = verticalFacing;
         this.horizontalFacing = horizontalFacing;
+    }
+
+    public void setSource(BlockVolume volume, Vector3i origin) {
+        this.source = volume;
     }
 
     public Facing getHorizontalFacing() {
@@ -106,6 +116,10 @@ public class Clipboard {
                 t.printStackTrace();
             }
         };
+    }
+
+    public static Clipboard empty() {
+        return new Clipboard();
     }
 
     public static Clipboard of(Player player, Vector3i min, Vector3i max, Vector3i origin) {
