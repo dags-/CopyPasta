@@ -8,9 +8,7 @@ import me.dags.copy.PlayerData;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
 import me.dags.copy.operation.PasteOperation;
-import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
@@ -18,7 +16,6 @@ import org.spongepowered.api.world.extent.BlockVolume;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -26,27 +23,29 @@ import java.util.UUID;
  */
 public class Clipboard {
 
+    private static final Clipboard EMPTY = new Clipboard();
+
     private final Facing verticalFacing;
     private final Facing horizontalFacing;
-    private final History history = new History(5);
-
-    private BlockVolume source;
-    private Vector3i origin;
+    private final BlockVolume source;
+    private final Vector3i origin;
 
     private Clipboard() {
         this.verticalFacing = Facing.none;
         this.horizontalFacing = Facing.none;
+        this.source = null;
+        this.origin = Vector3i.ZERO;
     }
 
-    private Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
+    protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
         this.source = source.getImmutableBlockCopy();
         this.origin = origin;
         this.verticalFacing = verticalFacing;
         this.horizontalFacing = horizontalFacing;
     }
 
-    public void setSource(BlockVolume volume, Vector3i origin) {
-        this.source = volume;
+    public boolean isPresent() {
+        return this != EMPTY;
     }
 
     public Facing getHorizontalFacing() {
@@ -57,11 +56,11 @@ public class Clipboard {
         return verticalFacing;
     }
 
-    public History getHistory() {
-        return history;
-    }
+    public void paste(Player player, History history, Vector3i pos, VolumeMapper transform, boolean air, Cause cause) {
+        if (!isPresent()) {
+            return;
+        }
 
-    public void paste(Player player, Vector3i pos, VolumeMapper transform, boolean air, Cause cause) {
         PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
@@ -74,30 +73,12 @@ public class Clipboard {
         Vector3i volumeOffset = transform.volumeOffset(source);
         Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);
 
-        FutureCallback<BlockVolume> callback = callback(player, pastePosition, air, cause);
+        FutureCallback<BlockVolume> callback = callback(player, history, pastePosition, air, cause);
         Runnable asyncTransform = transform.createTask(source, cause, callback);
         CopyPasta.getInstance().submitAsync(asyncTransform);
     }
 
-    public void undo(Player player) {
-        PlayerData data = CopyPasta.getInstance().ensureData(player);
-
-        if (data.isOperating()) {
-            Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
-            return;
-        }
-
-        if (history.hasNext()) {
-            data.setOperating(true);
-            List<BlockSnapshot> record = history.popRecord();
-            UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
-            CopyPasta.getInstance().getOperationManager().queueOperation(operation);
-        } else {
-            Fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
-        }
-    }
-
-    private FutureCallback<BlockVolume> callback(Player player, Vector3i position, boolean air, Cause cause) {
+    private FutureCallback<BlockVolume> callback(Player player, History history, Vector3i position, boolean air, Cause cause) {
         final UUID uuid = player.getUniqueId();
         final WeakReference<World> worldRef = new WeakReference<>(player.getWorld());
 
@@ -119,7 +100,7 @@ public class Clipboard {
     }
 
     public static Clipboard empty() {
-        return new Clipboard();
+        return EMPTY;
     }
 
     public static Clipboard of(Player player, Vector3i min, Vector3i max, Vector3i origin) {

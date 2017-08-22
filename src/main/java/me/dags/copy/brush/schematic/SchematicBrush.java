@@ -3,12 +3,11 @@ package me.dags.copy.brush.schematic;
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
-import me.dags.copy.block.state.State;
+import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
-import me.dags.copy.brush.clipboard.Clipboard;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
-import me.dags.copy.registry.option.Option;
+import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.schematic.CachedSchematic;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
@@ -22,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
@@ -30,37 +29,24 @@ import java.util.*;
 @Aliases({"schematic", "schem"})
 public class SchematicBrush extends ClipboardBrush {
 
-    public static final Option SCHEMATICS = Option.of("schematics");
-    public static final Option MODE = Option.of("mode");
-    public static final Option NAME = Option.of("name");
-    public static final Option DIR = Option.of("dir");
-
-    private static final Random RANDOM = new Random();
-
-    private final Clipboard clipboard = Clipboard.empty();
-
-    public SchematicBrush() {
-        setOption(ClipboardBrush.FLIPX, false);
-        setOption(ClipboardBrush.FLIPY, false);
-        setOption(ClipboardBrush.FLIPZ, false);
-        setOption(ClipboardBrush.AUTO_FLIP, false);
-        setOption(ClipboardBrush.AUTO_ROTATE, false);
-        setOption(ClipboardBrush.RANDOM_FLIPH, true);
-        setOption(ClipboardBrush.RANDOM_FLIPV, false);
-        setOption(ClipboardBrush.RANDOM_ROTATE, true);
-        setOption(ClipboardBrush.SOLID_FOUNDATION, true);
-        setOption(ClipboardBrush.RANGE, 50);
-        setOption(ClipboardBrush.MAPPERS, new LinkedList<State.Mapper>());
-    }
+    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class);
+    public static final Option<Mode> MODE = Option.of("mode", Mode.class);
+    public static final Option<String> NAME = Option.of("name", String.class);
+    public static final Option<String> DIR = Option.of("dir", String.class);
 
     @Override
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
+        Facing horizontal = Facing.getHorizontal(player);
+        Facing vertical = Facing.getVertical(player);
+
         ArchetypeVolume volume = player.getWorld().createArchetypeVolume(min, max, origin);
 
         Schematic schematic = Schematic.builder()
                 .paletteType(BlockPaletteTypes.LOCAL)
                 .volume(volume)
                 .metaValue(Schematic.METADATA_AUTHOR, player.getName())
+                .metaValue(CachedSchematic.FACING_H, horizontal.name())
+                .metaValue(CachedSchematic.FACING_V, vertical.name())
                 .build();
 
         Path output = getFilePath();
@@ -71,6 +57,10 @@ public class SchematicBrush extends ClipboardBrush {
                 DataContainer container = DataTranslators.SCHEMATIC.translate(schematic);
                 DataFormats.NBT.writeTo(outputStream, container);
             }
+
+            SchematicList list = getOptions().ensure(SCHEMATICS, SchematicList.supplier());
+            list.add(new SchematicEntry(output));
+
             Fmt.info("Saved schematic to %s", output).tell(player);
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,9 +76,7 @@ public class SchematicBrush extends ClipboardBrush {
     @Override
     public void primary(Player player, Vector3i pos, Action action) {
         if (getOption(MODE, Mode.SAVE) == Mode.SAVE) {
-            super.setClipboard(null);
-        } else {
-            super.setClipboard(clipboard);
+            setClipboard(null);
         }
 
         super.primary(player, pos, action);
@@ -97,13 +85,12 @@ public class SchematicBrush extends ClipboardBrush {
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         if (getOption(MODE, Mode.SAVE) == Mode.SAVE) {
-            super.setClipboard(null);
+            setClipboard(null);
         } else {
-            List<SchematicEntry> schematics = getOption(SCHEMATICS, Collections.emptyList());
+            SchematicList schematics = getOption(SCHEMATICS, SchematicList.EMPTY);
             Optional<CachedSchematic> schematic = chooseNext(schematics);
             if (schematic.isPresent()) {
-                clipboard.setSource(schematic.get().getVolume(), schematic.get().getOrigin());
-                super.setClipboard(clipboard);
+                setClipboard(schematic.get());
             }
         }
 
@@ -126,7 +113,7 @@ public class SchematicBrush extends ClipboardBrush {
         return path;
     }
 
-    private Optional<CachedSchematic> chooseNext(List<SchematicEntry> schematics) {
+    private Optional<CachedSchematic> chooseNext(SchematicList schematics) {
         for (int i = 0; i < 5; i++) {
             int index = RANDOM.nextInt(schematics.size());
             Optional<CachedSchematic> schematic = schematics.get(index).getSchematic();

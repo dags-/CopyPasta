@@ -3,8 +3,7 @@ package me.dags.copy.registry.brush;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Brush;
-import me.dags.copy.registry.option.BrushOptionRegistry;
-import me.dags.copy.registry.option.Option;
+import me.dags.copy.brush.option.Option;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
 import java.lang.reflect.Field;
@@ -28,36 +27,35 @@ public class BrushRegistry implements CatalogRegistryModule<BrushType> {
     private BrushRegistry(){}
 
     public <T extends Brush> void register(Class<T> type, Supplier<T> supplier) {
-        String[] aliases = type.isAnnotationPresent(Aliases.class) ? type.getAnnotation(Aliases.class).value() : new String[]{type.getSimpleName().toLowerCase()};
-
-        BrushType brushType = BrushType.of(type, supplier, aliases);
-        types.put(type, brushType);
-
-        for (String alias : brushType.getAliases()) {
-            registry.put(alias, brushType);
-        }
-
+        ImmutableList.Builder<Option<?>> options = ImmutableList.builder();
         for (Field field : type.getFields()) {
             if (Modifier.isStatic(field.getModifiers()) && field.getType() == Option.class) {
                 try {
                     Option option = (Option) field.get(null);
-                    BrushOptionRegistry.getInstance().register(option);
+                    options.add(option);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        String[] aliases = type.isAnnotationPresent(Aliases.class) ? type.getAnnotation(Aliases.class).value() : new String[]{type.getSimpleName().toLowerCase()};
+
+        BrushType brushType = BrushType.of(type, supplier, options.build(), aliases);
+        types.put(type, brushType);
+
+        for (String alias : brushType.getAliases()) {
+            registry.put(alias, brushType);
+        }
     }
 
     @Override
     public Optional<BrushType> getById(String id) {
-        System.out.println("getById: " + id);
         return Optional.ofNullable(registry.get(id));
     }
 
     @Override
     public Collection<BrushType> getAll() {
-        System.out.println("getAll");
         return ImmutableList.copyOf(registry.values());
     }
 

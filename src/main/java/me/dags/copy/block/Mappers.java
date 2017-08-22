@@ -1,4 +1,4 @@
-package me.dags.copy;
+package me.dags.copy.block;
 
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.state.State;

@@ -6,7 +6,10 @@ import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.brush.Brush;
+import me.dags.copy.brush.option.Option;
+import me.dags.copy.brush.option.Value;
 import me.dags.copy.registry.brush.BrushType;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -53,32 +56,8 @@ public class BrushCommands {
         }
     }
 
-    @Command("br reset")
-    public void reset(@Src Player player) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            reset(player, brush.get().getType());
-        }
-    }
-
-    @Command("br reset <brush>")
-    public void reset(@Src Player player, BrushType type) {
-        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
-        if (data.isPresent()) {
-            Optional<Brush> brush = type.create();
-            if (brush.isPresent() && data.get().resetBrush(brush.get())) {
-                Fmt.info("Reset brush %s", type.getId()).tell(player);
-            }
-        }
-    }
-
-    @Command("br <range>")
-    public void setRange(@Src Player player, int range) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            int value = Math.min(50, Math.max(1, range));
-            brush.get().setRange(value);
-            Fmt.info("Set brush %s range to %s", brush.get().getType().getName(), range).tell(player);
-        }
+    @Command("br <brush> set <option> <value>")
+    public void setOption(@Src CommandSource source, BrushType type, Option<?> option, Value<?> value) {
+        Fmt.info("Brush: ").stress(type).info(", Option: ").stress(option).info(", Value: ").stress(value.getValue()).tell(source);
     }
 }

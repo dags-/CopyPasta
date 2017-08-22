@@ -15,10 +15,10 @@ class StateMapper implements State.Mapper {
 
     static final StateMapper EMPTY = new StateMapper(Collections.emptyMap());
 
-    private final Map<BlockState, BlockState> states;
+    private final Map<BlockState, BlockState> mappings;
 
     StateMapper(Map<BlockState, BlockState> states) {
-        this.states = states;
+        this.mappings = states;
     }
 
     @Override
@@ -29,14 +29,14 @@ class StateMapper implements State.Mapper {
     @Override
     public BlockState map(BlockState state) {
         if (isPresent()) {
-            return states.getOrDefault(state, state);
+            return mappings.getOrDefault(state, state);
         }
         return state;
     }
 
     @Override
     public String toString() {
-        return states.toString();
+        return mappings.toString();
     }
 
     static State.Mapper mapper(Iterable<Merger> mergers) {

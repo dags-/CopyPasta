@@ -5,7 +5,7 @@ import me.dags.commandbus.fmt.Fmt;
 import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Action;
-import me.dags.copy.registry.option.BrushOptions;
+import me.dags.copy.brush.option.Options;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -27,11 +27,12 @@ public class SelectorBrush extends AbstractBrush {
     private Vector3i pos2 = Vector3i.ZERO;
 
     SelectorBrush(ClipboardBrush clipboardBrush) {
+        super(0);
         this.clipboardBrush = clipboardBrush;
     }
 
     @Override
-    public BrushOptions getOptions() {
+    public Options getOptions() {
         return clipboardBrush.getOptions();
     }
 
@@ -76,6 +77,11 @@ public class SelectorBrush extends AbstractBrush {
             pos2 = pos;
             tellPos(player, "pos2", pos);
         }
+    }
+
+    @Override
+    public void undo(Player player) {
+
     }
 
     private void reset(Player player) {

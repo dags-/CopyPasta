@@ -12,8 +12,8 @@ configurations {
     compile.extendsFrom shadow
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
 }
 
 repositories {
@@ -27,8 +27,8 @@ repositories {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow 'com.github.dags-:CommandBus:2.0.0-SNAPSHOT'
+    compileOnly "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
+    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-4'
 }
 
 shadowJar {

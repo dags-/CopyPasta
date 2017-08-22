@@ -3,7 +3,6 @@ package me.dags.copy;
 import com.google.common.base.Stopwatch;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.registry.brush.BrushType;
-import me.dags.copy.registry.option.Options;
 import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
@@ -29,7 +28,7 @@ public class PlayerData {
     private final ConfigurationNode rootNode;
 
     private boolean operating = false;
-    private Stopwatch cooldown = Stopwatch.createStarted();
+    private Stopwatch coolDown = Stopwatch.createStarted();
 
     public PlayerData(Path path) {
         loader = HoconConfigurationLoader.builder()
@@ -41,8 +40,8 @@ public class PlayerData {
     }
 
     public boolean isCoolingDown() {
-        if (cooldown.elapsed(TimeUnit.MILLISECONDS) > 250) {
-            cooldown.reset().start();
+        if (coolDown.elapsed(TimeUnit.MILLISECONDS) > 250) {
+            coolDown.reset().start();
             return false;
         }
         return true;
@@ -102,10 +101,6 @@ public class PlayerData {
 
     public void save() {
         Utils.writeNode(loader, rootNode);
-    }
-
-    private Options getOptions(BrushType brushType) {
-        return new Options(getNode(brushType.getId()));
     }
 
     private ConfigurationNode getNode(String path) {

@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import me.dags.copy.block.property.Facing;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.persistence.DataFormats;
@@ -24,6 +25,8 @@ public class SchematicRegistry implements CacheLoader<Path, CachedSchematic> {
 
     private static final SchematicRegistry instance = new SchematicRegistry();
     private static final DataQuery ORIGIN = DataQuery.of("offset");
+    private static final DataQuery FACEINGH = DataQuery.of(CachedSchematic.FACING_H);
+    private static final DataQuery FACEINGV = DataQuery.of(CachedSchematic.FACING_V);
 
     private final Cache<Path, CachedSchematic> cache = Caffeine.<String, CachedSchematic>newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -43,7 +46,9 @@ public class SchematicRegistry implements CacheLoader<Path, CachedSchematic> {
             DataContainer container = DataFormats.NBT.readFrom(inputStream);
             Vector3i origin = container.getView(ORIGIN).map(DataTranslators.VECTOR_3_I::translate).orElse(Vector3i.ZERO);
             Schematic schematic = DataTranslators.SCHEMATIC.translate(container);
-            return CachedSchematic.of(schematic, origin);
+            Facing horizontal = schematic.getMetadata().getString(FACEINGH).map(Facing::valueOf).orElse(Facing.none);
+            Facing vertical = schematic.getMetadata().getString(FACEINGV).map(Facing::valueOf).orElse(Facing.none);
+            return CachedSchematic.of(schematic, origin, horizontal, vertical);
         }
     }
 
