@@ -40,8 +40,9 @@ abstract class BaseElement implements Element {
                     return;
                 }
 
+                String upper = e.toUpperCase();
                 for (String option : options) {
-                    if (option.startsWith(e)) {
+                    if (option.toUpperCase().startsWith(upper)) {
                         suggestions.add(option);
                     }
                 }

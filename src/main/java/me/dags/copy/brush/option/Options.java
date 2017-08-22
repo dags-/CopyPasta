@@ -19,18 +19,9 @@ public class Options {
         return def;
     }
 
-    public <T> T ensure(Option<T> option, T def) {
-        Object o = options.get(option);
-        if (o == null || !option.getType().isInstance(o)) {
-            options.put(option, def);
-            return def;
-        }
-        return option.getType().cast(o);
-    }
-
     public <T> T ensure(Option<T> option, Supplier<T> def) {
         Object o = options.get(option);
-        if (o == null || !option.getType().isInstance(o)) {
+        if (o == null || o.getClass() != option.getType()) {
             T t = def.get();
             options.put(option, t);
             return t;
@@ -38,7 +29,7 @@ public class Options {
         return option.getType().cast(o);
     }
 
-    public <T> void set(Option<T> option, T value) {
+    public void set(Option option, Object value) {
         options.put(option, value);
     }
 }

@@ -2,7 +2,6 @@ package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.block.BlockUtils;
@@ -15,6 +14,7 @@ import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.ReMappers;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.fmt;
 import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -31,14 +31,13 @@ public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
 
-    public static final Option<Boolean> FLIPX = Option.of("flipx", boolean.class);
-    public static final Option<Boolean> FLIPY = Option.of("flipy", boolean.class);
-    public static final Option<Boolean> FLIPZ = Option.of("flipz", boolean.class);
-    public static final Option<Boolean> AUTO_FLIP = Option.of("auto_flip", boolean.class);
-    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto_rotate", boolean.class);
-    public static final Option<Boolean> RANDOM_ROTATE = Option.of("random_rotate", boolean.class);
-    public static final Option<Boolean> RANDOM_FLIPH = Option.of("random_flip_h", boolean.class);
-    public static final Option<Boolean> RANDOM_FLIPV = Option.of("random_flip_v", boolean.class);
+    public static final Option<Boolean> FLIPX = Option.of("x.flip", boolean.class);
+    public static final Option<Boolean> FLIPY = Option.of("y.flip", boolean.class);
+    public static final Option<Boolean> FLIPZ = Option.of("z.flip", boolean.class);
+    public static final Option<Boolean> AUTO_FLIP = Option.of("auto.flip", boolean.class);
+    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", boolean.class);
+    public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.reotate", boolean.class);
+    public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", boolean.class);
     public static final Option<Boolean> AIR = Option.of("air", boolean.class);
     public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", boolean.class);
     public static final Option<Integer> PASTE_OFFSET = Option.of("offset", int.class);
@@ -51,7 +50,7 @@ public class ClipboardBrush extends AbstractBrush {
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
         Clipboard clipboard = Clipboard.of(player, min, max, origin);
         setClipboard(clipboard);
-        Fmt.info("Copied ").stress(size).info(" blocks").tell(player);
+        fmt.info("Copied ").stress(size).info(" blocks").tell(player);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class ClipboardBrush extends AbstractBrush {
         if (clipboard.isPresent()) {
             if (action == Action.SECONDARY) {
                 setClipboard(null);
-                Fmt.info("Cleared clipboard").tell(player);
+                fmt.info("Cleared clipboard").tell(player);
                 return;
             }
 
@@ -99,7 +98,7 @@ public class ClipboardBrush extends AbstractBrush {
         PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
-            Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
 
@@ -109,7 +108,7 @@ public class ClipboardBrush extends AbstractBrush {
             UndoOperation operation = new UndoOperation(record, player.getUniqueId(), getHistory());
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
-            Fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
+            fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
         }
     }
 
@@ -142,10 +141,6 @@ public class ClipboardBrush extends AbstractBrush {
         if (getOption(RANDOM_FLIPH, false)) {
             flipX = RANDOM.nextBoolean();
             flipZ = RANDOM.nextBoolean();
-        }
-
-        if (getOption(RANDOM_FLIPV, false)) {
-            flipY = RANDOM.nextBoolean();
         }
 
         ReMappers reMappers = getOption(MAPPERS, ReMappers.EMPTY);

@@ -1,11 +1,11 @@
 package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.commandbus.fmt.Fmt;
 import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Action;
 import me.dags.copy.brush.option.Options;
+import me.dags.copy.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -55,11 +55,11 @@ public class SelectorBrush extends AbstractBrush {
     public void secondary(Player player, Vector3i pos, Action action) {
         if (action == Action.SECONDARY) {
             if (pos1 == Vector3i.ZERO) {
-                Fmt.error("Pos1 has not been set").tell(player);
+                fmt.error("Pos1 has not been set").tell(player);
                 return;
             }
             if (pos2 == Vector3i.ZERO) {
-                Fmt.error("Pos2 has not been set").tell(player);
+                fmt.error("Pos2 has not been set").tell(player);
                 return;
             }
 
@@ -71,7 +71,7 @@ public class SelectorBrush extends AbstractBrush {
                 Vector3i max = pos1.max(pos2);
                 clipboardBrush.commitSelection(player, min, max, pos, size);
             } else {
-                Fmt.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);
+                fmt.error("Selection size is too large: ").stress(size).info(" / ").stress(limit).tell(player);
             }
         } else {
             pos2 = pos;
@@ -87,17 +87,17 @@ public class SelectorBrush extends AbstractBrush {
     private void reset(Player player) {
         pos1 = Vector3i.ZERO;
         pos2 = Vector3i.ZERO;
-        Fmt.info("Reset points").tell(player);
+        fmt.info("Reset points").tell(player);
     }
 
     private void tellPos(Player player, String posName, Vector3i pos) {
-        Formatter fmt = Fmt.info("Set %s ", posName).stress(pos);
+        Formatter f = fmt.info("Set %s ", posName).stress(pos);
 
         if (pos1 != Vector3i.ZERO && pos2 != Vector3i.ZERO) {
-            fmt.info(" (%s blocks)", getSize(pos1, pos2));
+            f.info(" (%s blocks)", getSize(pos1, pos2));
         }
 
-        fmt.tell(player);
+        f.tell(player);
     }
 
     private static int getSize(Vector3i pos1, Vector3i pos2) {

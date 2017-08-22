@@ -1,12 +1,12 @@
 package me.dags.copy.operation;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.History;
 import me.dags.copy.event.BrushEvent;
 import me.dags.copy.event.BrushPlaceEvent;
 import me.dags.copy.event.LocatableBlockChange;
+import me.dags.copy.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -123,7 +123,7 @@ public class PasteOperation implements Operation {
             }
         }
 
-        Fmt.stress("Paste complete").tell(CopyPasta.NOTICE_TYPE, player.get());
+        fmt.stress("Paste complete").tell(CopyPasta.NOTICE_TYPE, player.get());
     }
 
     @Override

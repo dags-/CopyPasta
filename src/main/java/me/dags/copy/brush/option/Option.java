@@ -1,6 +1,10 @@
 package me.dags.copy.brush.option;
 
+import com.google.common.base.Preconditions;
+import me.dags.commandbus.utils.ClassUtils;
 import org.spongepowered.api.CatalogType;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author dags <dags@dags.me>
@@ -10,7 +14,7 @@ public class Option<T> implements CatalogType {
     private final String key;
     private final Class<T> type;
 
-    private Option(String key, Class<T> type) {
+    private Option(@Nonnull String key, @Nonnull Class<T> type) {
         this.key = key;
         this.type = type;
     }
@@ -30,8 +34,16 @@ public class Option<T> implements CatalogType {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Option<?> option = (Option<?>) o;
+        return getType() == option.getType() && key.equals(option.key);
+    }
+
+    @Override
     public int hashCode() {
-        return key != null ? key.hashCode() : 0;
+        return key.hashCode();
     }
 
     @Override
@@ -39,7 +51,14 @@ public class Option<T> implements CatalogType {
         return key;
     }
 
-    public static <T> Option<T> of(String key, Class<T> type) {
+    public static <T> Option<T> of(@Nonnull String key, @Nonnull Class<T> type) {
+        type = wrap(type);
+        Preconditions.checkState(!type.isPrimitive(), "Primitive types not allowed!");
         return new Option<>(key, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Class<T> wrap(Class<T> type) {
+        return (Class<T>) ClassUtils.wrapPrimitive(type);
     }
 }

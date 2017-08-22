@@ -2,11 +2,11 @@ package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
-import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
+import me.dags.copy.fmt;
 import me.dags.copy.operation.PasteOperation;
 import me.dags.copy.operation.VolumeMapper;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,7 +38,7 @@ public class Clipboard {
     }
 
     protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
-        this.source = source.getImmutableBlockCopy();
+        this.source = source;
         this.origin = origin;
         this.verticalFacing = verticalFacing;
         this.horizontalFacing = horizontalFacing;
@@ -64,7 +64,7 @@ public class Clipboard {
         PlayerData data = CopyPasta.getInstance().ensureData(player);
 
         if (data.isOperating()) {
-            Fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
 
@@ -93,7 +93,7 @@ public class Clipboard {
 
             @Override
             public void onFailure(Throwable t) {
-                Fmt.warn("Unable to transform the clipboard! See the console").tell(player);
+                fmt.warn("Unable to transform the clipboard! See the console").tell(player);
                 t.printStackTrace();
             }
         };
@@ -108,6 +108,6 @@ public class Clipboard {
         Facing verticalFacing = Facing.getVertical(player);
         Facing horizontalFacing = Facing.getHorizontal(player);
         BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView().getImmutableBlockCopy();
-        return new Clipboard(backing, offset, horizontalFacing, verticalFacing);
+        return new Clipboard(backing.getImmutableBlockCopy(), offset, horizontalFacing, verticalFacing);
     }
 }

@@ -1,8 +1,8 @@
 package me.dags.copy.operation;
 
-import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.History;
+import me.dags.copy.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -49,7 +49,7 @@ public class UndoOperation implements Operation {
         Sponge.getServer().getPlayer(owner).ifPresent(player -> {
             int size = history.getSize();
             int max = history.getMax();
-            Fmt.subdued("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
+            fmt.sub("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
         });
     }
 

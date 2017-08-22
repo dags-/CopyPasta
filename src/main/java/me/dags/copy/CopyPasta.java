@@ -3,6 +3,7 @@ package me.dags.copy;
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
 import me.dags.commandbus.element.ElementFactory;
+import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
@@ -86,6 +87,8 @@ public class CopyPasta {
                 .build();
 
         commandBus.register(BrushCommands.class).submit();
+
+        Mappers.init();
     }
 
     @Listener

@@ -42,15 +42,11 @@ public interface Brush {
         return getOptions().get(option, def);
     }
 
-    default <T> void setOption(Option<T> option, T value) {
+    default void setOption(Option option, Object value) {
         getOptions().set(option, value);
     }
 
     default int getRange() {
-        return getOptions().ensure(RANGE, 5);
-    }
-
-    default void setRange(int range) {
-        getOptions().set(RANGE, range);
+        return getOptions().ensure(RANGE, () -> 5);
     }
 }

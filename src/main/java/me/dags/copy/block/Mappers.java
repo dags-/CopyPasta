@@ -15,6 +15,10 @@ public class Mappers {
     private static final State.Mapper FLIPY = State.flip(Axis.y);
     private static final State.Mapper FLIPZ = State.flip(Axis.z);
 
+    public static void init() {
+        // instantiates mappers
+    }
+
     public static State.Mapper getRotationY(int angle) {
         if (angle == 90) {
             return ROT90;

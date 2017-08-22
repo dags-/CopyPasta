@@ -59,8 +59,8 @@ public class PlayerData {
         return Optional.ofNullable(brushes.get(item));
     }
 
-    public Optional<? extends Brush> getBrush(BrushType type) {
-        return getBrush(type.getType());
+    public Optional<Brush> getBrush(BrushType type) {
+        return getBrush(type.getType()).map(b -> b);
     }
 
     public <T extends Brush> Optional<T> getBrush(Class<T> type) {

@@ -10,7 +10,6 @@ import me.dags.copy.registry.brush.BrushType;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
@@ -24,14 +23,9 @@ public class BrushElement extends BaseElement {
     @Override
     public void parse(Input input, Context context) throws CommandException {
         String next = input.next();
-        Optional<BrushType> type = BrushRegistry.getInstance().getById(next);
-
-        if (!type.isPresent()) {
-            throw new CommandException("Input '%s' is not a valid BrushType", next);
-        }
-
-        context.add(getKey(), type.get());
-        context.add(BrushType.class.getCanonicalName(), type.get());
+        BrushType type = BrushRegistry.getInstance().getById(next).orElseThrow(() -> new CommandException("Invalid BrushType '%s'", next));
+        context.add(getKey(), type);
+        context.add(BrushType.class.getCanonicalName(), type);
     }
 
     @Override

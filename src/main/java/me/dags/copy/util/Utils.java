@@ -5,6 +5,11 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.DataTranslators;
+import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.schematic.BlockPaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 
@@ -19,6 +24,10 @@ import java.util.Comparator;
  * @author dags <dags@dags.me>
  */
 public class Utils {
+
+    public static ItemType getHeldItem(Player player) {
+        return player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
+    }
 
     public static Path ensure(Path root, Object... path) {
         return root.resolve("todo");
