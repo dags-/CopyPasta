@@ -1,8 +1,9 @@
 package me.dags.copy.operation;
 
 import me.dags.copy.CopyPasta;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.History;
-import me.dags.copy.fmt;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -55,6 +56,6 @@ public class UndoOperation implements Operation {
 
     @Override
     public void dispose() {
-        CopyPasta.getInstance().getData(owner).ifPresent(data -> data.setOperating(false));
+        PlayerManager.getInstance().get(owner).ifPresent(data -> data.setOperating(false));
     }
 }

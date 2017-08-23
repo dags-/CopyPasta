@@ -4,15 +4,11 @@ import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.ElementProvider;
-import me.dags.copy.CopyPasta;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushType;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +35,7 @@ public class OptionElement extends BaseElement {
         Optional<Option<?>> option = type.getOption(next);
 
         if (!option.isPresent()) {
-            throw new CommandException("Option '%s' is not valid for brush '%s'", next, type.getName());
+            throw new CommandException("Option '%s' is not valid for brush '%s'", next, type);
         }
 
         context.add(getKey(), option.get());
@@ -58,10 +54,10 @@ public class OptionElement extends BaseElement {
     private BrushType getBrush(Context context) {
         BrushType type = context.getOne(BrushType.class.getCanonicalName());
         if (type == null) {
-            Optional<Player> player = context.getSource(Player.class);
-            if (player.isPresent()) {
-                ItemType item = player.get().getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-                Optional<Brush> brush = CopyPasta.getInstance().getData(player.get()).flatMap(d -> d.getBrush(item));
+            Optional<Player> source = context.getSource(Player.class);
+            if (source.isPresent()) {
+                Player player = source.get();
+                Optional<Brush> brush = PlayerManager.getInstance().get(player).flatMap(d -> d.getBrush(player));
                 if (brush.isPresent()) {
                     return brush.get().getType();
                 }

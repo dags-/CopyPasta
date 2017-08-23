@@ -30,9 +30,9 @@ public class BrushElement extends BaseElement {
 
     @Override
     Collection<String> getOptions(Context context) {
-        List<String> options = new LinkedList<>();
-        BrushRegistry.getInstance().getAll().stream().map(BrushType::getAliases).forEach(options::addAll);
-        return options;
+        List<String> list = new LinkedList<>();
+        BrushRegistry.getInstance().forEachAlias((s, type) -> list.add(s));
+        return list;
     }
 
     public static ElementProvider provider() {

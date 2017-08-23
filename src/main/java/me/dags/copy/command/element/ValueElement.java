@@ -33,10 +33,10 @@ public class ValueElement extends BaseElement {
         }
 
         ValueParser<?> parser = factory.getParser(option.getType());
-        Object object = parser.parse(input);
-
+        String next = input.next();
+        Object object = parser.parse(next);
         if (object == null) {
-            throw new CommandException("Unable to parse value for Option %s", option.getName());
+            throw new CommandException("Unable to parse Value '%' for Option '%s'", next, option);
         }
 
         context.add(getKey(), Value.of(object));

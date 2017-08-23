@@ -5,7 +5,7 @@ import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Action;
 import me.dags.copy.brush.option.Options;
-import me.dags.copy.fmt;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;

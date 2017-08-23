@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
@@ -43,5 +44,9 @@ public class SchematicList implements Iterable<SchematicEntry> {
     @Override
     public Iterator<SchematicEntry> iterator() {
         return list.iterator();
+    }
+
+    public static Supplier<SchematicList> supplier() {
+        return () -> new SchematicList(new LinkedList<>());
     }
 }

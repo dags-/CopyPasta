@@ -1,14 +1,17 @@
 package me.dags.copy.command;
 
-import me.dags.commandbus.annotation.Command;
-import me.dags.commandbus.annotation.Src;
-import me.dags.copy.CopyPasta;
+import me.dags.commandbus.annotation.*;
+import me.dags.commandbus.command.Flags;
+import me.dags.commandbus.fmt.PagFormatter;
 import me.dags.copy.PlayerData;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
-import me.dags.copy.fmt;
+import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.util.fmt;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -29,7 +32,7 @@ public class BrushCommands {
             return Optional.empty();
         }
 
-        Optional<Brush> brush = CopyPasta.getInstance().getData(player).flatMap(data -> data.getBrush(item.get()));
+        Optional<Brush> brush = PlayerManager.getInstance().get(player).flatMap(data -> data.getBrush(player));
         if (!brush.isPresent()) {
             fmt.error("You have not bound a brush to item %s", item.get().getName()).tell(player);
             return Optional.empty();
@@ -38,30 +41,72 @@ public class BrushCommands {
         return brush;
     }
 
+    @Permission
     @Command("copy <brush>")
+    @Description("Bind the <brush> to your held item")
     public void brush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-        PlayerData data = CopyPasta.getInstance().ensureData(player);
+        PlayerData data = PlayerManager.getInstance().must(player);
 
         if (item == ItemTypes.NONE) {
-            data.removeBrush(type.getType());
-            fmt.info("Removed %s brush", type.getName()).tell(player);
+            data.removeBrush(item);
+            fmt.sub("Removed %s brush", type).tell(player);
         } else {
-            Optional<Brush> brush = type.create();
+            Optional<Brush> brush = type.create(data);
             if (brush.isPresent()) {
-                data.resetBrush(brush.get(), item);
-                fmt.info("Assigned %s brush to %s", type.getName(), item.getName()).tell(player);
+                data.setBrush(item, brush.get());
+                fmt.info("Set brush ").stress(type).info(" to item ").stress(item.getName()).tell(player);
             }
         }
     }
 
+    @Flag("a")
+    @Permission
+    @Command("copy list")
+    @Description("List all brush types")
+    public void list(@Src CommandSource source, Flags flags) {
+        boolean aliases = flags.has("a");
+        PagFormatter page = fmt.page();
+        if (aliases) {
+            BrushRegistry.getInstance().forEachAlias((s, type) -> page.line().subdued(" - ").stress(s).info(" (%s)", type));
+        } else {
+            BrushRegistry.getInstance().forEachUnique((s, type) -> page.line().subdued(" - ").stress(s));
+        }
+        page.sort(true).build().sendTo(source);
+    }
+
+    @Permission
+    @Command("copy reset")
+    @Description("Reset all options for your current brush to their defaults")
+    public void reset(@Src Player player) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            brush.get().getOptions().reset();
+        }
+    }
+
+    @Permission
     @Command("copy <option> <value>")
+    @Description("Set an option for your current brush")
     public void option(@Src Player player, Option<?> option, Value<?> value) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
             BrushType type = brush.get().getType();
-            brush.get().setOption(option, value.getValue());
+            brush.get().setOption(option, value.get());
             fmt.info("Set ").stress(option).info("=").stress(value).info(" for brush ").stress(type).tell(player);
+        }
+    }
+
+    @Permission
+    @Command("copy options")
+    @Description("List all options and their values for the current brush")
+    public void options(@Src Player player) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            PagFormatter page = fmt.page();
+            page.title().stress("%s Options:", brush.get().getType());
+            brush.get().getOptions().forEach((option, o) -> page.line().subdued(" - ").stress(option).info("=").stress(o).info(" (%s)", option.getType().getSimpleName()));
+            page.sort(true).build().sendTo(player);
         }
     }
 }

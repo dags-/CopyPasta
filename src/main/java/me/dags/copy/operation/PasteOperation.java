@@ -2,11 +2,12 @@ package me.dags.copy.operation;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.CopyPasta;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.History;
 import me.dags.copy.event.BrushEvent;
 import me.dags.copy.event.BrushPlaceEvent;
 import me.dags.copy.event.LocatableBlockChange;
-import me.dags.copy.fmt;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -128,6 +129,6 @@ public class PasteOperation implements Operation {
 
     @Override
     public void dispose() {
-        CopyPasta.getInstance().getData(owner).ifPresent(data -> data.setOperating(false));
+        PlayerManager.getInstance().get(owner).ifPresent(data -> data.setOperating(false));
     }
 }

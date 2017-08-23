@@ -7,15 +7,16 @@ import me.dags.copy.brush.option.Options;
  */
 public abstract class AbstractBrush implements Brush {
 
-    private final Options options = new Options();
+    private final Options options;
     private final History history;
 
     protected AbstractBrush() {
-        history = new History(5);
+        this(0);
     }
 
     protected AbstractBrush(int size) {
-        history = new History(size);
+        this.options = new Options();
+        this.history = new History(size);
     }
 
     @Override

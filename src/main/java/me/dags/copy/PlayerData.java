@@ -1,16 +1,20 @@
 package me.dags.copy;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
 import me.dags.copy.brush.Brush;
-import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.brush.option.Option;
+import me.dags.copy.brush.option.Value;
 import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -22,10 +26,9 @@ public class PlayerData {
 
     private static final ConfigurationOptions options = ConfigurationOptions.defaults().setShouldCopyDefaults(true);
 
-    private final Map<ItemType, Brush> brushes = new HashMap<>();
-    private final Map<Class<?>, ItemType> wands = new HashMap<>();
+    private final Map<ItemType, Brush> brushes = Maps.newHashMap();
     private final HoconConfigurationLoader loader;
-    private final ConfigurationNode rootNode;
+    private final ConfigurationNode root;
 
     private boolean operating = false;
     private Stopwatch coolDown = Stopwatch.createStarted();
@@ -36,7 +39,7 @@ public class PlayerData {
                 .setPath(path)
                 .build();
 
-        rootNode = Utils.getRootNode(loader);
+        root = Utils.getRootNode(loader);
     }
 
     public boolean isCoolingDown() {
@@ -55,55 +58,47 @@ public class PlayerData {
         this.operating = operating;
     }
 
+    public Optional<Brush> getBrush(Player player) {
+        return player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).flatMap(this::getBrush);
+    }
+
     public Optional<Brush> getBrush(ItemType item) {
         return Optional.ofNullable(brushes.get(item));
     }
 
-    public Optional<Brush> getBrush(BrushType type) {
-        return getBrush(type.getType()).map(b -> b);
-    }
-
-    public <T extends Brush> Optional<T> getBrush(Class<T> type) {
-        ItemType item = wands.get(type);
-        if (item != null) {
-            Brush brush = brushes.get(item);
-            if (brush != null && type.isInstance(brush)) {
-                return Optional.of(type.cast(brush));
+    public Brush apply(Brush brush) {
+        ConfigurationNode node = root.getNode(brush.getType().getId());
+        for (Option<?> option : brush.getType().getOptions()) {
+            ConfigurationNode child = node.getNode(option.getId());
+            Object value = child.getValue();
+            if (option.accepts(value)) {
+                brush.setOption(option, value);
             }
         }
-        return Optional.empty();
+        return brush;
     }
 
-    public boolean resetBrush(Brush brush) {
-        ItemType item = wands.get(brush.getClass());
-        return item != null && resetBrush(brush, item);
-    }
-
-    public boolean resetBrush(Brush brush, ItemType type) {
-        brushes.put(type, brush);
-        wands.put(brush.getClass(), type);
-        return true;
+    public void setBrush(ItemType item, Brush brush) {
+        brushes.put(item, brush);
     }
 
     public void removeBrush(ItemType type) {
-        Brush brush = brushes.remove(type);
-        if (brush != null) {
-            wands.remove(brush.getClass());
-        }
-    }
-
-    public void removeBrush(Class<? extends Brush> brush) {
-        ItemType item = wands.remove(brush);
-        if (item != null) {
-            brushes.remove(item);
-        }
+        brushes.remove(type);
     }
 
     public void save() {
-        Utils.writeNode(loader, rootNode);
-    }
+        for (Brush brush : brushes.values()) {
+            brush.getOptions().forEach((option, o) -> {
+                ConfigurationNode node = root.getNode(brush.getType().getId());
+                Value def = option.getDefault();
+                if (def.isPresent() && def.get().equals(o)) {
+                    node.removeChild(option.getId());
+                    return;
+                }
+                node.getNode(option.getId()).setValue(o);
+            });
+        }
 
-    private ConfigurationNode getNode(String path) {
-        return rootNode.getNode(path);
+        Utils.writeNode(loader, root);
     }
 }

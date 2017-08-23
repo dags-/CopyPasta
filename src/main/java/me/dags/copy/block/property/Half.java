@@ -6,8 +6,7 @@ package me.dags.copy.block.property;
 public enum Half implements Property<Half> {
 
     top,
-    bottom,
-    ;
+    bottom,;
 
     private final String property = "half=" + this.toString();
 

@@ -2,15 +2,11 @@ package me.dags.copy;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.brush.Brush;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.World;
@@ -24,10 +20,9 @@ public class EventListener {
 
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
-        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
+        Optional<PlayerData> data = PlayerManager.getInstance().get(player);
         if (data.isPresent() && !data.get().isCoolingDown()) {
-            Optional<Brush> brush = data.get().getBrush(item);
+            Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
                 Vector3i target = targetPosition(player, brush.get().getRange());
                 brush.get().primary(player, target);
@@ -38,10 +33,9 @@ public class EventListener {
 
     @Listener
     public void interactSecondary(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
-        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-        Optional<PlayerData> data = CopyPasta.getInstance().getData(player);
+        Optional<PlayerData> data = PlayerManager.getInstance().get(player);
         if (data.isPresent() && !data.get().isCoolingDown()) {
-            Optional<Brush> brush = data.get().getBrush(item);
+            Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
                 Vector3i target = targetPosition(player, brush.get().getRange());
                 brush.get().secondary(player, target);
@@ -52,7 +46,7 @@ public class EventListener {
 
     @Listener
     public void disconnect(ClientConnectionEvent.Disconnect event) {
-        CopyPasta.getInstance().dropData(event.getTargetEntity());
+        PlayerManager.getInstance().drop(event.getTargetEntity());
     }
 
     private static Vector3i targetPosition(Player player, int limit) {

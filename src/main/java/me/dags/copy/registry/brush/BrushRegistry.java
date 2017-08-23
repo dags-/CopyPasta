@@ -4,20 +4,18 @@ import com.google.common.collect.ImmutableList;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
-import org.spongepowered.api.registry.CatalogRegistryModule;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class BrushRegistry implements CatalogRegistryModule<BrushType> {
+public class BrushRegistry {
 
     private static final BrushRegistry instance = new BrushRegistry();
 
@@ -26,7 +24,7 @@ public class BrushRegistry implements CatalogRegistryModule<BrushType> {
 
     private BrushRegistry(){}
 
-    public <T extends Brush> void register(Class<T> type, Supplier<T> supplier) {
+    public <T extends Brush> void register(Class<T> type, BrushSupplier supplier) {
         ImmutableList.Builder<Option<?>> options = ImmutableList.builder();
         for (Field field : type.getFields()) {
             if (Modifier.isStatic(field.getModifiers()) && field.getType() == Option.class) {
@@ -41,22 +39,24 @@ public class BrushRegistry implements CatalogRegistryModule<BrushType> {
 
         String[] aliases = type.isAnnotationPresent(Aliases.class) ? type.getAnnotation(Aliases.class).value() : new String[]{type.getSimpleName().toLowerCase()};
 
-        BrushType brushType = BrushType.of(type, supplier, options.build(), aliases);
+        BrushType brushType = BrushType.of(aliases[0], type, supplier, options.build());
         types.put(type, brushType);
 
-        for (String alias : brushType.getAliases()) {
+        for (String alias : aliases) {
             registry.put(alias, brushType);
         }
     }
 
-    @Override
     public Optional<BrushType> getById(String id) {
         return Optional.ofNullable(registry.get(id));
     }
 
-    @Override
-    public Collection<BrushType> getAll() {
-        return ImmutableList.copyOf(registry.values());
+    public void forEachUnique(BiConsumer<String, BrushType> consumer) {
+        types.values().forEach(type -> consumer.accept(type.getId(), type));
+    }
+
+    public void forEachAlias(BiConsumer<String, BrushType> consumer) {
+        registry.forEach(consumer);
     }
 
     public static BrushRegistry getInstance() {

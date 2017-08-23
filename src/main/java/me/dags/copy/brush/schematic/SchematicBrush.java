@@ -7,8 +7,8 @@ import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.fmt;
 import me.dags.copy.registry.schematic.CachedSchematic;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.DataTranslators;
@@ -29,10 +29,10 @@ import java.util.Optional;
 @Aliases({"schematic", "schem"})
 public class SchematicBrush extends ClipboardBrush {
 
-    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class);
-    public static final Option<Mode> MODE = Option.of("mode", Mode.class);
-    public static final Option<String> NAME = Option.of("name", String.class);
-    public static final Option<String> DIR = Option.of("dir", String.class);
+    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList.supplier());
+    public static final Option<Mode> MODE = Option.of("mode", Mode.SAVE);
+    public static final Option<String> NAME = Option.of("name", "schem");
+    public static final Option<String> DIR = Option.of("dir", "");
 
     @Override
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
@@ -57,7 +57,7 @@ public class SchematicBrush extends ClipboardBrush {
                 DataFormats.NBT.writeTo(outputStream, container);
             }
 
-            SchematicList list = getOptions().ensure(SCHEMATICS, SchematicList::new);
+            SchematicList list = getOptions().must(SCHEMATICS);
             list.add(new SchematicEntry(output));
 
             fmt.info("Saved schematic to %s", output).tell(player);
@@ -74,8 +74,8 @@ public class SchematicBrush extends ClipboardBrush {
 
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
-        if (getOption(MODE, Mode.SAVE) == Mode.PASTE) {
-            SchematicList schematics = getOption(SCHEMATICS, SchematicList.EMPTY);
+        if (getOption(MODE) == Mode.PASTE) {
+            SchematicList schematics = mustOption(SCHEMATICS);
             Optional<CachedSchematic> schematic = chooseNext(schematics);
             schematic.ifPresent(this::setClipboard);
         }
@@ -84,8 +84,8 @@ public class SchematicBrush extends ClipboardBrush {
     }
 
     private Path getFilePath() {
-        String name = getOption(NAME, "schem");
-        String dir = getOption(DIR, "");
+        String name = getOption(NAME);
+        String dir = getOption(DIR);
 
         Path root = CopyPasta.getInstance().getConfigDir().resolve("schematics").resolve(dir);
         Path path;
@@ -99,7 +99,7 @@ public class SchematicBrush extends ClipboardBrush {
         return path;
     }
 
-    private Optional<CachedSchematic> chooseNext(SchematicList schematics) {
+    public Optional<CachedSchematic> chooseNext(SchematicList schematics) {
         for (int i = 0; i < 5; i++) {
             int index = RANDOM.nextInt(schematics.size());
             Optional<CachedSchematic> schematic = schematics.get(index).getSchematic();

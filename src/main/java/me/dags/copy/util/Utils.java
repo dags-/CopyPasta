@@ -5,11 +5,6 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.DataTranslators;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.schematic.BlockPaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 
@@ -18,19 +13,30 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class Utils {
 
-    public static ItemType getHeldItem(Player player) {
-        return player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
-    }
+    public static Path ensure(Path root, String... path) {
+        Path p = root;
+        for (String child : path) {
+            p = p.resolve(child);
+        }
 
-    public static Path ensure(Path root, Object... path) {
-        return root.resolve("todo");
+        Path dir = p;
+        if (!Files.isDirectory(dir)) {
+            dir = dir.getParent();
+        }
+        if (!Files.exists(dir)) {
+            try {
+                Files.createDirectories(dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return p;
     }
 
     public static ConfigurationNode getRootNode(HoconConfigurationLoader loader) {
@@ -49,17 +55,6 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Comparator<String> suggestionSorter(String input) {
-        return (s1, s2) -> {
-            int i1 = s1.indexOf(input);
-            int i2 = s2.indexOf(input);
-            if (i1 != i2) {
-                return Integer.compare(i1, i2);
-            }
-            return Integer.compare(s1.length(), s2.length());
-        };
     }
 
     public static void convertLegacySchematic(Path dir, boolean recurse) {

@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.block.BlockUtils;
 import me.dags.copy.block.Mappers;
 import me.dags.copy.block.property.Axis;
@@ -14,9 +15,9 @@ import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.ReMappers;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.fmt;
 import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -31,17 +32,17 @@ public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
 
-    public static final Option<Boolean> FLIPX = Option.of("x.flip", boolean.class);
-    public static final Option<Boolean> FLIPY = Option.of("y.flip", boolean.class);
-    public static final Option<Boolean> FLIPZ = Option.of("z.flip", boolean.class);
-    public static final Option<Boolean> AUTO_FLIP = Option.of("auto.flip", boolean.class);
-    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", boolean.class);
-    public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.reotate", boolean.class);
-    public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", boolean.class);
-    public static final Option<Boolean> AIR = Option.of("air", boolean.class);
-    public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", boolean.class);
-    public static final Option<Integer> PASTE_OFFSET = Option.of("offset", int.class);
-    public static final Option<ReMappers> MAPPERS = Option.of("mappers", ReMappers.class);
+    public static final Option<Boolean> FLIPX = Option.of("x.flip", false);
+    public static final Option<Boolean> FLIPY = Option.of("y.flip", false);
+    public static final Option<Boolean> FLIPZ = Option.of("z.flip", false);
+    public static final Option<Boolean> AUTO_FLIP = Option.of("auto.flip", true);
+    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", false);
+    public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.rotate", false);
+    public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", false);
+    public static final Option<Boolean> AIR = Option.of("air", false);
+    public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", false);
+    public static final Option<Integer> PASTE_OFFSET = Option.of("offset", 0);
+    public static final Option<ReMappers> MAPPERS = Option.of("mappers", ReMappers.class, ReMappers::new);
 
     private SelectorBrush selector = new SelectorBrush(this);
 
@@ -76,18 +77,18 @@ public class ClipboardBrush extends AbstractBrush {
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         if (clipboard.isPresent()) {
-            if (getOption(REQUIRE_SOLID, false)) {
+            if (getOption(REQUIRE_SOLID)) {
                 pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
                 if (pos == Vector3i.ZERO) {
                     return;
                 }
             }
 
-            int offset = getOption(PASTE_OFFSET, 0);
+            int offset = getOption(PASTE_OFFSET);
             pos = pos.add(0, offset, 0);
 
             VolumeMapper mapper = getMapper(clipboard, player);
-            clipboard.paste(player, getHistory(), pos, mapper, getOption(AIR, false), CopyPasta.getInstance().getCause(player));
+            clipboard.paste(player, getHistory(), pos, mapper, getOption(AIR), PlayerManager.getCause(player));
         } else {
             selector.secondary(player, pos, action);
         }
@@ -95,7 +96,7 @@ public class ClipboardBrush extends AbstractBrush {
 
     @Override
     public void undo(Player player) {
-        PlayerData data = CopyPasta.getInstance().ensureData(player);
+        PlayerData data = PlayerManager.getInstance().must(player);
 
         if (data.isOperating()) {
             fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
@@ -121,29 +122,29 @@ public class ClipboardBrush extends AbstractBrush {
         Facing pvFacing = Facing.getVertical(player);
 
         int angle = 0;
-        boolean flipX = getOption(FLIPX, false);
-        boolean flipY = getOption(FLIPY, false);
-        boolean flipZ = getOption(FLIPZ, false);
+        boolean flipX = getOption(FLIPX);
+        boolean flipY = getOption(FLIPY);
+        boolean flipZ = getOption(FLIPZ);
 
-        if (getOption(AUTO_ROTATE, true)) {
+        if (getOption(AUTO_ROTATE)) {
             angle = clipboard.getHorizontalFacing().angle(phFacing, Axis.y);
         }
 
-        if (getOption(RANDOM_ROTATE, false)) {
+        if (getOption(RANDOM_ROTATE)) {
             int turns = RANDOM.nextInt(4);
             angle = turns * 90;
         }
 
-        if (getOption(AUTO_FLIP, true) && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
+        if (getOption(AUTO_FLIP) && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
             flipY = pvFacing != clipboard.getVerticalFacing();
         }
 
-        if (getOption(RANDOM_FLIPH, false)) {
+        if (getOption(RANDOM_FLIPH)) {
             flipX = RANDOM.nextBoolean();
             flipZ = RANDOM.nextBoolean();
         }
 
-        ReMappers reMappers = getOption(MAPPERS, ReMappers.EMPTY);
+        ReMappers reMappers = getOption(MAPPERS);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
         mappers.addAll(reMappers);
 

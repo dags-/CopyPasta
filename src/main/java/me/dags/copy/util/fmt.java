@@ -1,8 +1,9 @@
-package me.dags.copy;
+package me.dags.copy.util;
 
 import me.dags.commandbus.fmt.Fmt;
 import me.dags.commandbus.fmt.Format;
 import me.dags.commandbus.fmt.Formatter;
+import me.dags.commandbus.fmt.PagFormatter;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 
@@ -18,6 +19,10 @@ public class fmt {
 
     public static Format get() {
         return Fmt.get("copy", DEFAULT);
+    }
+
+    public static PagFormatter page() {
+        return get().list().lines(15);
     }
 
     public static Formatter info(Object s, Object... args) {

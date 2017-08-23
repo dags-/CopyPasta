@@ -4,11 +4,12 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
-import me.dags.copy.fmt;
 import me.dags.copy.operation.PasteOperation;
 import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
@@ -61,7 +62,7 @@ public class Clipboard {
             return;
         }
 
-        PlayerData data = CopyPasta.getInstance().ensureData(player);
+        PlayerData data = PlayerManager.getInstance().must(player);
 
         if (data.isOperating()) {
             fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);

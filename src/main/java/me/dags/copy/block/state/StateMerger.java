@@ -16,7 +16,7 @@ import java.util.Map;
  */
 class StateMerger implements State.Merger {
 
-    static final StateMerger EMPTY = new StateMerger();
+    private static final StateMerger EMPTY = new StateMerger();
 
     private final BlockType type;
     private final Map<String, Object> properties;

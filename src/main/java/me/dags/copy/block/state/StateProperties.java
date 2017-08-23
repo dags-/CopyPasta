@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public class StateProperties implements State.Properties {
 
-    static StateProperties EMPTY = new StateProperties(BlockTypes.AIR, Collections.emptyMap());
+    private static StateProperties EMPTY = new StateProperties(BlockTypes.AIR, Collections.emptyMap());
 
     private final BlockType type;
     private final Map<String, Object> properties;
