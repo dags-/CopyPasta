@@ -1,10 +1,12 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Action;
-import me.dags.copy.brush.History;
+import me.dags.copy.brush.Aliases;
+import me.dags.copy.brush.clipboard.Clipboard;
+import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.registry.brush.BrushSupplier;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -12,10 +14,11 @@ import org.spongepowered.api.entity.living.player.Player;
 /**
  * @author dags <dags@dags.me>
  */
-public class StencilBrush extends AbstractBrush {
+@Aliases({"stencil"})
+public class StencilBrush extends ClipboardBrush {
 
     public static final Option<Stencil> STENCIL = Option.of("stencil", Stencil.EMPTY);
-    public static final Option<BlockState> MATERIAL = Option.of("material", BlockTypes.SAND.getDefaultState());
+    public static final Option<BlockState> MATERIAL = Option.of("material", BlockState.class, BlockTypes.SAND::getDefaultState);
 
     @Override
     public String getPermission() {
@@ -23,29 +26,22 @@ public class StencilBrush extends AbstractBrush {
     }
 
     @Override
-    public void primary(Player player, Vector3i pos, Action action) {
-
-    }
-
-    @Override
     public void secondary(Player player, Vector3i pos, Action action) {
-
-    }
-
-    @Override
-    public void apply(Player player, Vector3i pos, History history) {
         Stencil stencil = getOption(STENCIL);
-        BlockState state = getOption(MATERIAL);
+        BlockState material = getOption(MATERIAL);
 
-        if (!stencil.isPresent()) {
+        if (!stencil.isPresent() || material.getType() == BlockTypes.AIR) {
             return;
         }
 
+        StencilVolume volume = new StencilVolume(stencil, material);
+        Clipboard clipboard = Clipboard.of(player, volume, stencil.getCenter().mul(-1), true);
+        setClipboard(clipboard);
 
+        apply(player, pos, getHistory());
     }
 
-    @Override
-    public void undo(Player player, History history) {
-
+    public static BrushSupplier supplier() {
+        return player -> new StencilBrush();
     }
 }

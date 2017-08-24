@@ -45,6 +45,10 @@ public class ClipboardBrush extends AbstractBrush {
     private SelectorBrush selector = new SelectorBrush(this);
     private Clipboard clipboard = Clipboard.empty();
 
+    public ClipboardBrush() {
+        super(5);
+    }
+
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
         Clipboard clipboard = Clipboard.of(player, min, max, origin);
         setClipboard(clipboard);
@@ -99,7 +103,7 @@ public class ClipboardBrush extends AbstractBrush {
         pos = pos.add(0, offset, 0);
 
         VolumeMapper mapper = getMapper(clipboard, player);
-        clipboard.paste(player, getHistory(), pos, mapper, getOption(AIR), PlayerManager.getCause(player));
+        clipboard.paste(player, history, pos, mapper, getOption(AIR), PlayerManager.getCause(player));
     }
 
     @Override

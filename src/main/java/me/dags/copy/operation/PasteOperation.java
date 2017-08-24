@@ -30,17 +30,17 @@ import java.util.UUID;
  */
 public class PasteOperation implements Operation {
 
-    private final boolean air;
-    private final UUID owner;
-    private final Cause cause;
-    private final History history;
-    private final Vector3i position;
-    private final BlockVolume source;
-    private final WeakReference<World> world;
+    protected final boolean air;
+    protected final UUID owner;
+    protected final Cause cause;
+    protected final History history;
+    protected final Vector3i position;
+    protected final BlockVolume source;
+    protected final WeakReference<World> world;
 
-    private final List<LocatableBlockChange> transactions = new LinkedList<>();
+    protected final List<LocatableBlockChange> transactions = new LinkedList<>();
 
-    private boolean cancelled = false;
+    protected boolean cancelled = false;
 
     public PasteOperation(Cause cause, WeakReference<World> world, UUID uuid, BlockVolume source, Vector3i position, History history, boolean air) {
         this.air = air;

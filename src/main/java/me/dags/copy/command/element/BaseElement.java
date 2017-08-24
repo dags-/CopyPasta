@@ -4,6 +4,7 @@ import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.Element;
+import me.dags.commandbus.element.function.Filter;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +43,7 @@ abstract class BaseElement implements Element {
 
                 String upper = e.toUpperCase();
                 for (String option : options) {
-                    if (option.toUpperCase().startsWith(upper)) {
+                    if (getFilter().test(option, upper)) {
                         suggestions.add(option);
                     }
                 }
@@ -50,6 +51,10 @@ abstract class BaseElement implements Element {
                 e.printStackTrace();
             }
         }
+    }
+
+    Filter getFilter() {
+        return Filter.STARTS_WITH;
     }
 
     abstract Collection<String> getOptions(Context context);

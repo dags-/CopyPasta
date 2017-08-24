@@ -9,6 +9,7 @@ import me.dags.copy.brush.multi.MultiPointBrush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
 import me.dags.copy.brush.schematic.SchematicBrush;
+import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.command.BrushCommands;
 import me.dags.copy.command.element.BrushElement;
 import me.dags.copy.command.element.OptionElement;
@@ -31,6 +32,8 @@ import org.spongepowered.api.text.chat.ChatTypes;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
@@ -60,6 +63,7 @@ public class CopyPasta {
         BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
         BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
         BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
+        BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
     }
 
@@ -116,6 +120,13 @@ public class CopyPasta {
 
     public void submitAsync(Runnable runnable) {
         asyncExecutor.submit(runnable);
+    }
+
+    public <T> void submitAsync(Supplier<T> async, Consumer<T> callback) {
+        asyncExecutor.submit(() -> {
+            T t = async.get();
+            Task.builder().execute(() -> callback.accept(t)).submit(getInstance());
+        });
     }
 
     public static CopyPasta getInstance() {

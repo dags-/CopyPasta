@@ -23,7 +23,7 @@ public class MultiPointBrush extends AbstractBrush {
     private static final Random RANDOM = new Random();
 
     public static final Option<Integer> RADIUS = Option.of("radius", 10);
-    public static final Option<Float> DENSITY = Option.of("density", 0.05F);
+    public static final Option<Float> DENSITY = Option.of("density", 0.5F);
     public static final Option<Integer> SPACING = Option.of("spacing", 2);
 
     private final Brush delegate;
@@ -46,19 +46,28 @@ public class MultiPointBrush extends AbstractBrush {
 
     @Override
     public void primary(Player player, Vector3i pos, Action action) {
-        delegate.primary(player, pos, action);
+        if (action == Action.PRIMARY) {
+            undo(player, getHistory());
+        }
     }
 
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
+        PlayerData data = PlayerManager.getInstance().must(player);
+
+        if (data.isOperating()) {
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+
+        data.setOperating(true);
+
         if (action == Action.PRIMARY) {
             List<Vector3i> list = getLocations(pos);
             history = new History(list.size());
             for (Vector3i vec : list) {
                 apply(player, vec, history);
             }
-        } else {
-            delegate.secondary(player, pos, action);
         }
     }
 
@@ -76,13 +85,15 @@ public class MultiPointBrush extends AbstractBrush {
             return;
         }
 
-        if (history.hasNext()) {
-            data.setOperating(true);
+        if (!history.hasNext()) {
+            fmt.error("No more history to undo").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+
+        while (history.hasNext()) {
             List<BlockSnapshot> record = history.popRecord();
             UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
-        } else {
-            fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
         }
     }
 
@@ -100,8 +111,7 @@ public class MultiPointBrush extends AbstractBrush {
         int s2 = spacing * spacing;
         for (int dz = 0; dz <= radius; dz++) {
             for (int dx = 0; dx <= radius; dx++) {
-                int px = center.getX() + dx, pz = center.getZ() + dz;
-                if (((px * px) + (pz * pz)) <= r2) {
+                if (((dx * dx) + (dz * dz)) <= r2) {
                     addPoint(list, center, dx, dz, density, s2);
                     if (dx == 0 && dz == 0) {
                         continue;

@@ -1,15 +1,12 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.copy.block.VolumeVisitor;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.BitSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,6 +17,7 @@ public class Stencil {
     static final Stencil EMPTY = new Stencil(new BitSet(0), 0, 0);
 
     private final BitSet pixels;
+    private final Vector3i center;
     private final int width;
     private final int height;
 
@@ -27,6 +25,7 @@ public class Stencil {
         this.pixels = pixels;
         this.width = width;
         this.height = height;
+        this.center = new Vector3i(width / 2, 0, height / 2);
     }
 
     private Stencil(byte[] data, int width, int height) {
@@ -37,23 +36,21 @@ public class Stencil {
         return this != EMPTY;
     }
 
-    public void iterate(VolumeVisitor visitor) {
-        int xOff = width / 2;
-        int zOff = height / 2;
-        for (int z = 0; z < height; z++) {
-            for (int x = 0; x < width; x++) {
-                int index = (z * width) + x;
-                if (pixels.get(index)) {
-                    visitor.visit(x - xOff, 0, z - zOff);
-                }
-            }
-        }
+    public Vector3i getCenter() {
+        return center;
     }
 
-    public List<Vector3i> getPoints(Vector3i center) {
-        List<Vector3i> pixels = new LinkedList<>();
-        iterate((x, y, z) -> pixels.add(center.add(x, y, z)));
-        return pixels;
+    public Vector3i getMin() {
+        return Vector3i.ZERO;
+    }
+
+    public Vector3i getMax() {
+        return new Vector3i(width, 0, height);
+    }
+
+    public boolean contains(int x, int y, int z) {
+        int index = (z * width) + x;
+        return index < pixels.size() && pixels.get(index);
     }
 
     public static Optional<Stencil> fromUrl(String url, int scale, float min) {

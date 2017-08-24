@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-4'
+    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-5'
 }
 
 shadowJar {

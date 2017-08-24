@@ -5,13 +5,16 @@ import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
+import me.dags.copy.operation.Operation;
 import me.dags.copy.operation.PasteOperation;
+import me.dags.copy.operation.StencilPasteOperation;
 import me.dags.copy.operation.VolumeMapper;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.BlockVolume;
+import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -28,17 +31,24 @@ public class Clipboard {
     private final Facing verticalFacing;
     private final BlockVolume source;
     private final Vector3i origin;
+    private final boolean stencil;
 
     private Clipboard() {
         this.horizontalFacing = Facing.none;
         this.verticalFacing = Facing.none;
         this.source = null;
+        this.stencil = false;
         this.origin = Vector3i.ZERO;
     }
 
     protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
+        this(source, origin, horizontalFacing, verticalFacing, false);
+    }
+
+    protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing, boolean stencil) {
         this.source = source;
         this.origin = origin;
+        this.stencil = stencil;
         this.verticalFacing = verticalFacing;
         this.horizontalFacing = horizontalFacing;
     }
@@ -76,7 +86,12 @@ public class Clipboard {
             @Override
             public void onSuccess(@Nullable BlockVolume result) {
                 if (result != null) {
-                    PasteOperation operation = new PasteOperation(cause, worldRef, uuid, result, position, history, air);
+                    Operation operation;
+                    if (stencil) {
+                        operation = new StencilPasteOperation(cause, worldRef, uuid, result, position, history, air);
+                    } else {
+                        operation = new PasteOperation(cause, worldRef, uuid, result, position, history, air);
+                    }
                     CopyPasta.getInstance().getOperationManager().queueOperation(operation);
                 }
             }
@@ -99,5 +114,11 @@ public class Clipboard {
         Facing horizontalFacing = Facing.getHorizontal(player);
         BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView().getImmutableBlockCopy();
         return new Clipboard(backing.getImmutableBlockCopy(), offset, horizontalFacing, verticalFacing);
+    }
+
+    public static Clipboard of(Player player, ImmutableBlockVolume volume, Vector3i origin, boolean stencil) {
+        Facing verticalFacing = Facing.getVertical(player);
+        Facing horizontalFacing = Facing.getHorizontal(player);
+        return new Clipboard(volume, origin, horizontalFacing, verticalFacing, stencil);
     }
 }

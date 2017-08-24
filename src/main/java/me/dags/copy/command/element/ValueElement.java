@@ -6,6 +6,7 @@ import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.ElementFactory;
 import me.dags.commandbus.element.ElementProvider;
+import me.dags.commandbus.element.function.Filter;
 import me.dags.commandbus.element.function.ValueParser;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
@@ -50,6 +51,11 @@ public class ValueElement extends BaseElement {
         }
 
         return factory.getOptions(option.getType()).get().collect(Collectors.toList());
+    }
+
+    @Override
+    Filter getFilter() {
+        return Filter.CONTAINS;
     }
 
     public static ElementProvider provider() {
