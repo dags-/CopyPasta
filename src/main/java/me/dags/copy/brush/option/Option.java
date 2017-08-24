@@ -1,7 +1,8 @@
 package me.dags.copy.brush.option;
 
 import me.dags.commandbus.utils.ClassUtils;
-import org.spongepowered.api.CatalogType;
+import me.dags.copy.util.Serializable;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
@@ -9,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * @author dags <dags@dags.me>
  */
-public class Option<T> implements CatalogType {
+public class Option<T> {
 
     private final String key;
     private final Class<T> type;
@@ -19,6 +20,21 @@ public class Option<T> implements CatalogType {
         this.key = key;
         this.type = type;
         this.defaultValue = defaultValue;
+        register();
+    }
+
+    private void register() {
+        Value value = defaultValue.get();
+        if (value.isPresent()) {
+            Object o = value.get();
+            if (o instanceof Serializable) {
+                Serializable.class.cast(o).register(TypeSerializers.getDefaultSerializers());
+            }
+        }
+    }
+
+    public String getId() {
+        return key;
     }
 
     public Class<T> getType() {
@@ -31,16 +47,6 @@ public class Option<T> implements CatalogType {
 
     public boolean accepts(Object o) {
         return o != null && getType().isInstance(o);
-    }
-
-    @Override
-    public String getId() {
-        return key;
-    }
-
-    @Override
-    public String getName() {
-        return key;
     }
 
     @Override

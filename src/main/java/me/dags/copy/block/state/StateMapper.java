@@ -13,12 +13,26 @@ import java.util.Map;
  */
 class StateMapper implements State.Mapper {
 
-    static final StateMapper EMPTY = new StateMapper(Collections.emptyMap());
+    static final StateMapper EMPTY = new StateMapper("", "", Collections.emptyMap());
 
     private final Map<BlockState, BlockState> mappings;
+    private final String match;
+    private final String replace;
 
-    StateMapper(Map<BlockState, BlockState> states) {
+    StateMapper(String match, String replace, Map<BlockState, BlockState> states) {
         this.mappings = states;
+        this.match = match;
+        this.replace = replace;
+    }
+
+    @Override
+    public String getMatch() {
+        return match;
+    }
+
+    @Override
+    public String getReplace() {
+        return replace;
     }
 
     @Override
@@ -39,7 +53,7 @@ class StateMapper implements State.Mapper {
         return mappings.toString();
     }
 
-    static State.Mapper mapper(Iterable<Merger> mergers) {
+    static State.Mapper mapper(String match, String replace, Iterable<Merger> mergers) {
         Map<BlockState, BlockState> map = new HashMap<>();
         Sponge.getRegistry().getAllOf(BlockState.class).forEach(state -> {
             for (Merger merger : mergers) {
@@ -49,11 +63,11 @@ class StateMapper implements State.Mapper {
                 }
             }
         });
-        return new StateMapper(ImmutableMap.copyOf(map));
+        return new StateMapper(match, replace, ImmutableMap.copyOf(map));
     }
 
 
-    static State.Mapper mapper(State.Merger... mergers) {
+    static State.Mapper mapper(String match, String replace, State.Merger... mergers) {
         Map<BlockState, BlockState> map = new HashMap<>();
         Sponge.getRegistry().getAllOf(BlockState.class).forEach(state -> {
             for (Merger merger : mergers) {
@@ -63,6 +77,6 @@ class StateMapper implements State.Mapper {
                 }
             }
         });
-        return new StateMapper(ImmutableMap.copyOf(map));
+        return new StateMapper(match, replace, ImmutableMap.copyOf(map));
     }
 }

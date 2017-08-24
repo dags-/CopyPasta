@@ -16,21 +16,27 @@ import java.util.Map;
  */
 class StateMerger implements State.Merger {
 
-    private static final StateMerger EMPTY = new StateMerger();
+    private static final StateMerger EMPTY = new StateMerger("", "");
 
     private final BlockType type;
+    private final String match;
+    private final String replace;
     private final Map<String, Object> properties;
     private final State.Matcher matcher;
 
-    private StateMerger() {
+    private StateMerger(String match, String replace) {
+        this.match = match;
+        this.replace = replace;
         this.type = BlockTypes.AIR;
         this.matcher = StateMatcher.EMPTY;
         this.properties = Collections.emptyMap();
     }
 
-    private StateMerger(State.Matcher matcher, BlockType type, Map<String, Object> map) {
+    private StateMerger(String match, String replace, Matcher matcher, BlockType type, Map<String, Object> map) {
         this.type = type;
         this.matcher = matcher;
+        this.match = match;
+        this.replace = replace;
         this.properties = map;
     }
 
@@ -77,6 +83,16 @@ class StateMerger implements State.Merger {
     }
 
     @Override
+    public String getMatch() {
+        return match;
+    }
+
+    @Override
+    public String getReplace() {
+        return replace;
+    }
+
+    @Override
     public State.Mapper toMapper() {
         if (isPresent()) {
             ImmutableMap.Builder<BlockState, BlockState> builder = ImmutableMap.builder();
@@ -88,7 +104,7 @@ class StateMerger implements State.Merger {
                 }
             });
 
-            return new StateMapper(builder.build());
+            return new StateMapper(match, replace, builder.build());
         }
 
         return StateMapper.EMPTY;
@@ -118,7 +134,7 @@ class StateMerger implements State.Merger {
                 }
             }
 
-            return new StateMerger(matcher, type, ImmutableMap.copyOf(props));
+            return new StateMerger(match, replace, matcher, type, ImmutableMap.copyOf(props));
         }
 
         return StateMerger.EMPTY;

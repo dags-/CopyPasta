@@ -3,8 +3,6 @@ package me.dags.copy.brush.clipboard;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.CopyPasta;
-import me.dags.copy.PlayerData;
-import me.dags.copy.PlayerManager;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
 import me.dags.copy.operation.PasteOperation;
@@ -26,14 +24,14 @@ public class Clipboard {
 
     private static final Clipboard EMPTY = new Clipboard();
 
-    private final Facing verticalFacing;
     private final Facing horizontalFacing;
+    private final Facing verticalFacing;
     private final BlockVolume source;
     private final Vector3i origin;
 
     private Clipboard() {
-        this.verticalFacing = Facing.none;
         this.horizontalFacing = Facing.none;
+        this.verticalFacing = Facing.none;
         this.source = null;
         this.origin = Vector3i.ZERO;
     }
@@ -61,15 +59,6 @@ public class Clipboard {
         if (!isPresent()) {
             return;
         }
-
-        PlayerData data = PlayerManager.getInstance().must(player);
-
-        if (data.isOperating()) {
-            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
-            return;
-        }
-
-        data.setOperating(true);
 
         Vector3i volumeOffset = transform.volumeOffset(source);
         Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);

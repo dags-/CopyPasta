@@ -7,6 +7,7 @@ import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.registry.schematic.CachedSchematic;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.data.DataContainer;
@@ -26,7 +27,7 @@ import java.util.Optional;
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"schematic", "schem"})
+@Aliases({"schematic", "schem", "s"})
 public class SchematicBrush extends ClipboardBrush {
 
     public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList.supplier());
@@ -114,5 +115,9 @@ public class SchematicBrush extends ClipboardBrush {
         PASTE,
         SAVE,
         ;
+    }
+
+    public static BrushSupplier supplier() {
+        return player -> new SchematicBrush();
     }
 }

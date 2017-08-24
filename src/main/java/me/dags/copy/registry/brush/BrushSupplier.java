@@ -1,14 +1,12 @@
 package me.dags.copy.registry.brush;
 
 import me.dags.copy.brush.Brush;
-
-import java.util.function.Supplier;
+import org.spongepowered.api.entity.living.player.Player;
 
 /**
  * @author dags <dags@dags.me>
  */
-public interface BrushSupplier extends Supplier<Brush> {
+public interface BrushSupplier {
 
-    @Override
-    Brush get();
+    Brush create(Player player);
 }

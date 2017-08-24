@@ -1,8 +1,9 @@
 package me.dags.copy.registry.brush;
 
-import me.dags.copy.PlayerData;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class BrushType {
     private BrushType() {
         name = "none";
         type =  Brush.class;
-        supplier = () -> null;
+        supplier = p -> null;
         options = Collections.emptyList();
     }
 
@@ -35,12 +36,12 @@ public class BrushType {
         this.supplier = supplier;
     }
 
-    public Optional<Brush> create(PlayerData data) {
-        Brush brush = supplier.get();
+    public Optional<Brush> create(Player player) {
+        Brush brush = supplier.create(player);
         if (brush == null) {
             return Optional.empty();
         }
-        return Optional.of(data.apply(brush));
+        return Optional.of(PlayerManager.getInstance().must(player).apply(brush));
     }
 
     public Class<? extends Brush> getType() {

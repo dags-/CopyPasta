@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
+    compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
     shadow 'com.github.dags-:CommandBus:2.0.0-TEST-4'
 }
 

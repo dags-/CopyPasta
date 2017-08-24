@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Action;
+import me.dags.copy.brush.History;
 import me.dags.copy.brush.option.Options;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
@@ -80,7 +81,12 @@ public class SelectorBrush extends AbstractBrush {
     }
 
     @Override
-    public void undo(Player player) {
+    public void apply(Player player, Vector3i pos, History history) {
+
+    }
+
+    @Override
+    public void undo(Player player, History history) {
 
     }
 

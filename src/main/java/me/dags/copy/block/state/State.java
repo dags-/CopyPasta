@@ -57,12 +57,20 @@ public interface State {
 
         BlockState merge(BlockState state);
 
+        String getMatch();
+
+        String getReplace();
+
         Mapper toMapper();
     }
 
     interface Mapper extends State, BlockVolumeMapper {
 
         BlockState map(BlockState state);
+
+        String getMatch();
+
+        String getReplace();
 
         default BlockState map(UnmodifiableBlockVolume volume, int x, int y, int z) {
             return map(volume.getBlock(x, y, z));
@@ -96,12 +104,12 @@ public interface State {
         return merger(match, replace).toMapper();
     }
 
-    static Mapper mapper(Merger... mergers) {
-        return StateMapper.mapper(mergers);
+    static Mapper mapper(String match, String replace, Merger... mergers) {
+        return StateMapper.mapper(match, replace, mergers);
     }
 
-    static Mapper mapper(Iterable<Merger> mergers) {
-        return StateMapper.mapper(mergers);
+    static Mapper mapper(String match, String replace, Iterable<Merger> mergers) {
+        return StateMapper.mapper(match, replace, mergers);
     }
 
     static Mapper rotate(Axis axis, int angle) {
@@ -113,7 +121,7 @@ public interface State {
         Property.rotate(match, replace, Axis.values(), axis, angle, mergers);
         Property.rotate(match, replace, Half.values(), axis, angle, mergers);
         Property.rotate(match, replace, Facing.values(), axis, angle, mergers);
-        return mapper(mergers);
+        return mapper(match, replace, mergers);
     }
 
     static Mapper flip(Axis direction) {
@@ -125,6 +133,6 @@ public interface State {
         Property.flip(match, replace, Axis.values(), direction, mergers);
         Property.flip(match, replace, Half.values(), direction, mergers);
         Property.flip(match, replace, Facing.values(), direction, mergers);
-        return mapper(mergers);
+        return mapper(match, replace, mergers);
     }
 }

@@ -48,7 +48,7 @@ public class OptionElement extends BaseElement {
         if (type == null) {
             return Collections.emptyList();
         }
-        return type.getOptions().stream().map(Option::getName).collect(Collectors.toList());
+        return type.getOptions().stream().map(Option::getId).collect(Collectors.toList());
     }
 
     private BrushType getBrush(Context context) {

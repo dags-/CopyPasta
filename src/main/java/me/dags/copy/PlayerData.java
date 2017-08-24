@@ -67,12 +67,14 @@ public class PlayerData {
     }
 
     public Brush apply(Brush brush) {
-        ConfigurationNode node = root.getNode(brush.getType().getId());
-        for (Option<?> option : brush.getType().getOptions()) {
-            ConfigurationNode child = node.getNode(option.getId());
-            Object value = child.getValue();
-            if (option.accepts(value)) {
-                brush.setOption(option, value);
+        if (brush != null) {
+            ConfigurationNode node = root.getNode(brush.getType().getId());
+            for (Option<?> option : brush.getType().getOptions()) {
+                ConfigurationNode child = node.getNode(option.getId());
+                Object value = child.getValue();
+                if (option.accepts(value)) {
+                    brush.setOption(option, value);
+                }
             }
         }
         return brush;

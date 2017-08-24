@@ -5,6 +5,7 @@ import me.dags.commandbus.CommandBus;
 import me.dags.commandbus.element.ElementFactory;
 import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
+import me.dags.copy.brush.multi.MultiPointBrush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
 import me.dags.copy.brush.schematic.SchematicBrush;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(id = CopyPasta.ID, name = "CopyPasta", version = "0.2", description = ".")
+@Plugin(id = CopyPasta.ID, name = "CopyPasta", version = "0.3", description = ".")
 public class CopyPasta {
 
     public static final String ID = "copypasta";
@@ -56,13 +57,14 @@ public class CopyPasta {
 
     @Listener
     public void pre(GamePreInitializationEvent event) {
-        BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush::new);
-        BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush::new);
+        BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
+        BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
+        BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
+        asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
     }
 
     @Listener
     public void init(GameInitializationEvent event) {
-        asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
         reload(null);
 
         ElementFactory factory = CommandBus.elements()

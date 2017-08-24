@@ -10,13 +10,11 @@ import me.dags.copy.block.Mappers;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
-import me.dags.copy.brush.AbstractBrush;
-import me.dags.copy.brush.Action;
-import me.dags.copy.brush.Aliases;
-import me.dags.copy.brush.ReMappers;
+import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -27,7 +25,7 @@ import java.util.Random;
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"clipboard", "cb"})
+@Aliases({"clipboard", "c"})
 public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
@@ -45,7 +43,6 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<ReMappers> MAPPERS = Option.of("mappers", ReMappers.class, ReMappers::new);
 
     private SelectorBrush selector = new SelectorBrush(this);
-
     private Clipboard clipboard = Clipboard.empty();
 
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
@@ -63,12 +60,12 @@ public class ClipboardBrush extends AbstractBrush {
     public void primary(Player player, Vector3i pos, Action action) {
         if (clipboard.isPresent()) {
             if (action == Action.SECONDARY) {
-                setClipboard(null);
+                setClipboard(Clipboard.empty());
                 fmt.info("Cleared clipboard").tell(player);
                 return;
             }
 
-            undo(player);
+            undo(player, getHistory());
         } else {
             selector.primary(player, pos, action);
         }
@@ -77,25 +74,36 @@ public class ClipboardBrush extends AbstractBrush {
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         if (clipboard.isPresent()) {
-            if (getOption(REQUIRE_SOLID)) {
-                pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
-                if (pos == Vector3i.ZERO) {
-                    return;
-                }
-            }
-
-            int offset = getOption(PASTE_OFFSET);
-            pos = pos.add(0, offset, 0);
-
-            VolumeMapper mapper = getMapper(clipboard, player);
-            clipboard.paste(player, getHistory(), pos, mapper, getOption(AIR), PlayerManager.getCause(player));
+            apply(player, pos, getHistory());
         } else {
             selector.secondary(player, pos, action);
         }
     }
 
     @Override
-    public void undo(Player player) {
+    public void apply(Player player, Vector3i pos, History history) {
+        if (!clipboard.isPresent()) {
+            return;
+        }
+
+        if (getOption(REQUIRE_SOLID)) {
+            pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
+            if (pos == Vector3i.ZERO) {
+                return;
+            }
+        }
+
+        PlayerManager.getInstance().must(player).setOperating(true);
+
+        int offset = getOption(PASTE_OFFSET);
+        pos = pos.add(0, offset, 0);
+
+        VolumeMapper mapper = getMapper(clipboard, player);
+        clipboard.paste(player, getHistory(), pos, mapper, getOption(AIR), PlayerManager.getCause(player));
+    }
+
+    @Override
+    public void undo(Player player, History history) {
         PlayerData data = PlayerManager.getInstance().must(player);
 
         if (data.isOperating()) {
@@ -103,10 +111,10 @@ public class ClipboardBrush extends AbstractBrush {
             return;
         }
 
-        if (getHistory().hasNext()) {
+        if (history.hasNext()) {
             data.setOperating(true);
-            List<BlockSnapshot> record = getHistory().popRecord();
-            UndoOperation operation = new UndoOperation(record, player.getUniqueId(), getHistory());
+            List<BlockSnapshot> record = history.popRecord();
+            UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
             fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
@@ -165,5 +173,9 @@ public class ClipboardBrush extends AbstractBrush {
         }
 
         return new VolumeMapper(angle, flipX, flipY, flipZ, mappers.build());
+    }
+
+    public static BrushSupplier supplier() {
+        return player -> new ClipboardBrush();
     }
 }

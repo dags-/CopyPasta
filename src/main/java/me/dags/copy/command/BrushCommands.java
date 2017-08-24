@@ -52,7 +52,7 @@ public class BrushCommands {
             data.removeBrush(item);
             fmt.sub("Removed %s brush", type).tell(player);
         } else {
-            Optional<Brush> brush = type.create(data);
+            Optional<Brush> brush = type.create(player);
             if (brush.isPresent()) {
                 data.setBrush(item, brush.get());
                 fmt.info("Set brush ").stress(type).info(" to item ").stress(item.getName()).tell(player);
