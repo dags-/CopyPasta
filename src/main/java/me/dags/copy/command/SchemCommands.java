@@ -3,7 +3,7 @@ package me.dags.copy.command;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
-import me.dags.copy.brush.schematic.SchematicEntry;
+import me.dags.copy.registry.schematic.SchematicEntry;
 import org.spongepowered.api.entity.living.player.Player;
 
 /**

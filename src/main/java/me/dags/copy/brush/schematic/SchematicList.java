@@ -1,16 +1,12 @@
 package me.dags.copy.brush.schematic;
 
 import com.google.common.reflect.TypeToken;
+import me.dags.copy.registry.schematic.SchematicEntry;
 import me.dags.copy.util.Serializable;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -76,24 +72,11 @@ public class SchematicList implements Iterable<SchematicEntry>, Serializable<Sch
         return () -> new SchematicList(new LinkedList<>());
     }
 
-    public static SchematicList forDir(Path dir, String glob) {
-        List<SchematicEntry> entries = new LinkedList<>();
-
-        try {
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher(glob);
-            Files.list(dir).filter(p -> matcher.matches(p.getFileName())).map(SchematicEntry::new).forEach(entries::add);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new SchematicList(entries);
-    }
-
     private static TypeSerializer<SchematicList> SERIALIZER = new TypeSerializer<SchematicList>() {
         @Override
         public SchematicList deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
             SchematicList list = new SchematicList();
-            list.addAll(value.getList(SchematicEntry.TOKEN));
+
             return list;
         }
 

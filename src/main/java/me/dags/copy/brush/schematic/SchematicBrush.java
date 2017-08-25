@@ -16,7 +16,6 @@ import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.schematic.BlockPaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -73,22 +72,6 @@ public class SchematicBrush extends ClipboardBrush {
         }
 
         super.secondary(player, pos, action);
-    }
-
-    private Path getFilePath() {
-        String name = getOption(NAME);
-        String dir = getOption(DIR);
-
-        Path root = CopyPasta.getInstance().getConfigDir().resolve("schematics").resolve(dir);
-        Path path;
-
-        int counter = 0;
-        String fileName = String.format("%s-%03d.schematic", name, counter);
-        while (Files.exists(path = root.resolve(fileName))) {
-            fileName = String.format("%s-%03d.schematic", name, ++counter);
-        }
-
-        return path;
     }
 
     public Optional<CachedSchematic> chooseNext(SchematicList schematics) {

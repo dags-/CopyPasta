@@ -3,6 +3,7 @@ package me.dags.copy.registry.schematic;
 import me.dags.copy.CopyPasta;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataTranslators;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.schematic.Schematic;
@@ -30,19 +31,35 @@ public class Repository {
     private final String name;
     private final String extension;
     private final PathMatcher matcher;
+    private final DataTranslator<Schematic> format;
 
     private volatile List<Path> tree = Collections.emptyList();
 
-    public Repository(Path root, String name) {
-        this(root, name, "schematic");
-    }
-
-    public Repository(Path root, String name, String extension) {
+    public Repository(Path root, String name, String extension, DataTranslator<Schematic> format) {
         this.name = name;
         this.root = root;
         this.extension = extension;
+        this.format = format;
         this.matcher = FileSystems.getDefault().getPathMatcher("glob:*." + extension);
         Task.builder().execute(this::scan).interval(15, TimeUnit.MINUTES).submit(CopyPasta.getInstance());
+    }
+
+    public DataTranslator<Schematic> getFormat() {
+        return format;
+    }
+
+    public Path getRelative(Path in) {
+        if (in.startsWith(root)) {
+            return root.relativize(in);
+        }
+        return in;
+    }
+
+    public Path getAbsolute(Path relative) {
+        if (relative.startsWith(root)) {
+            return relative;
+        }
+        return root.resolve(relative);
     }
 
     public String getName() {
