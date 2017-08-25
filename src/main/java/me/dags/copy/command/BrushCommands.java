@@ -30,7 +30,18 @@ import java.util.function.Supplier;
  */
 public class BrushCommands {
 
-    private Optional<Brush> getBrush(Player player) {
+    static  <T extends Brush> Optional<T> getBrush(Player player, Class<T> type) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            if (type.isInstance(brush.get())) {
+                return brush.map(type::cast);
+            }
+            fmt.error("Current brush is not a %s", type.getSimpleName());
+        }
+        return Optional.empty();
+    }
+
+    static Optional<Brush> getBrush(Player player) {
         Optional<ItemType> item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
         if (!item.isPresent()) {
             fmt.error("You are not holding an item").tell(player);
@@ -117,8 +128,8 @@ public class BrushCommands {
 
     @Permission
     @Command("stencil <url> <samples> <threshold>")
-    @Description("Create a line stencil from an image on the given url")
-    public void stencil(@Src Player player, String url, int scale, float level) {
+    @Description("Create a line stencil from an image at the given url")
+    public void stencil(@Src Player player, String url, int samples, float threshold) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
             if (brush.get().getType().getType() != StencilBrush.class) {
@@ -126,7 +137,7 @@ public class BrushCommands {
                 return;
             }
 
-            Supplier<Optional<Stencil>> supplier = () -> Stencil.fromUrl(url, scale, level);
+            Supplier<Optional<Stencil>> supplier = () -> Stencil.fromUrl(url, samples, threshold);
             Consumer<Optional<Stencil>> consumer = stencil -> {
                 if (stencil.isPresent()) {
                     brush.get().setOption(StencilBrush.STENCIL, stencil.get());

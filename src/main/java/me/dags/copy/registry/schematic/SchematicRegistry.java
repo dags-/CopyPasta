@@ -38,7 +38,7 @@ public class SchematicRegistry implements CacheLoader<Path, CachedSchematic> {
 
     }
 
-    public Optional<CachedSchematic> get(Path path) {
+    public Optional<CachedSchematic> getSchematic(Path path) {
         return Optional.ofNullable(cache.get(path));
     }
 

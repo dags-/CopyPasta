@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 /**
  * @author dags <dags@dags.me>
@@ -27,7 +28,8 @@ public class BrushRegistry {
     public <T extends Brush> void register(Class<T> type, BrushSupplier supplier) {
         ImmutableList.Builder<Option<?>> options = ImmutableList.builder();
         for (Field field : type.getFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && field.getType() == Option.class) {
+            int modifiers = field.getModifiers();
+            if (Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers) && field.getType() == Option.class) {
                 try {
                     Option option = (Option) field.get(null);
                     options.add(option);
@@ -57,6 +59,10 @@ public class BrushRegistry {
 
     public void forEachAlias(BiConsumer<String, BrushType> consumer) {
         registry.forEach(consumer);
+    }
+
+    public Stream<String> getAliases() {
+        return registry.keySet().stream();
     }
 
     public static BrushRegistry getInstance() {

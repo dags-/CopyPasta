@@ -26,7 +26,7 @@ public class SchematicEntry implements Serializable<SchematicEntry> {
     }
 
     public Optional<CachedSchematic> getSchematic() {
-        return SchematicRegistry.getInstance().get(path);
+        return SchematicRegistry.getInstance().getSchematic(path);
     }
 
     @Override

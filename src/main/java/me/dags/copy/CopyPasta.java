@@ -1,22 +1,15 @@
 package me.dags.copy;
 
 import com.google.inject.Inject;
-import me.dags.commandbus.CommandBus;
-import me.dags.commandbus.element.ElementFactory;
 import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.multi.MultiPointBrush;
-import me.dags.copy.brush.option.Option;
-import me.dags.copy.brush.option.Value;
 import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.command.BrushCommands;
-import me.dags.copy.command.element.BrushElement;
-import me.dags.copy.command.element.OptionElement;
-import me.dags.copy.command.element.ValueElement;
+import me.dags.copy.command.element.BrushElements;
 import me.dags.copy.operation.OperationManager;
 import me.dags.copy.registry.brush.BrushRegistry;
-import me.dags.copy.registry.brush.BrushType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -70,20 +63,7 @@ public class CopyPasta {
     @Listener
     public void init(GameInitializationEvent event) {
         reload(null);
-
-        ElementFactory factory = CommandBus.elements()
-                .provider(BrushType.class, BrushElement.provider())
-                .provider(Option.class, OptionElement.provider())
-                .provider(Value.class, ValueElement.provider())
-                .build();
-
-        CommandBus commandBus = CommandBus.builder()
-                .elements(factory)
-                .owner(this)
-                .build();
-
-        commandBus.register(BrushCommands.class).submit();
-
+        BrushElements.getCommandBus(this).register(BrushCommands.class).submit();
         Mappers.init();
     }
 

@@ -9,20 +9,17 @@ import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.registry.schematic.CachedSchematic;
+import me.dags.copy.registry.schematic.Repository;
 import me.dags.copy.util.fmt;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.persistence.DataFormats;
-import org.spongepowered.api.data.persistence.DataTranslators;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.schematic.BlockPaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
@@ -34,6 +31,7 @@ public class SchematicBrush extends ClipboardBrush {
     public static final Option<Mode> MODE = Option.of("mode", Mode.SAVE);
     public static final Option<String> NAME = Option.of("name", "schem");
     public static final Option<String> DIR = Option.of("dir", "");
+    public static final Option<Repository> REPOSITORY = Option.of("repository", null);
 
     @Override
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
@@ -49,23 +47,16 @@ public class SchematicBrush extends ClipboardBrush {
                 .volume(volume)
                 .build();
 
-        Path output = getFilePath();
+        Repository repository = getOption(REPOSITORY);
+        Supplier<Optional<Path>> async = repository.save(schematic, getOption(DIR), getOption(NAME));
 
-        try {
-            Files.createDirectories(output.getParent());
-            try (OutputStream outputStream = Files.newOutputStream(getFilePath())) {
-                DataContainer container = DataTranslators.SCHEMATIC.translate(schematic);
-                DataFormats.NBT.writeTo(outputStream, container);
+        CopyPasta.getInstance().submitAsync(async, path -> {
+            if (path.isPresent()) {
+                fmt.info("Successfully saved to %s", path.get()).tell(player);
+            } else {
+                fmt.warn("Unable to save schematic").tell(player);
             }
-
-            SchematicList list = getOptions().must(SCHEMATICS);
-            list.add(new SchematicEntry(output));
-
-            fmt.info("Saved schematic to %s", output).tell(player);
-        } catch (IOException e) {
-            e.printStackTrace();
-            fmt.warn("An error occurred whilst saving schematic to %s", output).tell(player);
-        }
+        });
     }
 
     @Override

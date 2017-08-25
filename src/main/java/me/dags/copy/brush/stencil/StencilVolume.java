@@ -23,14 +23,14 @@ public class StencilVolume implements ImmutableBlockVolume {
     private final Stencil stencil;
     private final Vector3i min;
     private final Vector3i max;
-    private final BlockState material;
+    private final StencilPalette palette;
     private final BlockState air = BlockTypes.AIR.getDefaultState();
 
-    public StencilVolume(Stencil stencil, BlockState material) {
+    StencilVolume(Stencil stencil, StencilPalette palette) {
         this.stencil = stencil;
         this.min = stencil.getMin();
         this.max = stencil.getMax();
-        this.material = material;
+        this.palette = palette;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class StencilVolume implements ImmutableBlockVolume {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return stencil.contains(x, y, z) ? material : air;
+        return stencil.contains(x, y, z) ? palette.next() : air;
     }
 
     @Override

@@ -7,7 +7,6 @@ import me.dags.copy.brush.clipboard.Clipboard;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushSupplier;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -18,7 +17,8 @@ import org.spongepowered.api.entity.living.player.Player;
 public class StencilBrush extends ClipboardBrush {
 
     public static final Option<Stencil> STENCIL = Option.of("stencil", Stencil.EMPTY);
-    public static final Option<BlockState> MATERIAL = Option.of("material", BlockState.class, BlockTypes.SAND::getDefaultState);
+    public static final Option<StencilPalette> PALETTE = Option.of("palette", StencilPalette
+            .create().add(BlockTypes.WOOL.getDefaultState(), 0.1));
 
     @Override
     public String getPermission() {
@@ -28,14 +28,14 @@ public class StencilBrush extends ClipboardBrush {
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         Stencil stencil = getOption(STENCIL);
-        BlockState material = getOption(MATERIAL);
+        StencilPalette palette = getOption(PALETTE);
 
-        if (!stencil.isPresent() || material.getType() == BlockTypes.AIR) {
+        if (!stencil.isPresent()) {
             return;
         }
 
-        StencilVolume volume = new StencilVolume(stencil, material);
-        Clipboard clipboard = Clipboard.of(player, volume, stencil.getCenter().mul(-1), true);
+        StencilVolume volume = new StencilVolume(stencil, palette);
+        Clipboard clipboard = Clipboard.of(player, volume, stencil.getOffset(), true);
         setClipboard(clipboard);
 
         apply(player, pos, getHistory());

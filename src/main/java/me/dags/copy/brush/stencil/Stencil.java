@@ -17,7 +17,7 @@ public class Stencil {
     static final Stencil EMPTY = new Stencil(new BitSet(0), 0, 0);
 
     private final BitSet pixels;
-    private final Vector3i center;
+    private final Vector3i offset;
     private final int width;
     private final int height;
 
@@ -25,19 +25,15 @@ public class Stencil {
         this.pixels = pixels;
         this.width = width;
         this.height = height;
-        this.center = new Vector3i(width / 2, 0, height / 2);
-    }
-
-    private Stencil(byte[] data, int width, int height) {
-        this(BitSet.valueOf(data), width, height);
+        this.offset = new Vector3i(-width / 2, 0, -height / 2);
     }
 
     public boolean isPresent() {
         return this != EMPTY;
     }
 
-    public Vector3i getCenter() {
-        return center;
+    public Vector3i getOffset() {
+        return offset;
     }
 
     public Vector3i getMin() {
@@ -53,17 +49,17 @@ public class Stencil {
         return index < pixels.size() && pixels.get(index);
     }
 
-    public static Optional<Stencil> fromUrl(String url, int scale, float min) {
+    public static Optional<Stencil> fromUrl(String url, int samples, float threshold) {
         try {
-            return Optional.of(readStencil(read(url), scale, min));
+            return Optional.of(readStencil(read(url), samples, threshold));
         } catch (IOException e) {
             return Optional.empty();
         }
     }
 
-    private static Stencil readStencil(BufferedImage image, int scale, float min) {
-        int width = image.getWidth() / scale;
-        int height = image.getHeight() / scale;
+    private static Stencil readStencil(BufferedImage image, int samples, float threshold) {
+        int width = image.getWidth() / samples;
+        int height = image.getHeight() / samples;
         BitSet pixels = new BitSet(width * height);
 
         for (int y = 0; y < width; y++) {
@@ -71,10 +67,10 @@ public class Stencil {
                 float darkness = 0;
                 float count = 0;
 
-                for (int dy = 0; dy < scale; dy++) {
-                    int yPos = (y * scale) + dy;
-                    for (int dx = 0; dx < scale; dx++) {
-                        int xPos = (x * scale) + dx;
+                for (int dy = 0; dy < samples; dy++) {
+                    int yPos = (y * samples) + dy;
+                    for (int dx = 0; dx < samples; dx++) {
+                        int xPos = (x * samples) + dx;
                         if (xPos < image.getWidth() && yPos < image.getHeight()) {
                             int rgb = image.getRGB(xPos, yPos);
                             darkness += getDarkness(rgb);
@@ -83,8 +79,7 @@ public class Stencil {
                     }
                 }
 
-                float avg = darkness / count;
-                if (avg > min) {
+                if (darkness / count >= threshold) {
                     int index = (width * y) + x;
                     pixels.set(index, true);
                 }
