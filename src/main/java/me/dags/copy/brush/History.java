@@ -3,21 +3,20 @@ package me.dags.copy.brush;
 import org.spongepowered.api.block.BlockSnapshot;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class History {
 
-    private final LinkedList<List<BlockSnapshot>> history = new LinkedList<>();
+    private final LinkedList<LinkedList<BlockSnapshot>> history = new LinkedList<>();
     private final int size;
 
     public History(int size) {
         this.size = size;
     }
 
-    public List<BlockSnapshot> popRecord() {
+    public LinkedList<BlockSnapshot> popRecord() {
         return history.removeLast();
     }
 
@@ -25,8 +24,8 @@ public class History {
         return !history.isEmpty();
     }
 
-    public List<BlockSnapshot> nextRecord() {
-        List<BlockSnapshot> list = new LinkedList<>();
+    public LinkedList<BlockSnapshot> nextRecord() {
+        LinkedList<BlockSnapshot> list = new LinkedList<>();
         if (history.size() < size) {
             history.add(list);
         } else {

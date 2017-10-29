@@ -2,6 +2,7 @@ package me.dags.copy.util;
 
 import com.google.common.collect.Maps;
 
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.function.BiConsumer;
@@ -16,12 +17,20 @@ public class WeightedList<T> {
 
     private double total = 0F;
 
-    protected WeightedList() {
+    public WeightedList() {
 
     }
 
     public void iterate(BiConsumer<T, Double> consumer) {
         map.entrySet().forEach(e -> consumer.accept(e.getValue(), e.getKey()));
+    }
+
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    public int size() {
+        return map.size();
     }
 
     public WeightedList<T> add(T value, double weight) {
@@ -32,8 +41,21 @@ public class WeightedList<T> {
         return this;
     }
 
+    public T next(Random random) {
+        double lookup = random.nextFloat() * total;
+        Map.Entry<Double, T> entry = map.higherEntry(lookup);
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return null;
+    }
+
     public T next() {
         double lookup = random.nextFloat() * total;
-        return map.higherEntry(lookup).getValue();
+        Map.Entry<Double, T> entry = map.higherEntry(lookup);
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return null;
     }
 }

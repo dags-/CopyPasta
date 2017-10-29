@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import me.dags.copy.CopyPasta;
 import me.dags.copy.block.property.Facing;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 /**
  * @author dags <dags@dags.me>
@@ -35,6 +36,7 @@ public class SchematicRegistry implements CacheLoader<SchematicEntry, CachedSche
     private static final DataQuery FACEINGH = DataQuery.of(CachedSchematic.FACING_H);
     private static final DataQuery FACEINGV = DataQuery.of(CachedSchematic.FACING_V);
 
+    private final Repository defaultRepo;
     private final Map<String, Repository> repositories = new HashMap<>();
     private final LoadingCache<SchematicEntry, CachedSchematic> cache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -42,16 +44,19 @@ public class SchematicRegistry implements CacheLoader<SchematicEntry, CachedSche
 
     private SchematicRegistry() {
         Path config = Sponge.getGame().getGameDirectory().resolve("config");
-        addRepository(config, "copypasta", "schematics", "schematic", DataTranslators.SCHEMATIC);
-        addRepository(config, "worldedit", "schematics", "schematic", DataTranslators.LEGACY_SCHEMATIC);
+        defaultRepo = repo(config, CopyPasta.ID, "schematics", "schematic", DataTranslators.SCHEMATIC);
+        repo(config, "worldedit", "schematics", "schematic", DataTranslators.LEGACY_SCHEMATIC);
     }
 
-    private void addRepository(Path sharedConfig, String name, String path, String extension, DataTranslator<Schematic> format) {
+    private Repository repo(Path sharedConfig, String name, String path, String extension, DataTranslator<Schematic> format) {
         Path root = sharedConfig.resolve(name).resolve(path);
-        if (Files.exists(root)) {
-            Repository repository = new Repository(root, name, extension, format);
-            repositories.put(repository.getName(), repository);
-        }
+        Repository repository = new Repository(root, name, extension, format);
+        repositories.put(repository.getName(), repository);
+        return repository;
+    }
+
+    public Repository getDefaultRepo() {
+        return defaultRepo;
     }
 
     public Optional<CachedSchematic> getSchematic(SchematicEntry entry) {
@@ -62,8 +67,8 @@ public class SchematicRegistry implements CacheLoader<SchematicEntry, CachedSche
         return Optional.ofNullable(repositories.get(name));
     }
 
-    public void iterateRepositories(BiConsumer<String, Repository> consumer) {
-        repositories.forEach(consumer);
+    public Stream<String> getRepositories() {
+        return repositories.keySet().stream();
     }
 
     @Override

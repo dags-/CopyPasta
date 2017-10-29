@@ -53,7 +53,7 @@ public class VolumeMapper {
         Vector3i size = max.sub(min).add(Vector3i.ONE);
         MutableBlockVolume buffer = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
 
-        // can't use block-worker off the main thread!
+        // can't use block-calculator off the main thread!
         for (int y = source.getBlockMin().getY(); y <= source.getBlockMax().getY(); y++) {
             for (int z = source.getBlockMin().getZ(); z <= source.getBlockMax().getZ(); z++) {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {

@@ -4,7 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.BitSet;
 import java.util.Optional;
@@ -46,7 +46,28 @@ public class Stencil {
 
     public boolean contains(int x, int y, int z) {
         int index = (z * width) + x;
-        return index < pixels.size() && pixels.get(index);
+        return index > -1 && index < pixels.size() && pixels.get(index);
+    }
+
+    public static void write(Stencil stencil, OutputStream outputStream) throws IOException {
+        try (DataOutputStream out = new DataOutputStream(outputStream)) {
+            byte[] pixels = stencil.pixels.toByteArray();
+            out.writeInt(stencil.width);
+            out.writeInt(stencil.height);
+            out.writeInt(pixels.length);
+            out.write(pixels);
+        }
+    }
+
+    public static Stencil read(InputStream inputStream) throws IOException {
+        try (DataInputStream in = new DataInputStream(inputStream)) {
+            int width = in.readInt();
+            int height = in.readInt();
+            int len = in.readInt();
+            byte[] pixels = new byte[len];
+            in.readFully(pixels);
+            return new Stencil(BitSet.valueOf(pixels), width, height);
+        }
     }
 
     public static Optional<Stencil> fromUrl(String url, int samples, float threshold) {

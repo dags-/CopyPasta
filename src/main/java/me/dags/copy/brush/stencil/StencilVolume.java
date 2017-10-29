@@ -1,6 +1,7 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
+import me.dags.copy.brush.Palette;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -23,10 +24,10 @@ public class StencilVolume implements ImmutableBlockVolume {
     private final Stencil stencil;
     private final Vector3i min;
     private final Vector3i max;
-    private final StencilPalette palette;
+    private final Palette palette;
     private final BlockState air = BlockTypes.AIR.getDefaultState();
 
-    StencilVolume(Stencil stencil, StencilPalette palette) {
+    StencilVolume(Stencil stencil, Palette palette) {
         this.stencil = stencil;
         this.min = stencil.getMin();
         this.max = stencil.getMax();
@@ -50,7 +51,7 @@ public class StencilVolume implements ImmutableBlockVolume {
 
     @Override
     public boolean containsBlock(int x, int y, int z) {
-        return x >= min.getX() && x <= max.getX() && y >= min.getY() && y <= max.getY() && z >= min.getZ() && z <= max.getZ();
+        return x >= min.getX() && x <= max.getX() && z >= min.getZ() && z <= max.getZ();
     }
 
     @Override

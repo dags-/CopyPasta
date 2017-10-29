@@ -8,7 +8,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
 
-import java.util.List;
+import java.util.LinkedList;
 import java.util.UUID;
 
 /**
@@ -16,46 +16,47 @@ import java.util.UUID;
  */
 public class UndoOperation implements Operation {
 
-    private final List<BlockSnapshot> snapshots;
+    private final LinkedList<BlockSnapshot> snapshots;
     private final History history;
     private final UUID owner;
 
-    public UndoOperation(List<BlockSnapshot> snapshots, UUID owner, History history) {
+    public UndoOperation(LinkedList<BlockSnapshot> snapshots, UUID owner, History history) {
         this.snapshots = snapshots;
         this.history = history;
         this.owner = owner;
     }
 
     @Override
-    public boolean isCancelled() {
-        return false;
+    public Phase calculate(int limit) {
+        return Phase.TEST;
     }
 
     @Override
-    public void calculate() {
-
+    public Phase test(int limit) {
+        return Phase.APPLY;
     }
 
     @Override
-    public void test() {
-
-    }
-
-    @Override
-    public void apply() {
-        for (BlockSnapshot snapshot : snapshots) {
+    public Phase apply(int limit) {
+        while (!snapshots.isEmpty() && limit-- > 0) {
+            BlockSnapshot snapshot = snapshots.pollLast();
             snapshot.restore(true, BlockChangeFlag.NONE);
         }
 
+        if (!snapshots.isEmpty()) {
+            return Phase.APPLY;
+        }
+
+        return Phase.DISPOSE;
+    }
+
+    @Override
+    public void dispose(Phase phase) {
+        PlayerManager.getInstance().get(owner).ifPresent(data -> data.setOperating(false));
         Sponge.getServer().getPlayer(owner).ifPresent(player -> {
             int size = history.getSize();
             int max = history.getMax();
             fmt.sub("Undo Complete (%s / %s)", size, max).tell(CopyPasta.NOTICE_TYPE, player);
         });
-    }
-
-    @Override
-    public void dispose() {
-        PlayerManager.getInstance().get(owner).ifPresent(data -> data.setOperating(false));
     }
 }

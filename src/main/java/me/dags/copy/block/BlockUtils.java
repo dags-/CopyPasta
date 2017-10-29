@@ -1,74 +1,43 @@
 package me.dags.copy.block;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.world.World;
 
-import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class BlockUtils {
 
+    private static final Predicate<BlockState> PASSABLE = b -> b.getProperty(PassableProperty.class).map(PassableProperty::getValue).orElse(false);
+
     public static Vector3i findSolidFoundation(World world, Vector3i pos) {
-        return findSolidFoundation(world, pos, 0);
+        int y = findSurface(world, pos.getX(), pos.getZ(), 0, 255);
+        while (PASSABLE.test(world.getBlock(pos.getX(), y, pos.getZ()))) {
+            y--;
+        }
+        return new Vector3i(pos.getX(), y, pos.getZ());
     }
 
-    public static Vector3i findSolidFoundation(World world, Vector3i pos, int offset) {
-        boolean inAir = isAir(world, pos.getX(), pos.getY(), pos.getZ());
-        Vector3i down = findDown(world, pos, offset, inAir);
-        Vector3i up = findUp(world, pos, offset,inAir);
+    public static int findSurface(World world, int x, int z, int min, int max) {
+        // mid point between min and max
+        int mid = min + ((max - min) >> 1);
 
-        if (down == Vector3i.ZERO) {
-            return up;
+        // if no change we have hit the target
+        if (mid == min) {
+            return mid;
         }
 
-        if (up == Vector3i.ZERO) {
-            return down;
+        if (world.getBlockType(x, mid, z) == BlockTypes.AIR) {
+            // position above surface, search lower half
+            return findSurface(world, x, z, min, mid);
         }
 
-        int downDistance = pos.getY() - down.getY();
-        int upDistance = down.getY() - pos.getY();
-
-        if (downDistance < upDistance) {
-            return down;
-        }
-
-        return up;
-    }
-
-    private static Vector3i findDown(World world, Vector3i pos, int offset, boolean currentAir) {
-        boolean wasInAir = currentAir;
-        int max = pos.getY();
-        for (int dy = 0; dy < max; dy++) {
-            if (isAir(world, pos.getX(), pos.getY() - dy, pos.getZ())) {
-                wasInAir = true;
-            } else if (wasInAir) {
-                return pos.add(0, -dy + offset, 0);
-            }
-        }
-        return Vector3i.ZERO;
-    }
-
-    private static Vector3i findUp(World world, Vector3i pos, int offset, boolean currentAir) {
-        boolean wasInSolid = !currentAir;
-        int max = 255 - pos.getY();
-        for (int dy = 0; dy < max; dy++) {
-            if (!isAir(world, pos.getX(), pos.getY() + dy, pos.getZ())) {
-                wasInSolid = true;
-            } else if (wasInSolid) {
-                return pos.add(0, dy - 1 + offset, 0);
-            }
-        }
-        return Vector3i.ZERO;
-    }
-
-    public static boolean isAir(World world, int x, int y, int z) {
-        if (world.containsBlock(x, y, z)) {
-            Optional<PassableProperty> property = world.getProperty(x, y, z, PassableProperty.class);
-            return property.map(PassableProperty::getValue).orElse(true);
-        }
-        return true;
+        // position below surface, search upper half
+        return findSurface(world, x, z, mid, max);
     }
 }

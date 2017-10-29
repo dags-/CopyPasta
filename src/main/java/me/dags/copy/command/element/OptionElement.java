@@ -42,7 +42,7 @@ class OptionElement extends ChainElement<BrushType, Option> {
                 Player player = source.get();
                 Optional<Brush> brush = PlayerManager.getInstance().get(player).flatMap(d -> d.getBrush(player));
                 if (brush.isPresent()) {
-                    context.add(BrushType.class.getCanonicalName(), brush.get());
+                    context.add(BrushType.class.getCanonicalName(), brush.get().getType());
                 }
             }
         }

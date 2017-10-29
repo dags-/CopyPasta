@@ -13,15 +13,21 @@ import java.util.Optional;
 public class SchematicEntry {
 
     private final DataTranslator<Schematic> format;
+    private final String repo;
     private final Path path;
 
-    private SchematicEntry(Path path, DataTranslator<Schematic> format) {
+    private SchematicEntry(String repo, Path path, DataTranslator<Schematic> format) {
+        this.repo = repo;
         this.path = path;
         this.format = format;
     }
 
     public DataTranslator<Schematic> getFormat() {
         return format;
+    }
+
+    public String getRepo() {
+        return repo;
     }
 
     public Path getName() {
@@ -66,6 +72,6 @@ public class SchematicEntry {
     }
 
     public static SchematicEntry of(Repository repository, Path path) {
-        return new SchematicEntry(repository.getAbsolute(path), repository.getFormat());
+        return new SchematicEntry(repository.getName(), repository.getAbsolute(path), repository.getFormat());
     }
 }

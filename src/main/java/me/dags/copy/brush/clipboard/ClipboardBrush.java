@@ -12,13 +12,20 @@ import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.event.LocatableBlockChange;
 import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.operation.visitor.Visitor3D;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -39,7 +46,7 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", false);
     public static final Option<Boolean> AIR = Option.of("air", false);
     public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", false);
-    public static final Option<Integer> PASTE_OFFSET = Option.of("offset", 0);
+    public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
     public static final Option<ReMappers> MAPPERS = Option.of("mappers", ReMappers.class, ReMappers::new);
 
     private SelectorBrush selector = new SelectorBrush(this);
@@ -47,6 +54,7 @@ public class ClipboardBrush extends AbstractBrush {
 
     public ClipboardBrush() {
         super(5);
+        setOption(RANGE, 5);
     }
 
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
@@ -98,12 +106,10 @@ public class ClipboardBrush extends AbstractBrush {
         }
 
         PlayerManager.getInstance().must(player).setOperating(true);
-
-        int offset = getOption(PASTE_OFFSET);
-        pos = pos.add(0, offset, 0);
-
+        Vector3i offset = getOption(PASTE_OFFSET);
+        boolean withAir = getOption(AIR);
         VolumeMapper mapper = getMapper(clipboard, player);
-        clipboard.paste(player, history, pos, mapper, getOption(AIR), PlayerManager.getCause(player));
+        clipboard.paste(player, history, pos, offset, mapper, withAir, PlayerManager.getCause(player));
     }
 
     @Override
@@ -117,7 +123,7 @@ public class ClipboardBrush extends AbstractBrush {
 
         if (history.hasNext()) {
             data.setOperating(true);
-            List<BlockSnapshot> record = history.popRecord();
+            LinkedList<BlockSnapshot> record = history.popRecord();
             UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         } else {
@@ -181,5 +187,29 @@ public class ClipboardBrush extends AbstractBrush {
 
     public static BrushSupplier supplier() {
         return player -> new ClipboardBrush();
+    }
+
+    public static Visitor3D visitor(World world, Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
+        return (v, x, y, z) -> {
+            BlockState state = v.getBlock(x, y, z);
+            if (state.getType() == BlockTypes.AIR && !air) {
+                return 0;
+            }
+
+            x += position.getX();
+            y += position.getY();
+            z += position.getZ();
+
+            if (!world.containsBlock(x, y, z)) {
+                return 0;
+            }
+
+            Location<World> location = world.getLocation(offset.add(x, y, z));
+            if (location.getBlock() != state) {
+                changes.add(new LocatableBlockChange(location, state));
+            }
+
+            return 1;
+        };
     }
 }

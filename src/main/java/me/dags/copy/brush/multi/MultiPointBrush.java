@@ -91,7 +91,7 @@ public class MultiPointBrush extends AbstractBrush {
         }
 
         while (history.hasNext()) {
-            List<BlockSnapshot> record = history.popRecord();
+            LinkedList<BlockSnapshot> record = history.popRecord();
             UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(operation);
         }

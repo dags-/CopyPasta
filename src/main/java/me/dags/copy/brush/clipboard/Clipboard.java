@@ -5,10 +5,16 @@ import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.History;
+import me.dags.copy.brush.stencil.StencilBrush;
+import me.dags.copy.event.LocatableBlockChange;
 import me.dags.copy.operation.Operation;
-import me.dags.copy.operation.PasteOperation;
-import me.dags.copy.operation.StencilPasteOperation;
+import me.dags.copy.operation.PlaceOperation;
 import me.dags.copy.operation.VolumeMapper;
+import me.dags.copy.operation.applier.Applier;
+import me.dags.copy.operation.calculator.Calculator;
+import me.dags.copy.operation.calculator.Volume;
+import me.dags.copy.operation.tester.Tester;
+import me.dags.copy.operation.visitor.Visitor3D;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -18,6 +24,8 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -31,6 +39,7 @@ public class Clipboard {
     private final Facing verticalFacing;
     private final BlockVolume source;
     private final Vector3i origin;
+    private final int depth;
     private final boolean stencil;
 
     private Clipboard() {
@@ -38,14 +47,16 @@ public class Clipboard {
         this.verticalFacing = Facing.none;
         this.source = null;
         this.stencil = false;
+        this.depth = 1;
         this.origin = Vector3i.ZERO;
     }
 
     protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing) {
-        this(source, origin, horizontalFacing, verticalFacing, false);
+        this(source, origin, horizontalFacing, verticalFacing, false, 1);
     }
 
-    protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing, boolean stencil) {
+    protected Clipboard(BlockVolume source, Vector3i origin, Facing horizontalFacing, Facing verticalFacing, boolean stencil, int depth) {
+        this.depth = depth;
         this.source = source;
         this.origin = origin;
         this.stencil = stencil;
@@ -65,7 +76,7 @@ public class Clipboard {
         return verticalFacing;
     }
 
-    public void paste(Player player, History history, Vector3i pos, VolumeMapper transform, boolean air, Cause cause) {
+    public void paste(Player player, History history, Vector3i pos, Vector3i offset, VolumeMapper transform, boolean air, Cause cause) {
         if (!isPresent()) {
             return;
         }
@@ -73,25 +84,33 @@ public class Clipboard {
         Vector3i volumeOffset = transform.volumeOffset(source);
         Vector3i pastePosition = transform.apply(origin).add(pos).add(volumeOffset);
 
-        FutureCallback<BlockVolume> callback = callback(player, history, pastePosition, air, cause);
+        FutureCallback<BlockVolume> callback = callback(player, history, pastePosition, offset, air, cause);
         Runnable asyncTransform = transform.createTask(source, cause, callback);
         CopyPasta.getInstance().submitAsync(asyncTransform);
     }
 
-    private FutureCallback<BlockVolume> callback(Player player, History history, Vector3i position, boolean air, Cause cause) {
+    private FutureCallback<BlockVolume> callback(Player player, History history, Vector3i position, Vector3i offset, boolean air, Cause cause) {
         final UUID uuid = player.getUniqueId();
         final WeakReference<World> worldRef = new WeakReference<>(player.getWorld());
 
         return new FutureCallback<BlockVolume>() {
             @Override
             public void onSuccess(@Nullable BlockVolume result) {
-                if (result != null) {
-                    Operation operation;
+                World world = worldRef.get();
+                if (result != null && world != null) {
+                    List<LocatableBlockChange> changes = new LinkedList<>();
+                    Visitor3D visitor;
+
                     if (stencil) {
-                        operation = new StencilPasteOperation(cause, worldRef, uuid, result, position, history, air);
+                        visitor = StencilBrush.visitor(world, position, offset, air, changes);
                     } else {
-                        operation = new PasteOperation(cause, worldRef, uuid, result, position, history, air);
+                        visitor = ClipboardBrush.visitor(world, position, offset, air, changes);
                     }
+
+                    Calculator calculator = new Volume(result);
+                    Tester tester = new Tester(world, changes, cause);
+                    Applier applier = new Applier(world, uuid, changes, history, cause);
+                    Operation operation = new PlaceOperation(uuid, calculator, tester, applier, visitor);
                     CopyPasta.getInstance().getOperationManager().queueOperation(operation);
                 }
             }
@@ -116,9 +135,9 @@ public class Clipboard {
         return new Clipboard(backing.getImmutableBlockCopy(), offset, horizontalFacing, verticalFacing);
     }
 
-    public static Clipboard of(Player player, ImmutableBlockVolume volume, Vector3i origin, boolean stencil) {
+    public static Clipboard stencil(Player player, ImmutableBlockVolume volume, Vector3i origin, int depth) {
         Facing verticalFacing = Facing.getVertical(player);
         Facing horizontalFacing = Facing.getHorizontal(player);
-        return new Clipboard(volume, origin, horizontalFacing, verticalFacing, stencil);
+        return new Clipboard(volume, origin, horizontalFacing, verticalFacing, true, depth);
     }
 }

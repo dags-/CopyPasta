@@ -1,5 +1,6 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id "com.qixalite.spongestart" version "1.6.0"
     id 'java'
 }
 
@@ -12,8 +13,18 @@ configurations {
     compile.extendsFrom shadow
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
+}
+
+spongestart{
+    eula true
+    minecraft '1.10.2'
+    type 'stable'
 }
 
 repositories {
@@ -28,7 +39,7 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow 'com.github.dags-:CommandBus:master-SNAPSHOT'
+    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-7'
 }
 
 shadowJar {

@@ -5,8 +5,8 @@ import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.ChainElement;
 import me.dags.copy.PlayerManager;
+import me.dags.copy.brush.Palette;
 import me.dags.copy.brush.stencil.StencilBrush;
-import me.dags.copy.brush.stencil.StencilPalette;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
@@ -14,15 +14,15 @@ import java.util.Collection;
 /**
  * @author dags <dags@dags.me>
  */
-public class StencilPaletteElement extends ChainElement<StencilPalette, StencilPalette> {
+public class StencilPaletteElement extends ChainElement<Palette, Palette> {
 
     private final String key;
     private final String lookup;
 
-    StencilPaletteElement(String key, Builder<StencilPalette, StencilPalette> builder) {
+    StencilPaletteElement(String key, Builder<Palette, Palette> builder) {
         super(builder);
         this.key = key;
-        this.lookup = StencilPalette.class.getCanonicalName();
+        this.lookup = Palette.class.getCanonicalName();
     }
 
     @Override
@@ -30,10 +30,10 @@ public class StencilPaletteElement extends ChainElement<StencilPalette, StencilP
         ensurePalette(context);
 
         StencilPaletteElement palette = context.getLast(lookup);
-        if (palette != null && input.hasNext() && input.peek().equalsIgnoreCase("reset")) {
+        if (palette != null && input.hasNext() && input.peek().equalsIgnoreCase("init")) {
             input.next();
-            context.add(lookup, StencilPalette.create());
-            context.add(key, StencilPalette.create());
+            context.add(lookup, Palette.create());
+            context.add(key, Palette.create());
             return;
         }
 
@@ -51,6 +51,6 @@ public class StencilPaletteElement extends ChainElement<StencilPalette, StencilP
                 .flatMap(player -> PlayerManager.getInstance().get(player).flatMap(d -> d.getBrush(player)))
                 .filter(StencilBrush.class::isInstance)
                 .map(brush -> brush.getOption(StencilBrush.PALETTE))
-                .ifPresent(palette -> context.add(StencilPalette.class.getCanonicalName(), palette));
+                .ifPresent(palette -> context.add(Palette.class.getCanonicalName(), palette));
     }
 }

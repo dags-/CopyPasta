@@ -1,62 +1,22 @@
 package me.dags.copy.brush.schematic;
 
 import com.google.common.reflect.TypeToken;
+import me.dags.copy.CopyPasta;
 import me.dags.copy.registry.schematic.SchematicEntry;
 import me.dags.copy.util.Serializable;
+import me.dags.copy.util.WeightedList;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class SchematicList implements Iterable<SchematicEntry>, Serializable<SchematicList> {
+public class SchematicList extends WeightedList<SchematicEntry> implements Serializable<SchematicList> {
 
     private static final TypeToken<SchematicList> TOKEN = TypeToken.of(SchematicList.class);
-    public static final SchematicList EMPTY = new SchematicList(Collections.emptyList());
-
-    private final List<SchematicEntry> list;
-
-    private SchematicList(List<SchematicEntry> list) {
-        this.list = list;
-    }
-
-    public SchematicList() {
-        this.list = new LinkedList<>();
-    }
-
-    public boolean isPresent() {
-        return this != EMPTY;
-    }
-
-    public int size() {
-        return list.size();
-    }
-
-    public SchematicEntry get(int index) {
-        return list.get(index);
-    }
-
-    public void add(SchematicEntry entry) {
-        if (isPresent()) {
-            this.list.add(entry);
-        }
-    }
-
-    public void addAll(Iterable<SchematicEntry> entries) {
-        entries.forEach(list::add);
-    }
-
-    @Override
-    public Iterator<SchematicEntry> iterator() {
-        return list.iterator();
-    }
 
     @Override
     public TypeToken<SchematicList> getToken() {
@@ -65,24 +25,26 @@ public class SchematicList implements Iterable<SchematicEntry>, Serializable<Sch
 
     @Override
     public TypeSerializer<SchematicList> getSerializer() {
-        return SERIALIZER;
+        return new TypeSerializer<SchematicList>() {
+            @Override
+            public SchematicList deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+                SchematicList list = new SchematicList();
+                for (Map.Entry<?, ? extends ConfigurationNode> entry : value.getChildrenMap().entrySet()) {
+                    String path = entry.getKey().toString();
+                    double weight = value.getNode(path, "weight").getDouble(1D);
+                    String repo = value.getNode(path, "repo").getString(CopyPasta.ID);
+                    SchematicEntry.of(repo, path).ifPresent(e -> list.add(e, weight));
+                }
+                return list;
+            }
+
+            @Override
+            public void serialize(TypeToken<?> type, SchematicList obj, ConfigurationNode value) throws ObjectMappingException {
+                obj.iterate((entry, weight) -> {
+                    value.getNode(entry.getPath().toString(), "weight").setValue(weight);
+                    value.getNode(entry.getPath().toString(), "repo").setValue(entry.getRepo());
+                });
+            }
+        };
     }
-
-    public static Supplier<SchematicList> supplier() {
-        return () -> new SchematicList(new LinkedList<>());
-    }
-
-    private static TypeSerializer<SchematicList> SERIALIZER = new TypeSerializer<SchematicList>() {
-        @Override
-        public SchematicList deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-            SchematicList list = new SchematicList();
-
-            return list;
-        }
-
-        @Override
-        public void serialize(TypeToken<?> type, SchematicList obj, ConfigurationNode value) throws ObjectMappingException {
-            value.setValue(obj.list);
-        }
-    };
 }

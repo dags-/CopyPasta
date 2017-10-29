@@ -9,11 +9,13 @@ import me.dags.commandbus.element.function.Filter;
 import me.dags.commandbus.element.function.Options;
 import me.dags.commandbus.element.function.ValueParser;
 import me.dags.copy.CopyPasta;
+import me.dags.copy.brush.Palette;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
-import me.dags.copy.brush.stencil.StencilPalette;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
+import me.dags.copy.registry.schematic.SchematicEntry;
+import me.dags.copy.registry.schematic.SchematicRegistry;
 import org.spongepowered.api.block.BlockState;
 
 import java.util.Optional;
@@ -35,12 +37,25 @@ public class BrushElements {
     private static ElementFactory getElements() {
         ElementFactory.Builder builder = CommandBus.elements();
         stencilPalette(builder);
+        schem(builder);
 
         brush(builder);
         option(builder);
         value(builder);
 
         return builder.build();
+    }
+
+    private static void schem(ElementFactory.Builder builder) {
+        builder.filter(SchematicEntry.class, Filter.STARTS_WITH);
+        builder.options(SchematicEntry.class, () -> SchematicRegistry.getInstance().getDefaultRepo().getOptions());
+        builder.parser(SchematicEntry.class, s -> {
+            Optional<SchematicEntry> schem = SchematicRegistry.getInstance().getDefaultRepo().getById(s);
+            if (!schem.isPresent()) {
+                throw new CommandException("Could not find schematic for '%s'", s);
+            }
+            return schem.get();
+        });
     }
 
     private static void brush(ElementFactory.Builder builder) {
@@ -63,23 +78,24 @@ public class BrushElements {
         final Filter stateFilter = builtin.getFilter(BlockState.class);
 
         ElementProvider provider = (key, priority, options, filter, parser) -> {
-            ChainElement.Builder<StencilPalette, StencilPalette> chainBuilder = ChainElement.builder();
-            chainBuilder.key(key);
-            chainBuilder.dependency(StencilPalette.class);
-            chainBuilder.filter(stateFilter);
-            chainBuilder.options(palette -> stateOptions.get());
-            chainBuilder.mapper((input, palette) -> {
-                BlockState state = (BlockState) stateParser.parse(input);
-                Double weight = 1D;
-                if (input.hasNext()) {
-                    weight = (Double) weightParser.parse(input);
-                }
-                return palette.add(state, weight);
-            });
+            ChainElement.Builder<Palette, Palette> chainBuilder = ChainElement.<Palette, Palette>builder()
+                    .key(key)
+                    .dependency(Palette.class)
+                    .filter(stateFilter)
+                    .options(palette -> stateOptions.get())
+                    .mapper((input, palette) -> {
+                        BlockState state = (BlockState) stateParser.parse(input);
+                        Double weight = 1D;
+                        if (input.hasNext()) {
+                            weight = (Double) weightParser.parse(input);
+                        }
+                        return palette.add(state, weight);
+                    });
+
             return new StencilPaletteElement(key, chainBuilder);
         };
 
-        builder.provider(StencilPalette.class, provider);
+        builder.provider(Palette.class, provider);
     }
 
     private static void option(ElementFactory.Builder builder) {

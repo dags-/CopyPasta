@@ -6,10 +6,12 @@ import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.multi.MultiPointBrush;
 import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
+import me.dags.copy.brush.terrain.TerrainBrush;
 import me.dags.copy.command.BrushCommands;
 import me.dags.copy.command.element.BrushElements;
 import me.dags.copy.operation.OperationManager;
 import me.dags.copy.registry.brush.BrushRegistry;
+import me.dags.copy.registry.schematic.SchematicRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -55,6 +57,7 @@ public class CopyPasta {
     public void pre(GamePreInitializationEvent event) {
         BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
         BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
+        BrushRegistry.getInstance().register(TerrainBrush.class, TerrainBrush.supplier());
         BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
         BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
@@ -63,8 +66,9 @@ public class CopyPasta {
     @Listener
     public void init(GameInitializationEvent event) {
         reload(null);
-        BrushElements.getCommandBus(this).register(BrushCommands.class).submit();
+        BrushElements.getCommandBus(this).registerPackage(false, BrushCommands.class).submit();
         Mappers.init();
+        SchematicRegistry.getInstance();
     }
 
     @Listener

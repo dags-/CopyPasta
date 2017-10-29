@@ -10,6 +10,7 @@ import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.registry.schematic.CachedSchematic;
 import me.dags.copy.registry.schematic.Repository;
+import me.dags.copy.registry.schematic.SchematicRegistry;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
@@ -26,11 +27,11 @@ import java.util.function.Supplier;
 @Aliases({"schematic", "schem", "s"})
 public class SchematicBrush extends ClipboardBrush {
 
-    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList.supplier());
+    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList::new);
     public static final Option<Mode> MODE = Option.of("mode", Mode.SAVE);
     public static final Option<String> NAME = Option.of("name", "schem");
     public static final Option<String> DIR = Option.of("dir", "");
-    public static final Option<Repository> REPOSITORY = Option.of("repository", null);
+    public static final Option<Repository> REPOSITORY = Option.of("repository", Repository.class , SchematicRegistry.getInstance()::getDefaultRepo);
 
     @Override
     public void commitSelection(Player player, Vector3i min, Vector3i max, Vector3i origin, int size) {
@@ -42,7 +43,7 @@ public class SchematicBrush extends ClipboardBrush {
                 .metaValue(Schematic.METADATA_AUTHOR, player.getName())
                 .metaValue(CachedSchematic.FACING_H, horizontal.name())
                 .metaValue(CachedSchematic.FACING_V, vertical.name())
-                .paletteType(BlockPaletteTypes.LOCAL)
+                .paletteType(BlockPaletteTypes.GLOBAL)
                 .volume(volume)
                 .build();
 
@@ -66,23 +67,17 @@ public class SchematicBrush extends ClipboardBrush {
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         if (getOption(MODE) == Mode.PASTE) {
-            SchematicList schematics = mustOption(SCHEMATICS);
-            Optional<CachedSchematic> schematic = chooseNext(schematics);
+            SchematicList list = mustOption(SCHEMATICS);
+
+            if (list.isEmpty()) {
+                return;
+            }
+
+            Optional<CachedSchematic> schematic = list.next().getSchematic();
             schematic.ifPresent(this::setClipboard);
         }
 
         super.secondary(player, pos, action);
-    }
-
-    public Optional<CachedSchematic> chooseNext(SchematicList schematics) {
-        for (int i = 0; i < 5; i++) {
-            int index = RANDOM.nextInt(schematics.size());
-            Optional<CachedSchematic> schematic = schematics.get(index).getSchematic();
-            if (schematic.isPresent()) {
-                return schematic;
-            }
-        }
-        return Optional.empty();
     }
 
     private enum Mode {

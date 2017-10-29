@@ -1,8 +1,6 @@
 package me.dags.copy.brush.option;
 
 import me.dags.commandbus.utils.ClassUtils;
-import me.dags.copy.util.Serializable;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
@@ -20,17 +18,6 @@ public class Option<T> {
         this.key = key;
         this.type = type;
         this.defaultValue = defaultValue;
-        register();
-    }
-
-    private void register() {
-        Value value = defaultValue.get();
-        if (value.isPresent()) {
-            Object o = value.get();
-            if (o instanceof Serializable) {
-                Serializable.class.cast(o).register(TypeSerializers.getDefaultSerializers());
-            }
-        }
     }
 
     public String getId() {

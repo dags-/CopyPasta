@@ -16,7 +16,7 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public interface Brush {
 
-    Option<Integer> RANGE = Option.of("range", 5);
+    Option<Integer> RANGE = Option.of("range", 128);
 
     Options getOptions();
 
@@ -53,6 +53,10 @@ public interface Brush {
 
     default BrushType getType() {
         return BrushRegistry.forClass(getClass());
+    }
+
+    default boolean supports(Option option) {
+        return getType().getOption(option.getId()).isPresent();
     }
 
     default <T> T getOption(Option<T> option) {

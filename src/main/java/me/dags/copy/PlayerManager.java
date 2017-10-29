@@ -31,7 +31,7 @@ public class PlayerManager {
         Object instance = plugin.getInstance().orElseThrow(IllegalStateException::new);
         ConfigRoot root = Sponge.getGame().getConfigManager().getPluginConfig(instance);
         container = plugin;
-        userDir = Utils.ensure(root.getDirectory(), "users");
+        userDir = Utils.getDir(root.getDirectory(), "users");
         factory = uuid -> new PlayerData(userDir.resolve(uuid + ".conf"));
     }
 

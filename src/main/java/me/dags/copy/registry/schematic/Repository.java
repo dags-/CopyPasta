@@ -11,10 +11,7 @@ import org.spongepowered.api.world.schematic.Schematic;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -41,6 +38,7 @@ public class Repository {
         this.extension = extension;
         this.format = format;
         this.matcher = FileSystems.getDefault().getPathMatcher("glob:*." + extension);
+        scan();
         Task.builder().execute(this::scan).interval(15, TimeUnit.MINUTES).submit(CopyPasta.getInstance());
     }
 
@@ -68,28 +66,36 @@ public class Repository {
 
     public Supplier<Optional<Path>> save(Schematic schematic, String dir, String name) {
         return () -> {
-            Path path = getNext(dir, name);
+            Path path = root.resolve(getNext(dir, name));
             try {
                 Files.createDirectories(path.getParent());
+
                 try (OutputStream outputStream = Files.newOutputStream(path)) {
                     DataContainer container = DataTranslators.SCHEMATIC.translate(schematic);
                     DataFormats.NBT.writeTo(outputStream, container);
                 }
 
-                return Optional.of(path);
+                return Optional.of(getRelative(path));
             } catch (IOException e) {
                 return Optional.empty();
             }
         };
     }
 
-    public Stream<Path> match(String path) {
-        List<Path> paths = getTree();
-        return paths.stream().filter(p -> p.startsWith(path));
+    public Stream<String> getOptions() {
+        return getTree().stream().map(Path::toString).map(s -> s.substring(0, s.length() - (extension.length() + 1)));
+    }
+
+    public Optional<SchematicEntry> getById(String id) {
+        String file = id + "." + extension;
+        return getTree().stream()
+                .filter(p -> p.toString().equalsIgnoreCase(file))
+                .map(p -> SchematicEntry.of(this, p))
+                .findFirst();
     }
 
     private Path getNext(String dir, String name) {
-        Set<Path> paths = getTree().stream().collect(Collectors.toSet());
+        Set<Path> paths = new HashSet<>(getTree());
 
         Path base = Paths.get(dir);
         Path path;
@@ -117,6 +123,10 @@ public class Repository {
     }
 
     private void scan() {
+        if (!Files.exists(root)) {
+            return;
+        }
+
         try {
             List<Path> list = Files.walk(root)
                     .filter(p -> matcher.matches(p.getFileName()))

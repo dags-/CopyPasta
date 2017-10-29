@@ -7,6 +7,9 @@ import java.util.LinkedList;
  */
 public class OperationManager implements Runnable {
 
+    private static final int PRE_LIMIT = 1024 * 16;
+    private static final int CHANGE_LIMIT = 1024 * 4;
+
     private final Object lock = new Object();
     private final LinkedList<Operation> calculate = new LinkedList<>();
     private final LinkedList<Operation> test = new LinkedList<>();
@@ -32,16 +35,17 @@ public class OperationManager implements Runnable {
     public void run() {
         // drain queues in reverse order so that operations are spread across ticks
         Operation apply = this.apply.pollFirst();
-        apply(apply);
+        apply(apply, PRE_LIMIT);
 
         Operation test = this.test.pollFirst();
-        test(test);
+        test(test, PRE_LIMIT);
 
         Operation calculate;
         synchronized (lock) {
             calculate = this.calculate.pollFirst();
         }
-        compute(calculate);
+
+        compute(calculate, CHANGE_LIMIT);
     }
 
     public void finish() {
@@ -54,69 +58,67 @@ public class OperationManager implements Runnable {
 
             while (!calculate.isEmpty()) {
                 Operation operation = calculate.pollFirst();
-                compute(operation);
+                compute(operation, Integer.MAX_VALUE);
             }
 
             while (!test.isEmpty()) {
                 Operation operation = test.pollFirst();
-                test(operation);
+                test(operation, Integer.MAX_VALUE);
             }
 
             while (!apply.isEmpty()) {
                 Operation operation = apply.pollFirst();
-                apply(operation);
+                apply(operation, Integer.MAX_VALUE);
             }
         }
     }
 
-    private void compute(Operation operation) {
+    private void compute(Operation operation, int limit) {
         if (operation != null) {
-            if (operation.isCancelled()) {
-                operation.dispose();
-                return;
-            }
-
             try {
-                operation.calculate();
-                test.addLast(operation);
+                Operation.Phase result = operation.calculate(limit);
+                queue(operation, result);
             } catch (Throwable t) {
-                t.printStackTrace();
-                operation.dispose();
+                operation.dispose(Operation.Phase.ERROR);
             }
         }
     }
 
-    private void test(Operation operation) {
+    private void test(Operation operation, int limit) {
         if (operation != null) {
-            if (operation.isCancelled()) {
-                operation.dispose();
-                return;
-            }
-
             try {
-                operation.test();
-                apply.addLast(operation);
+                Operation.Phase result = operation.test(limit);
+                queue(operation, result);
             } catch (Throwable t) {
-                t.printStackTrace();
-                operation.dispose();
+                operation.dispose(Operation.Phase.ERROR);
             }
         }
     }
 
-    private void apply(Operation operation) {
+    private void apply(Operation operation, int limit) {
         if (operation != null) {
-            if (operation.isCancelled()) {
-                operation.dispose();
-                return;
-            }
-
             try {
-                operation.apply();
+                Operation.Phase result = operation.apply(limit);
+                queue(operation, result);
             } catch (Throwable t) {
-                t.printStackTrace();
-            } finally {
-                operation.dispose();
+                operation.dispose(Operation.Phase.ERROR);
             }
+        }
+    }
+
+    private void queue(Operation operation, Operation.Phase phase) {
+        switch (phase) {
+            case CALCULATE:
+                calculate.add(operation);
+                return;
+            case TEST:
+                test.add(operation);
+                return;
+            case APPLY:
+                apply.add(operation);
+                return;
+            default:
+                operation.dispose(phase);
         }
     }
 }

@@ -13,30 +13,34 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class Utils {
 
-    public static Path ensure(Path root, String... path) {
-        Path p = root;
-        for (String child : path) {
-            p = p.resolve(child);
+    public static Path getDir(Path parent, String... child) {
+        Path p = parent;
+        for (String c : child) {
+            p = p.resolve(c);
         }
-
-        Path dir = p;
-        if (!Files.isDirectory(dir)) {
-            dir = dir.getParent();
-        }
-        if (!Files.exists(dir)) {
-            try {
-                Files.createDirectories(dir);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            Files.createDirectories(p);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return p;
+    }
+
+    public static Path ensure(Path root, String... path) {
+        Path p0 = Paths.get(root.toAbsolutePath().toString(), path);
+        try {
+            Files.createDirectories(p0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return p0;
     }
 
     public static ConfigurationNode getRootNode(HoconConfigurationLoader loader) {

@@ -3,14 +3,11 @@ package me.dags.copy.command;
 import me.dags.commandbus.annotation.*;
 import me.dags.commandbus.command.Flags;
 import me.dags.commandbus.fmt.PagFormatter;
-import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
-import me.dags.copy.brush.stencil.Stencil;
-import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
 import me.dags.copy.util.fmt;
@@ -22,8 +19,6 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
@@ -58,7 +53,7 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("copy <brush>")
+    @Command("wand|w <brush>")
     @Description("Bind the <brush> to your held item")
     public void brush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
@@ -77,7 +72,7 @@ public class BrushCommands {
 
     @Flag("a")
     @Permission
-    @Command("copy list")
+    @Command("wand|w list")
     @Description("List all brush types")
     public void list(@Src CommandSource source, Flags flags) {
         boolean aliases = flags.has("a");
@@ -91,7 +86,7 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("copy reset")
+    @Command("wand|w reset")
     @Description("Reset all options for your current brush to their defaults")
     public void reset(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
@@ -102,7 +97,7 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("copy <option> <value>")
+    @Command("setting|set|s <option> <value>")
     @Description("Set an option for your current brush")
     public void option(@Src Player player, Option<?> option, Value<?> value) {
         Optional<Brush> brush = getBrush(player);
@@ -114,41 +109,20 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("copy options")
+    @Command("setting|set|s list")
     @Description("List all options and their values for the current brush")
     public void options(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
             PagFormatter page = fmt.page();
             page.title().stress("%s Options:", brush.get().getType());
-            brush.get().getOptions().forEach((option, o) -> page.line().subdued(" - ").stress(option).info("=").stress(o).info(" (%s)", option.getType().getSimpleName()));
-            page.sort(true).build().sendTo(player);
-        }
-    }
-
-    @Permission
-    @Command("stencil <url> <samples> <threshold>")
-    @Description("Create a line stencil from an image at the given url")
-    public void stencil(@Src Player player, String url, int samples, float threshold) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            if (brush.get().getType().getType() != StencilBrush.class) {
-                fmt.error("You must be using a Stencil Brush").tell(player);
-                return;
+            Brush instance = brush.get();
+            BrushType type = brush.get().getType();
+            for (Option<?> option : type.getOptions()) {
+                Object value = instance.getOption(option);
+                page.line().subdued(" - ").stress(option).info("=").stress(value).info(" (%s)", option.getType().getSimpleName());
             }
-
-            Supplier<Optional<Stencil>> supplier = () -> Stencil.fromUrl(url, samples, threshold);
-            Consumer<Optional<Stencil>> consumer = stencil -> {
-                if (stencil.isPresent()) {
-                    brush.get().setOption(StencilBrush.STENCIL, stencil.get());
-                    fmt.info("Successfully set your stencil").tell(player);
-                } else {
-                    fmt.error("Unable to create a stencil from the url %s", url).tell(player);
-                }
-            };
-
-            fmt.info("Creating stencil...").tell(player);
-            CopyPasta.getInstance().submitAsync(supplier, consumer);
+            page.sort(true).build().sendTo(player);
         }
     }
 }

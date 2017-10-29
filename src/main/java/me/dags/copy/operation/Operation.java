@@ -5,13 +5,21 @@ package me.dags.copy.operation;
  */
 public interface Operation {
 
-    boolean isCancelled();
+    Phase calculate(int limit);
 
-    void calculate();
+    Phase test(int limit);
 
-    void test();
+    Phase apply(int limit);
 
-    void apply();
+    void dispose(Phase phase);
 
-    void dispose();
+    enum Phase {
+        CALCULATE,
+        TEST,
+        APPLY,
+        DISPOSE,
+        ERROR,
+        CANCELLED,
+        ;
+    }
 }

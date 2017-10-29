@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
+import me.dags.copy.util.Serializable;
 import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
@@ -25,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class PlayerData {
 
     private static final ConfigurationOptions options = ConfigurationOptions.defaults().setShouldCopyDefaults(true);
-
     private final Map<ItemType, Brush> brushes = Maps.newHashMap();
     private final HoconConfigurationLoader loader;
     private final ConfigurationNode root;
@@ -71,7 +71,21 @@ public class PlayerData {
             ConfigurationNode node = root.getNode(brush.getType().getId());
             for (Option<?> option : brush.getType().getOptions()) {
                 ConfigurationNode child = node.getNode(option.getId());
-                Object value = child.getValue();
+                Object value = option.getDefault().get();
+
+                if (!child.isVirtual()) {
+                    if (value instanceof Serializable) {
+                        try {
+                            Serializable<?> serializable = Serializable.class.cast(value);
+                            value = serializable.getSerializer().deserialize(serializable.getToken(), child);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        value = child.getValue();
+                    }
+                }
+
                 if (option.accepts(value)) {
                     brush.setOption(option, value);
                 }
@@ -92,15 +106,26 @@ public class PlayerData {
         for (Brush brush : brushes.values()) {
             brush.getOptions().forEach((option, o) -> {
                 ConfigurationNode node = root.getNode(brush.getType().getId());
+                node.removeChild(option.getId());
+
                 Value def = option.getDefault();
                 if (def.isPresent() && def.get().equals(o)) {
-                    node.removeChild(option.getId());
                     return;
                 }
-                node.getNode(option.getId()).setValue(o);
+
+                ConfigurationNode value = node.getNode(option.getId());
+                if (o instanceof Serializable) {
+                    try {
+                        Serializable serializable = Serializable.class.cast(o);
+                        serializable.getSerializer().serialize(serializable.getToken(), o, value);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    value.setValue(o);
+                }
             });
         }
-
         Utils.writeNode(loader, root);
     }
 }
