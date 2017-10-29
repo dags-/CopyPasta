@@ -94,24 +94,20 @@ public class TerrainBrush extends AbstractBrush {
         int lift = base - variance + offset;
 
         UUID uuid = player.getUniqueId();
-        World world = player.getWorld();
         Cause cause = PlayerManager.getCause(player);
         List<LocatableBlockChange> changes = new LinkedList<>();
 
-        Calculator calculator = new Radius2D(world, radius);
-        Tester tester = new Tester(world, changes, cause);
-        Applier applier = new Applier(world, uuid, changes, history, cause);
-        Visitor2D visitor = (v, x, z) -> {
-            x += pos.getX();
-            z += pos.getZ();
-
+        Calculator calculator = new Radius2D(player.getWorld(), player.getWorld(), pos, radius);
+        Tester tester = new Tester(player.getWorld(), changes, cause);
+        Applier applier = new Applier(player.getWorld(), uuid, changes, history, cause);
+        Visitor2D visitor = (w, v, x, z) -> {
             double noise = module.getValue(x, 0, z);
-            int floor = BlockUtils.findSurface(world, x, z, 0, 255);
+            int floor = BlockUtils.findSurface(w, x, z, 0, 255);
             int height = (int) Math.round((variance * noise) + lift);
             height = Math.min(255, Math.max(0, height));
 
             for (int y = floor; y < height; y++) {
-                Location<World> location = new Location<>(world, x, y,  z);
+                Location<World> location = new Location<>(w, x, y,  z);
                 LocatableBlockChange record = new LocatableBlockChange(location, palette.next());
                 changes.add(record);
             }

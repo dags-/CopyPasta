@@ -4,21 +4,26 @@ import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.operation.Operation;
 import me.dags.copy.operation.visitor.Visitor2D;
 import me.dags.copy.operation.visitor.Visitor3D;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.BlockVolume;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class Volume implements Calculator {
 
+    private final WeakReference<World> world;
+    private final BlockVolume volume;
     private final Vector3i min;
     private final Vector3i max;
-    private final BlockVolume volume;
     private int dx = 0;
     private int dy = 0;
     private int dz = 0;
 
-    public Volume(BlockVolume volume) {
+    public Volume(World world, BlockVolume volume) {
+        this.world = new WeakReference<>(world);
         this.min = volume.getBlockMin();
         this.max = volume.getBlockMax();
         this.volume = volume;
@@ -39,10 +44,15 @@ public class Volume implements Calculator {
 
     @Override
     public Operation.Phase iterate(int limit, Visitor3D visitor) {
+        World world = this.world.get();
+        if (world == null) {
+            return Operation.Phase.ERROR;
+        }
+
         while (dy <= max.getY()) {
             while (dz <= max.getZ()) {
                 while (dx < max.getX()) {
-                    limit -= visitor.visit(volume, dx, dy, dz);
+                    limit -= visitor.visit(world, volume, dx, dy, dz);
                     dx++;
 
                     if (--limit <= 0) {

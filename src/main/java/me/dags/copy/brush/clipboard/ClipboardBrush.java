@@ -41,7 +41,7 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> FLIPY = Option.of("y.flip", false);
     public static final Option<Boolean> FLIPZ = Option.of("z.flip", false);
     public static final Option<Boolean> AUTO_FLIP = Option.of("auto.flip", true);
-    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", false);
+    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", true);
     public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.rotate", false);
     public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", false);
     public static final Option<Boolean> AIR = Option.of("air", false);
@@ -189,8 +189,8 @@ public class ClipboardBrush extends AbstractBrush {
         return player -> new ClipboardBrush();
     }
 
-    public static Visitor3D visitor(World world, Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
-        return (v, x, y, z) -> {
+    public static Visitor3D visitor(Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
+        return (w, v, x, y, z) -> {
             BlockState state = v.getBlock(x, y, z);
             if (state.getType() == BlockTypes.AIR && !air) {
                 return 0;
@@ -200,11 +200,11 @@ public class ClipboardBrush extends AbstractBrush {
             y += position.getY();
             z += position.getZ();
 
-            if (!world.containsBlock(x, y, z)) {
+            if (!w.containsBlock(x, y, z)) {
                 return 0;
             }
 
-            Location<World> location = world.getLocation(offset.add(x, y, z));
+            Location<World> location = w.getLocation(offset.add(x, y, z));
             if (location.getBlock() != state) {
                 changes.add(new LocatableBlockChange(location, state));
             }

@@ -44,7 +44,7 @@ public class Applier {
     public Operation.Phase apply(int limit) {
         World world = this.world.get();
         if (world == null) {
-            return Operation.Phase.DISPOSE;
+            return Operation.Phase.ERROR;
         }
 
         if (records == null || iterator == null) {

@@ -61,21 +61,21 @@ public class StencilBrush extends ClipboardBrush {
         return player -> new StencilBrush();
     }
 
-    public static Visitor3D visitor(World world, Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
-        return (v, x, y, z) -> {
+    public static Visitor3D visitor(Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
+        return (w, v, x, y, z) -> {
             BlockState state = v.getBlock(x, y, z);
             if (state.getType() == BlockTypes.AIR && !air) {
                 return 0;
             }
 
             Vector3i pos = position.add(x, y, z);
-            pos = BlockUtils.findSolidFoundation(world, pos).add(offset);
+            pos = BlockUtils.findSolidFoundation(w, pos).add(offset);
 
-            if (!world.containsBlock(pos)) {
+            if (!w.containsBlock(pos)) {
                 return 0;
             }
 
-            Location<World> location = world.getLocation(pos);
+            Location<World> location = w.getLocation(pos);
             if (location.getBlock() != state) {
                 changes.add(new LocatableBlockChange(location, state));
             }

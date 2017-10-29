@@ -102,12 +102,12 @@ public class Clipboard {
                     Visitor3D visitor;
 
                     if (stencil) {
-                        visitor = StencilBrush.visitor(world, position, offset, air, changes);
+                        visitor = StencilBrush.visitor(position, offset, air, changes);
                     } else {
-                        visitor = ClipboardBrush.visitor(world, position, offset, air, changes);
+                        visitor = ClipboardBrush.visitor(position, offset, air, changes);
                     }
 
-                    Calculator calculator = new Volume(result);
+                    Calculator calculator = new Volume(world, result);
                     Tester tester = new Tester(world, changes, cause);
                     Applier applier = new Applier(world, uuid, changes, history, cause);
                     Operation operation = new PlaceOperation(uuid, calculator, tester, applier, visitor);
