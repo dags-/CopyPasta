@@ -29,6 +29,7 @@ spongestart{
 
 repositories {
     mavenCentral()
+    jcenter()
     maven {
         url 'http://repo.spongepowered.org/maven'
     }
@@ -38,13 +39,16 @@ repositories {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
+    compile ("org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}") {
+//        exclude(group: 'com.flowpowered', module: 'flow-noise')
+    }
     shadow 'com.github.dags-:CommandBus:2.0.0-TEST-7'
 }
 
 shadowJar {
     configurations = [project.configurations.shadow]
     relocate 'me.dags.commandbus.', 'me.dags.copy.commandbus.'
+    relocate 'com.flowpowered.', 'me.dags.copy.noise.'
     archiveName = "${baseName}-${version}-SpongeAPI-${spongeAPI}.jar"
 }
 

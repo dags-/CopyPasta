@@ -3,6 +3,7 @@ package me.dags.copy;
 import com.google.inject.Inject;
 import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
+import me.dags.copy.brush.cloud.CloudBrush;
 import me.dags.copy.brush.multi.MultiPointBrush;
 import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
@@ -43,7 +44,7 @@ public class CopyPasta {
 
     private final Path configDir;
     private final EventListener eventListener = new EventListener();
-    private final OperationManager operationManager = new OperationManager();
+    private final OperationManager operationManager = new OperationManager(48000, 16000);
 
     private SpongeExecutorService asyncExecutor;
 
@@ -60,6 +61,7 @@ public class CopyPasta {
         BrushRegistry.getInstance().register(TerrainBrush.class, TerrainBrush.supplier());
         BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
         BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
+        BrushRegistry.getInstance().register(CloudBrush.class, CloudBrush.supplier());
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
     }
 

@@ -7,15 +7,19 @@ import java.util.LinkedList;
  */
 public class OperationManager implements Runnable {
 
-    private static final int PRE_LIMIT = 1024 * 16;
-    private static final int CHANGE_LIMIT = 1024 * 4;
-
+    private final int preLimit;
+    private final int changeLimit;
     private final Object lock = new Object();
     private final LinkedList<Operation> calculate = new LinkedList<>();
     private final LinkedList<Operation> test = new LinkedList<>();
     private final LinkedList<Operation> apply = new LinkedList<>();
 
     private boolean finishing = false;
+
+    public OperationManager(int pre, int change) {
+        this.preLimit = pre;
+        this.changeLimit = change;
+    }
 
     public void reset() {
         finishing = false;
@@ -35,17 +39,17 @@ public class OperationManager implements Runnable {
     public void run() {
         // drain queues in reverse order so that operations are spread across ticks
         Operation apply = this.apply.pollFirst();
-        apply(apply, PRE_LIMIT);
+        apply(apply, preLimit);
 
         Operation test = this.test.pollFirst();
-        test(test, PRE_LIMIT);
+        test(test, preLimit);
 
         Operation calculate;
         synchronized (lock) {
             calculate = this.calculate.pollFirst();
         }
 
-        compute(calculate, CHANGE_LIMIT);
+        compute(calculate, changeLimit);
     }
 
     public void finish() {
@@ -79,6 +83,7 @@ public class OperationManager implements Runnable {
                 Operation.Phase result = operation.calculate(limit);
                 queue(operation, result);
             } catch (Throwable t) {
+                t.printStackTrace();
                 operation.dispose(Operation.Phase.ERROR);
             }
         }
@@ -90,6 +95,7 @@ public class OperationManager implements Runnable {
                 Operation.Phase result = operation.test(limit);
                 queue(operation, result);
             } catch (Throwable t) {
+                t.printStackTrace();
                 operation.dispose(Operation.Phase.ERROR);
             }
         }
@@ -101,6 +107,7 @@ public class OperationManager implements Runnable {
                 Operation.Phase result = operation.apply(limit);
                 queue(operation, result);
             } catch (Throwable t) {
+                t.printStackTrace();
                 operation.dispose(Operation.Phase.ERROR);
             }
         }

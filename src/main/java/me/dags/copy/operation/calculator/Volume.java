@@ -51,7 +51,7 @@ public class Volume implements Calculator {
 
         while (dy <= max.getY()) {
             while (dz <= max.getZ()) {
-                while (dx < max.getX()) {
+                while (dx <= max.getX()) {
                     limit -= visitor.visit(world, volume, dx, dy, dz);
                     dx++;
 
