@@ -1,3 +1,5 @@
+# Wand
+
 | Command | Permission | Default Role  | Description |
 | :------ | :--------- | :-----------  | :---------- |
 | `wand reset` | `copypasta.wand.reset` |   | Reset all options for your current brush to their defaults |
