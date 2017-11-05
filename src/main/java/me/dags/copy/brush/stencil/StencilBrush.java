@@ -54,7 +54,6 @@ public class StencilBrush extends ClipboardBrush {
         StencilVolume volume = new StencilVolume(stencil, palette, depth);
         Clipboard clipboard = Clipboard.stencil(player, volume, stencil.getOffset());
         setClipboard(clipboard);
-
         apply(player, pos, getHistory());
     }
 

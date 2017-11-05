@@ -3,7 +3,6 @@ package me.dags.copy.brush;
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
-import me.dags.copy.block.BlockUtils;
 import me.dags.copy.brush.option.Options;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
@@ -40,7 +39,6 @@ public abstract class AbstractBrush implements Brush {
             fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
-        pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
         apply(player, pos, getHistory());
     }
 
