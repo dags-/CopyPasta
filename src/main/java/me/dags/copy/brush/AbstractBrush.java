@@ -1,6 +1,12 @@
 package me.dags.copy.brush;
 
+import com.flowpowered.math.vector.Vector3i;
+import me.dags.copy.CopyPasta;
+import me.dags.copy.PlayerManager;
+import me.dags.copy.block.BlockUtils;
 import me.dags.copy.brush.option.Options;
+import me.dags.copy.util.fmt;
+import org.spongepowered.api.entity.living.player.Player;
 
 /**
  * @author dags <dags@dags.me>
@@ -17,6 +23,25 @@ public abstract class AbstractBrush implements Brush {
     protected AbstractBrush(int size) {
         this.options = new Options();
         this.history = new History(size);
+    }
+
+    @Override
+    public void primary(Player player, Vector3i pos, Action action) {
+        if (PlayerManager.getInstance().must(player).isOperating()) {
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+        undo(player, getHistory());
+    }
+
+    @Override
+    public void secondary(Player player, Vector3i pos, Action action) {
+        if (PlayerManager.getInstance().must(player).isOperating()) {
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
+            return;
+        }
+        pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
+        apply(player, pos, getHistory());
     }
 
     @Override

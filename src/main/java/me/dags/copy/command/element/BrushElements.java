@@ -9,6 +9,7 @@ import me.dags.commandbus.element.function.Filter;
 import me.dags.commandbus.element.function.Options;
 import me.dags.commandbus.element.function.ValueParser;
 import me.dags.copy.CopyPasta;
+import me.dags.copy.block.state.State;
 import me.dags.copy.brush.Palette;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
@@ -42,6 +43,8 @@ public class BrushElements {
         brush(builder);
         option(builder);
         value(builder);
+
+        builder.provider(State.Mapper.class, StateMapperElement::new);
 
         return builder.build();
     }
@@ -132,6 +135,15 @@ public class BrushElements {
                     Object value = p.parse(input);
                     if (value == null) {
                         throw new CommandException("Unable to parse value for '%s'", option);
+                    }
+                    if (!option.validate(value)) {
+                        throw new CommandException(
+                                "The value '%s'(%s) is not valid for option '%s'(%s)",
+                                value,
+                                value.getClass().getSimpleName(),
+                                option,
+                                option.getUsage()
+                        );
                     }
                     return Value.of(value);
                 })

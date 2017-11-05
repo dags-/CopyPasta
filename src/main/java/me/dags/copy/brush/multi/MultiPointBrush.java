@@ -5,6 +5,7 @@ import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.*;
+import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.registry.brush.BrushSupplier;
@@ -22,9 +23,9 @@ public class MultiPointBrush extends AbstractBrush {
 
     private static final Random RANDOM = new Random();
 
-    public static final Option<Integer> RADIUS = Option.of("radius", 10);
-    public static final Option<Float> DENSITY = Option.of("density", 0.5F);
-    public static final Option<Integer> SPACING = Option.of("spacing", 2);
+    public static final Option<Integer> RADIUS = Option.of("radius", 10, Checks.range(1, 64));
+    public static final Option<Float> DENSITY = Option.of("density", 0.5F, Checks.range(0F, 1F));
+    public static final Option<Integer> SPACING = Option.of("spacing", 2, Checks.range(1, 32));
 
     private final Brush delegate;
     private History history = super.getHistory();

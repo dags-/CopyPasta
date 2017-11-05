@@ -14,7 +14,7 @@ public class CachedSchematic extends Clipboard {
     public static final String FACING_V = "Vertical Facing";
 
     private CachedSchematic(Schematic volume, Vector3i origin, Facing horizontal, Facing vertical) {
-        super(volume, origin, horizontal, vertical);
+        super(volume.getImmutableBlockCopy(), origin, horizontal, vertical);
     }
 
     public static CachedSchematic of(Schematic volume, Vector3i origin, Facing horizontal, Facing vertical) {

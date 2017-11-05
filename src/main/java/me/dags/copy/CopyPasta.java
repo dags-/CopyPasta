@@ -115,6 +115,10 @@ public class CopyPasta {
         });
     }
 
+    public void submitSync(Runnable runnable) {
+        Task.builder().execute(runnable).submit(this);
+    }
+
     public static CopyPasta getInstance() {
         return instance;
     }

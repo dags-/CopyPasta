@@ -2,28 +2,32 @@ package me.dags.copy.brush;
 
 import com.google.common.reflect.TypeToken;
 import me.dags.copy.block.state.State;
+import me.dags.copy.brush.option.Option;
 import me.dags.copy.util.Serializable;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class ReMappers implements Iterable<State.Mapper>, Serializable<ReMappers> {
+public class Mappers implements Iterable<State.Mapper>, Serializable<Mappers> {
 
-    private static final TypeToken<ReMappers> TOKEN = TypeToken.of(ReMappers.class);
-    public static final ReMappers EMPTY = new ReMappers(Collections.emptyList());
+    public static final Mappers EMPTY = new Mappers(Collections.emptyList());
+    public static final Option<Mappers> OPTION = Option.of("mapper", Mappers.class, (Supplier<Mappers>) Mappers::new);
+
+    private static final TypeToken<Mappers> TOKEN = TypeToken.of(Mappers.class);
 
     private final List<State.Mapper> mappers;
 
-    private ReMappers(List<State.Mapper> empty) {
+    private Mappers(List<State.Mapper> empty) {
         this.mappers = empty;
     }
 
-    public ReMappers() {
+    public Mappers() {
         this.mappers = new LinkedList<>();
     }
 
@@ -49,19 +53,19 @@ public class ReMappers implements Iterable<State.Mapper>, Serializable<ReMappers
     }
 
     @Override
-    public TypeToken<ReMappers> getToken() {
+    public TypeToken<Mappers> getToken() {
         return TOKEN;
     }
 
     @Override
-    public TypeSerializer<ReMappers> getSerializer() {
+    public TypeSerializer<Mappers> getSerializer() {
         return SERIALIZER;
     }
 
-    private static final TypeSerializer<ReMappers> SERIALIZER = new TypeSerializer<ReMappers>() {
+    private static final TypeSerializer<Mappers> SERIALIZER = new TypeSerializer<Mappers>() {
         @Override
-        public ReMappers deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-            ReMappers mappers = new ReMappers();
+        public Mappers deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+            Mappers mappers = new Mappers();
             for (Map.Entry<?, ?> entry : value.getChildrenMap().entrySet()) {
                 State.Mapper mapper = State.mapper(entry.getKey().toString(), entry.getValue().toString());
                 mappers.add(mapper);
@@ -70,7 +74,7 @@ public class ReMappers implements Iterable<State.Mapper>, Serializable<ReMappers
         }
 
         @Override
-        public void serialize(TypeToken<?> type, ReMappers obj, ConfigurationNode value) throws ObjectMappingException {
+        public void serialize(TypeToken<?> type, Mappers obj, ConfigurationNode value) throws ObjectMappingException {
             for (State.Mapper mapper : obj) {
                 value.getNode(mapper.getMatch()).setValue(mapper.getReplace());
             }

@@ -6,7 +6,6 @@ import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.ChainElement;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Palette;
-import me.dags.copy.brush.stencil.StencilBrush;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
@@ -49,8 +48,8 @@ public class StencilPaletteElement extends ChainElement<Palette, Palette> {
     private void ensurePalette(Context context) {
         context.getSource(Player.class)
                 .flatMap(player -> PlayerManager.getInstance().get(player).flatMap(d -> d.getBrush(player)))
-                .filter(StencilBrush.class::isInstance)
-                .map(brush -> brush.getOption(StencilBrush.PALETTE))
+                .filter(brush -> brush.supports(Palette.OPTION))
+                .map(brush -> brush.getOption(Palette.OPTION))
                 .ifPresent(palette -> context.add(Palette.class.getCanonicalName(), palette));
     }
 }

@@ -9,6 +9,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
+import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Collection;
@@ -35,7 +36,7 @@ public class VolumeMapper {
         this.mappers = mappers;
     }
 
-    public Runnable createTask(BlockVolume source, Cause cause, FutureCallback<BlockVolume> callback) {
+    public Runnable createTask(ImmutableBlockVolume source, Cause cause, FutureCallback<BlockVolume> callback) {
         return new Task(cause, source, callback);
     }
 
@@ -45,7 +46,7 @@ public class VolumeMapper {
         return pos1.min(pos2);
     }
 
-    public BlockVolume apply(BlockVolume source, Cause cause) {
+    public BlockVolume apply(ImmutableBlockVolume source, Cause cause) {
         Vector3i pos1 = apply(source.getBlockMin());
         Vector3i pos2 = apply(source.getBlockMax());
         Vector3i min = pos1.min(pos2);
@@ -138,10 +139,10 @@ public class VolumeMapper {
     private class Task implements Runnable {
 
         private final Cause cause;
-        private final BlockVolume source;
+        private final ImmutableBlockVolume source;
         private final FutureCallback<BlockVolume> callback;
 
-        private Task(Cause cause, BlockVolume source, FutureCallback<BlockVolume> callback) {
+        private Task(Cause cause, ImmutableBlockVolume source, FutureCallback<BlockVolume> callback) {
             this.cause = cause;
             this.source = source;
             this.callback = callback;

@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"schematic", "schem", "s"})
+@Aliases({"schematic", "schem"})
 public class SchematicBrush extends ClipboardBrush {
 
     public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList::new);

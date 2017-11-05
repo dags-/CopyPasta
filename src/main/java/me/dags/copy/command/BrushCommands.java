@@ -86,6 +86,24 @@ public class BrushCommands {
     }
 
     @Permission
+    @Command("wand|w options")
+    @Description("List all options and their values for the current brush")
+    public void options(@Src Player player) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            PagFormatter page = fmt.page();
+            page.title().stress("%s Options:", brush.get().getType());
+            Brush instance = brush.get();
+            BrushType type = brush.get().getType();
+            for (Option<?> option : type.getOptions()) {
+                Object value = instance.getOption(option);
+                page.line().subdued(" - ").stress(option).info("=").stress(value).info(" (%s)", option.getUsage());
+            }
+            page.sort(true).build().sendTo(player);
+        }
+    }
+
+    @Permission
     @Command("wand|w reset")
     @Description("Reset all options for your current brush to their defaults")
     public void reset(@Src Player player) {
@@ -97,7 +115,7 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("setting|set|s <option> <value>")
+    @Command("set|s <option> <value>")
     @Description("Set an option for your current brush")
     public void option(@Src Player player, Option<?> option, Value<?> value) {
         Optional<Brush> brush = getBrush(player);
@@ -105,24 +123,6 @@ public class BrushCommands {
             BrushType type = brush.get().getType();
             brush.get().setOption(option, value.get());
             fmt.info("Set ").stress(option).info("=").stress(value).info(" for brush ").stress(type).tell(player);
-        }
-    }
-
-    @Permission
-    @Command("setting|set|s list")
-    @Description("List all options and their values for the current brush")
-    public void options(@Src Player player) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            PagFormatter page = fmt.page();
-            page.title().stress("%s Options:", brush.get().getType());
-            Brush instance = brush.get();
-            BrushType type = brush.get().getType();
-            for (Option<?> option : type.getOptions()) {
-                Object value = instance.getOption(option);
-                page.line().subdued(" - ").stress(option).info("=").stress(value).info(" (%s)", option.getType().getSimpleName());
-            }
-            page.sort(true).build().sendTo(player);
         }
     }
 }

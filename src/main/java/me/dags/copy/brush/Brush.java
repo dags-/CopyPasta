@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
+import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Options;
 import me.dags.copy.registry.brush.BrushRegistry;
@@ -16,7 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public interface Brush {
 
-    Option<Integer> RANGE = Option.of("range", 128);
+    Option<Integer> RANGE = Option.of("range", 128, Checks.range(1, 128));
 
     Options getOptions();
 

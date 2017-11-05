@@ -7,6 +7,7 @@ import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.BlockUtils;
 import me.dags.copy.brush.*;
+import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.event.LocatableBlockChange;
 import me.dags.copy.operation.Operation;
@@ -18,7 +19,6 @@ import me.dags.copy.operation.calculator.Radius2D;
 import me.dags.copy.operation.tester.Tester;
 import me.dags.copy.operation.visitor.Visitor2D;
 import me.dags.copy.registry.brush.BrushSupplier;
-import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -32,19 +32,19 @@ import java.util.UUID;
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"terrain", "ter"})
+@Aliases({"terrain"})
 public class TerrainBrush extends AbstractBrush {
 
     public static final Option<Palette> PALETTE = Palette.OPTION;
-    public static final Option<Integer> BASE = Option.of("base", 65);
-    public static final Option<Integer> OFFSET = Option.of("offset", 12);
-    public static final Option<Integer> VARIANCE = Option.of("variance", 75);
-    public static final Option<Integer> RADIUS = Option.of("radius", 24);
+    public static final Option<Integer> BASE = Option.of("base", -1, Checks.range(-1, 255));
+    public static final Option<Integer> OFFSET = Option.of("offset", 12, Checks.range(0, 255));
+    public static final Option<Integer> VARIANCE = Option.of("variance", 75, Checks.range(0, 128));
+    public static final Option<Integer> RADIUS = Option.of("radius", 24, Checks.range(1, 64));
 
     public static final Option<NoiseType> NOISE = Option.of("noise", NoiseType.PERLIN);
     public static final Option<Integer> SEED = Option.of("seed", 1337);
-    public static final Option<Integer> SCALE = Option.of("scale", 98);
-    public static final Option<Integer> OCTAVES = Option.of("octaves", 3);
+    public static final Option<Integer> SCALE = Option.of("scale", 98, Checks.range(2, 512));
+    public static final Option<Integer> OCTAVES = Option.of("octaves", 3, Checks.range(1, 8));
 
     private TerrainBrush() {
         super(10);
@@ -52,30 +52,16 @@ public class TerrainBrush extends AbstractBrush {
 
     @Override
     public String getPermission() {
-        return "brush.mountain";
-    }
-
-    @Override
-    public void primary(Player player, Vector3i pos, Action action) {
-        if (PlayerManager.getInstance().must(player).isOperating()) {
-            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
-            return;
-        }
-        undo(player, getHistory());
+        return "brush.terrain";
     }
 
     @Override
     public void secondary(Player player, Vector3i pos, Action action) {
-        if (PlayerManager.getInstance().must(player).isOperating()) {
-            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
-            return;
-        }
         if (getOption(PALETTE).isEmpty()) {
             Fmt.warn("Your palette is empty! Use ").stress("/palette <blockstate>").tell(player);
             return;
         }
-        pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
-        apply(player, pos, getHistory());
+        super.secondary(player, pos, action);
     }
 
     @Override
@@ -89,6 +75,10 @@ public class TerrainBrush extends AbstractBrush {
         Palette palette = getOption(PALETTE);
         int radius = getOption(RADIUS);
         int base = getOption(BASE);
+        if (base == -1) {
+            base = BlockUtils.findSolidFoundation(player.getWorld(), pos).getY();
+        }
+
         int offset = getOption(OFFSET);
         int variance = getOption(VARIANCE);
         int lift = base - variance + offset;
@@ -123,6 +113,7 @@ public class TerrainBrush extends AbstractBrush {
     @Override
     public void undo(Player player, History history) {
         if (history.getSize() > 0) {
+            PlayerManager.getInstance().must(player).setOperating(true);
             LinkedList<BlockSnapshot> record = history.popRecord();
             UndoOperation undo = new UndoOperation(record, player.getUniqueId(), history);
             CopyPasta.getInstance().getOperationManager().queueOperation(undo);

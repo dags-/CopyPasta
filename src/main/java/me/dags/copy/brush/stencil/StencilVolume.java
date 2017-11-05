@@ -27,10 +27,10 @@ public class StencilVolume implements ImmutableBlockVolume {
     private final Palette palette;
     private final BlockState air = BlockTypes.AIR.getDefaultState();
 
-    StencilVolume(Stencil stencil, Palette palette) {
+    StencilVolume(Stencil stencil, Palette palette, int depth) {
         this.stencil = stencil;
         this.min = stencil.getMin();
-        this.max = stencil.getMax();
+        this.max = stencil.getMax().add(0, depth, 0);
         this.palette = palette;
     }
 

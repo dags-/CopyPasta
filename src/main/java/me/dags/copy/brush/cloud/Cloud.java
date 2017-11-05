@@ -5,13 +5,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -137,16 +135,7 @@ public class Cloud {
         return 1D - (modifier * modifier);
     }
 
-    public static Cloud of(int seed, int scale, int octaves, int radius, int height, int offset, float detail, float density, float feather, Collection<BlockState> blocks) {
-        List<BlockState> materials = new LinkedList<>();
-
-        int black = Math.round(blocks.size() * (1 - density));
-        for (int i = 0; i < black; i++) {
-            materials.add(BlockTypes.AIR.getDefaultState());
-        }
-
-        materials.addAll(blocks);
-
+    public static Cloud of(int seed, int scale, int octaves, int radius, int height, int offset, float detail, float feather, Collection<BlockState> materials) {
         return new Cloud(seed, scale, octaves, radius, height, offset, detail, feather, materials);
     }
 }

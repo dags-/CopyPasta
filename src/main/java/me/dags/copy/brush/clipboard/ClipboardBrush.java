@@ -6,7 +6,6 @@ import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.BlockUtils;
-import me.dags.copy.block.Mappers;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
@@ -32,7 +31,7 @@ import java.util.Random;
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"clipboard", "c"})
+@Aliases({"clipboard", "cb"})
 public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
@@ -47,7 +46,7 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> AIR = Option.of("air", false);
     public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", false);
     public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
-    public static final Option<ReMappers> MAPPERS = Option.of("mappers", ReMappers.class, ReMappers::new);
+    public static final Option<Mappers> REMAPPERS = Mappers.OPTION;
 
     private SelectorBrush selector = new SelectorBrush(this);
     private Clipboard clipboard = Clipboard.empty();
@@ -162,24 +161,24 @@ public class ClipboardBrush extends AbstractBrush {
             flipZ = RANDOM.nextBoolean();
         }
 
-        ReMappers reMappers = getOption(MAPPERS);
+        Mappers reMappers = getOption(Mappers.OPTION);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
         mappers.addAll(reMappers);
 
         if (angle != 0) {
-            mappers.add(Mappers.getRotationY(angle));
+            mappers.add(me.dags.copy.block.Mappers.getRotationY(angle));
         }
 
         if (flipX) {
-            mappers.add(Mappers.getFlipX());
+            mappers.add(me.dags.copy.block.Mappers.getFlipX());
         }
 
         if (flipY) {
-            mappers.add(Mappers.getFlipY());
+            mappers.add(me.dags.copy.block.Mappers.getFlipY());
         }
 
         if (flipZ) {
-            mappers.add(Mappers.getFlipZ());
+            mappers.add(me.dags.copy.block.Mappers.getFlipZ());
         }
 
         return new VolumeMapper(angle, flipX, flipY, flipZ, mappers.build());
