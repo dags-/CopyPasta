@@ -37,6 +37,20 @@ public class StencilCommands {
         }
     }
 
+    @Command("stencil save <stencil>")
+    public void save(@Src Player player, String name) {
+        Optional<StencilBrush> brush = BrushCommands.getBrush(player, StencilBrush.class);
+        if (brush.isPresent()) {
+            Stencil stencil = brush.get().getOption(StencilBrush.STENCIL);
+            if (stencil.isPresent()) {
+                write(stencil, name);
+                fmt.info("Successfully saved stencil ").stress(name).tell(player);
+            } else {
+                fmt.error("Your brush does not have a stencil attached to it").tell(player);
+            }
+        }
+    }
+
     @Permission
     @Command("stencil <url> <samples> <threshold>")
     @Description("Create a line stencil from an image at the given url")
@@ -52,7 +66,6 @@ public class StencilCommands {
             Consumer<Optional<Stencil>> consumer = stencil -> {
                 if (stencil.isPresent()) {
                     brush.get().setOption(StencilBrush.STENCIL, stencil.get());
-                    write(stencil.get(), "stencil");
                     fmt.info("Successfully set your stencil").tell(player);
                 } else {
                     fmt.error("Unable to create a stencil from the url %s", url).tell(player);
