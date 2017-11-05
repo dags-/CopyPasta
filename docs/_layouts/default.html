@@ -18,7 +18,7 @@
         <p>{{ site.description | default: site.github.project_tagline }}</p>
         
         {% for p in site.html_pages %}
-            <a href="/help{{ p.url }}">{{ p.title }}</a>
+            <a href="{{ p.url }}">{{ p.title }}</a>
             <br>
         {% endfor %}
 
