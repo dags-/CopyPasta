@@ -31,14 +31,9 @@ function perform(buffer, x, z, dist2) {
     let denom = dy < 0 ? Math.min(-1, startY - 1) : Math.max(1, endY + 1);
     let vmod = mod(dy, denom);
     let noise1 = getValue(px * detail, dy, pz * detail, frequency, octaves) / max;
-    let alpha = range * noise1 * opac * vmod;
-    if (alpha < emptiness) {
-      alpha = 0;
-    } else {
-      alpha = alpha - emptiness;
-    }
-
-    alpha = Math.min(255, alpha * 1.5);
+    let alpha = (range * noise1 * opac * vmod) - emptiness;
+    
+    alpha = clampAlpha(alpha * 1.5, 15); // clamps the alpha to a value 0-15. the x1.5 just brightens it up a little
 
     if (dy === sectionY) {
       buffer.setPlan(x, z, 255, 255, 255, alpha);
@@ -70,6 +65,12 @@ function opacity(val, bound, range) {
     return 1 - (d / range);
   }
   return 1;
+}
+
+function clampAlpha(value, bitrate) {
+    let perc = value / 255.0;
+    let steps = Math.round(bitrate * perc);
+    return Math.min(255, Math.max(0, steps * Math.round(255 / bitrate)));
 }
 
 function register(controls) {
