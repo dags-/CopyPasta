@@ -10,6 +10,7 @@ let time = 0;
 let animate = true;
 
 function init() {
+  console.log('initializing!');
   let controls = document.getElementById('controls');
   register(controls);
   setInterval(loop, 20);
