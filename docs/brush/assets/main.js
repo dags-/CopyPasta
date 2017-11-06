@@ -9,10 +9,12 @@ let increment = 0;
 let time = 0;
 let animate = true;
 
-setInterval(loop, 20);
-
-init();
-draw();
+function init() {
+  let controls = document.getElementById('controls');
+  register(controls);
+  setInterval(loop, 20);
+  draw();
+}
 
 function loop() {
   zOffset += increment;
@@ -40,11 +42,6 @@ function createBuffer() {
   let plan = context.createImageData(planWidth, planHeight);
   let section = context.createImageData(planWidth, sectionHeight);
   return new Buffer(plan, section);
-}
-
-function init() {
-  let controls = document.getElementById('controls');
-  register(controls);
 }
 
 function slider(id, min, max, val, fact, callback) {
