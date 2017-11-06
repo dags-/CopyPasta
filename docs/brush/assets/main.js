@@ -1,7 +1,8 @@
-const canvas = document.getElementById('preview');
-const context = canvas.getContext('2d');
-const buffer = createBuffer();
 const frameRate = 1000 / 30;
+
+let canvas;
+let context;
+let buffer
 
 let xOffset = Math.random() * 2048;
 let zOffset = Math.random() * 2048;
@@ -11,6 +12,10 @@ let animate = true;
 
 function init() {
   console.log('initializing!');
+  canvas = document.getElementById('preview');
+  context = canvas.getContext('2d');
+  buffer = createBuffer();
+  
   let controls = document.getElementById('controls');
   register(controls);
   setInterval(loop, 20);
