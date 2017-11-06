@@ -30,7 +30,7 @@ function perform(buffer, x, z, dist2) {
   for (let dy = startY; dy <= endY; dy++) {
     let denom = dy < 0 ? Math.min(-1, startY - 1) : Math.max(1, endY + 1);
     let vmod = mod(dy, denom);
-    let noise1 = getValue(px * detail, 0, pz * detail, frequency, octaves) / max;
+    let noise1 = getValue(px * detail, dy, pz * detail, frequency, octaves) / max;
     let alpha = range * noise1 * opac * vmod;
     if (alpha < emptiness) {
       alpha = 0;
