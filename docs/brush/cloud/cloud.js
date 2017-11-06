@@ -33,7 +33,7 @@ function perform(buffer, x, z, dist2) {
     let noise1 = getValue(px * detail, dy, pz * detail, frequency, octaves) / max;
     let alpha = (range * noise1 * opac * vmod) - emptiness;
     
-    alpha = clampAlpha(alpha * 1.5, 15); // clamps the alpha to a value 0-15. the x1.5 just brightens it up a little
+    alpha = clampAlpha(alpha * 1.5, 15); // clamps the alpha to an integer value 0-15. the x1.5 just brightens it up a little
 
     if (dy === sectionY) {
       buffer.setPlan(x, z, 255, 255, 255, alpha);
