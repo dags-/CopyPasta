@@ -113,7 +113,7 @@ public class BrushElements {
                         String next = input.next();
                         Optional<Option<?>> option = type.getOption(next);
                         if (!option.isPresent()) {
-                            throw new CommandException("Invalid Option '%s' for Brush %s", next, type);
+                            throw new CommandException("Invalid Option '%s' for Brush '%s'", next, type);
                         }
                         return option.get();
                     });
@@ -139,7 +139,7 @@ public class BrushElements {
                     }
                     if (!option.validate(value)) {
                         throw new CommandException(
-                                "The value '%s'(%s) is not valid for option '%s'(%s)",
+                                "The value '%s' (%s) is not valid for option '%s' (%s)",
                                 value,
                                 value.getClass().getSimpleName(),
                                 option,
