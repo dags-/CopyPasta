@@ -27,10 +27,11 @@ import java.util.Optional;
 public class BrushElements {
 
     private static final ElementFactory builtin = CommandBus.elements().build();
+    public static final ElementFactory FACTORY = getElements();
 
     public static CommandBus getCommandBus(CopyPasta plugin) {
         return CommandBus.builder()
-                .elements(getElements())
+                .elements(FACTORY)
                 .owner(plugin)
                 .build();
     }

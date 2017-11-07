@@ -6,7 +6,7 @@ import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.brush.option.Options;
+import me.dags.copy.brush.option.OptionHolder;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushType;
 import me.dags.copy.util.fmt;
@@ -15,11 +15,9 @@ import org.spongepowered.api.entity.living.player.Player;
 /**
  * @author dags <dags@dags.me>
  */
-public interface Brush {
+public interface Brush extends OptionHolder {
 
     Option<Integer> RANGE = Option.of("range", 128, Checks.range(1, 128));
-
-    Options getOptions();
 
     History getHistory();
 
@@ -58,18 +56,6 @@ public interface Brush {
 
     default boolean supports(Option option) {
         return getType().getOption(option.getId()).isPresent();
-    }
-
-    default <T> T getOption(Option<T> option) {
-        return getOptions().get(option);
-    }
-
-    default <T> T mustOption(Option<T> option) {
-        return getOptions().must(option);
-    }
-
-    default void setOption(Option option, Object value) {
-        getOptions().set(option, value);
     }
 
     default int getRange() {

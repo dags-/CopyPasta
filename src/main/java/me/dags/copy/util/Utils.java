@@ -1,5 +1,6 @@
 package me.dags.copy.util;
 
+import me.dags.commandbus.command.Input;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.data.DataContainer;
@@ -19,6 +20,16 @@ import java.nio.file.Paths;
  * @author dags <dags@dags.me>
  */
 public class Utils {
+
+    public static Input tokenize(String code) {
+        char[] chars = code.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == ';') {
+                chars[i] = ' ';
+            }
+        }
+        return new Input(new String(chars));
+    }
 
     public static Path getDir(Path parent, String... child) {
         Path p = parent;

@@ -68,7 +68,10 @@ public class Cloud {
 
     public BlockVolume apply(Vector3i pos, Cause cause) {
         int diameter = 1 + radius * 2;
-        Vector3i size = new Vector3i(diameter, height + offset, diameter);
+
+        // cloud can extend downwards 'offset' blocks, and upwards 'offset' + 'height' blocks
+        int maxHeight = this.height + (offset * 2) + 1;
+        Vector3i size = new Vector3i(diameter, maxHeight, diameter);
         MutableBlockVolume volume = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
 
         for (int dz = 0; dz <= radius; dz++) {
@@ -96,25 +99,24 @@ public class Cloud {
         int x = pos.getX() + dx;
         int y = pos.getY();
         int z = pos.getZ() + dz;
+
         double x1 = x * depth;
         double z1 = z * depth;
 
-        double horizontalMod = modifier(distance2, radius2);
-        double opacity = opacity(distance2, featherRadius2, featherRange);
-        double eNoise = ValueNoise.getValue(x, y, z, seed, frequency, octaves) / max;
+        double hMod = modifier(distance2, radius2);
+        double feather = feather(distance2, featherRadius2, featherRange);
+        double noise0 = ValueNoise.getValue(x, y, z, seed, frequency, octaves) / max;
 
-        int elevation = (int) Math.round(eNoise * height * horizontalMod);
-        elevation = Math.max(offset + 3, elevation);
-
+        int elevation = (int) Math.round(noise0 * height * hMod);
         int startY = -offset;
-        int endY = startY + elevation;
+        int endY = offset + elevation;
 
         for (int dy = startY; dy <= endY; dy++) {
             double y1 = y + dy;
-            double vNoise = ValueNoise.getValue(x1, y1, z1, seed, frequency, octaves) / max;
-            double verticalMod = modifier(dy, dy < 0 ? startY : endY);
+            double vMod = modifier(dy, dy < 0 ? Math.min(-1, startY) : Math.max(1, endY));
+            double noise1 = ValueNoise.getValue(x1, y1, z1, seed, frequency, octaves) / max;
 
-            int index = (int) Math.round(total * vNoise * opacity * verticalMod);
+            int index = (int) Math.round(total * noise1 * feather * vMod);
             index = Math.min(total, Math.max(0, index));
 
             BlockState material = materials.get(index);
@@ -122,7 +124,7 @@ public class Cloud {
         }
     }
 
-    private static double opacity(double value, double bound, double range) {
+    private static double feather(double value, double bound, double range) {
         if (value > bound) {
             double d0 = value - bound;
             return 1D - (d0 / range);
@@ -135,6 +137,7 @@ public class Cloud {
         return 1D - (modifier * modifier);
     }
 
+    // todo: builder
     public static Cloud of(int seed, int scale, int octaves, int radius, int height, int offset, float detail, float feather, Collection<BlockState> materials) {
         return new Cloud(seed, scale, octaves, radius, height, offset, detail, feather, materials);
     }

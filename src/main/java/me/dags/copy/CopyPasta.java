@@ -5,6 +5,7 @@ import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.cloud.CloudBrush;
 import me.dags.copy.brush.multi.MultiPointBrush;
+import me.dags.copy.brush.replace.ReplaceBrush;
 import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.brush.terrain.TerrainBrush;
@@ -62,6 +63,7 @@ public class CopyPasta {
         BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
         BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
         BrushRegistry.getInstance().register(CloudBrush.class, CloudBrush.supplier());
+        BrushRegistry.getInstance().register(ReplaceBrush.class, ReplaceBrush.supplier());
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
     }
 

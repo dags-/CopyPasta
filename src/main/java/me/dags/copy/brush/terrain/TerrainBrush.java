@@ -9,22 +9,22 @@ import me.dags.copy.block.BlockUtils;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.brush.option.Parsable;
 import me.dags.copy.event.LocatableBlockChange;
 import me.dags.copy.operation.Operation;
 import me.dags.copy.operation.PlaceOperation;
-import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.applier.Applier;
 import me.dags.copy.operation.calculator.Calculator;
 import me.dags.copy.operation.calculator.Radius2D;
 import me.dags.copy.operation.tester.Tester;
 import me.dags.copy.operation.visitor.Visitor2D;
 import me.dags.copy.registry.brush.BrushSupplier;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +33,7 @@ import java.util.UUID;
  * @author dags <dags@dags.me>
  */
 @Aliases({"terrain"})
-public class TerrainBrush extends AbstractBrush {
+public class TerrainBrush extends AbstractBrush implements Parsable {
 
     public static final Option<Palette> PALETTE = Palette.OPTION;
     public static final Option<Integer> BASE = Option.of("base", -1, Checks.range(-1, 255));
@@ -47,7 +47,12 @@ public class TerrainBrush extends AbstractBrush {
     public static final Option<Integer> OCTAVES = Option.of("octaves", 3, Checks.range(1, 8));
 
     private TerrainBrush() {
-        super(10);
+        super(5);
+    }
+
+    @Override
+    public List<Option<?>> getParseOptions() {
+        return Arrays.asList(NOISE, SCALE, OCTAVES, RADIUS, BASE, OFFSET, VARIANCE);
     }
 
     @Override
@@ -109,17 +114,6 @@ public class TerrainBrush extends AbstractBrush {
         Operation operation = new PlaceOperation(uuid, calculator, tester, applier, visitor);
         CopyPasta.getInstance().getOperationManager().queueOperation(operation);
     }
-
-    @Override
-    public void undo(Player player, History history) {
-        if (history.getSize() > 0) {
-            PlayerManager.getInstance().must(player).setOperating(true);
-            LinkedList<BlockSnapshot> record = history.popRecord();
-            UndoOperation undo = new UndoOperation(record, player.getUniqueId(), history);
-            CopyPasta.getInstance().getOperationManager().queueOperation(undo);
-        }
-    }
-
 
     public static BrushSupplier supplier() {
         return player -> new TerrainBrush();

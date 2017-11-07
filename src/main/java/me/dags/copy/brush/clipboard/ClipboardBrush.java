@@ -2,8 +2,6 @@ package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import me.dags.copy.CopyPasta;
-import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.BlockUtils;
 import me.dags.copy.block.property.Axis;
@@ -12,19 +10,16 @@ import me.dags.copy.block.state.State;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.event.LocatableBlockChange;
-import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.operation.VolumeMapper;
 import me.dags.copy.operation.visitor.Visitor3D;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -109,25 +104,6 @@ public class ClipboardBrush extends AbstractBrush {
         boolean withAir = getOption(AIR);
         VolumeMapper mapper = getMapper(clipboard, player);
         clipboard.paste(player, history, pos, offset, mapper, withAir, PlayerManager.getCause(player));
-    }
-
-    @Override
-    public void undo(Player player, History history) {
-        PlayerData data = PlayerManager.getInstance().must(player);
-
-        if (data.isOperating()) {
-            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
-            return;
-        }
-
-        if (history.hasNext()) {
-            data.setOperating(true);
-            LinkedList<BlockSnapshot> record = history.popRecord();
-            UndoOperation operation = new UndoOperation(record, player.getUniqueId(), history);
-            CopyPasta.getInstance().getOperationManager().queueOperation(operation);
-        } else {
-            fmt.error("No more history to undo!").tell(CopyPasta.NOTICE_TYPE, player);
-        }
     }
 
     public void setClipboard(Clipboard clipboard) {
