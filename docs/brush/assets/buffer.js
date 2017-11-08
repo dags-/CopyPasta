@@ -1,87 +1,88 @@
 class Buffer {
-  constructor(plan, section) {
-    this.plan = plan;
-    this.section = section;
-    this.planCenterY = plan.height / 2;
-    this.sectionCenterY = section.height / 2;
+  constructor(image, planHeight) {
+    let buf = new ArrayBuffer(image.data.length);
+    this.image = image;
+    this.buf8 = new Uint8ClampedArray(buf);
+    this.data = new Uint32Array(buf);
+    this.planStart = 0;
+    this.planEnd = planHeight;
+    this.sectionStart = this.planEnd;
+    this.sectionEnd = image.height;
+
+    this.planOffsetX = (image.width / 2) - 1;
+    this.planOffsetY = planHeight / 2;
+
+    this.sectionOffsetX = image.width / 2;
+    this.sectionOffsetY = planHeight + ((image.height - planHeight) / 2);
   }
 
-  width() {
-    return this.plan.width + 1;
-  }
-
-  height() {
-    return this.plan.height;
-  }
-
-  setPlan(x, z, r, g, b, a) {
-    if (Buffer.checkBounds(this.plan, x, z)) {
-      Buffer.setRGBA(this.plan, x, z, r, g, b, a);
+  drawPlan(x, z, r, g, b, a) {
+    x += this.planOffsetX;
+    z += this.planOffsetY;
+    if (this.checkBounds(x, z, 0, 0, this.image.width, this.planEnd)) {
+      this.setRGBA(x, z, r, g, b, a);
     }
   }
 
-  setSection(x, y, r, g, b, a) {
-    if (Buffer.checkBounds(this.section, x, y)) {
-      Buffer.setRGBA(this.section, x, y, r, g, b, a);
+  drawSection(x, y, r, g, b, a) {
+    x += this.sectionOffsetX;
+    y += this.sectionOffsetY;
+    if (this.checkBounds(x, y, 0, this.sectionStart, this.image.width, this.sectionEnd)) {
+      this.setRGBA(x, y, r, g, b, a);
     }
   }
 
   apply(canvas, context) {
-    let left = (canvas.width - this.plan.width) / 2
-    context.putImageData(this.plan, left, 0);
-    context.putImageData(this.section, left, this.plan.height);
-  }
-
-  setBackground(r, g, b) {
-    Buffer.fill(this.plan, r, g, b);
-    Buffer.fill(this.section, r, g, b);
+    let left = (canvas.width - this.image.width) / 2
+    this.image.data.set(this.buf8);
+    context.putImageData(this.image, 0, 0);
   }
 
   drawSectionLine(r, g, b, a) {
-    Buffer.drawLine(this.plan, 0, this.planCenterY, this.plan.width - 1, this.planCenterY, r, g, b, a);
+    this.drawLine(0, this.planOffsetY, this.image.width - 1, this.planOffsetY, r, g, b, a);
   }
 
   drawSeparator(r, g, b, a) {
-    Buffer.drawLine(this.plan, 0, this.plan.height - 1, this.plan.width - 1, this.plan.height - 1, r, g, b, a);
-    Buffer.drawLine(this.section, 0, 0, this.section.width - 1, 0, r, g, b, 255);
+    this.drawLine(0, this.planEnd - 1, this.image.width - 1, this.planEnd + 1, r, g, b, a);
   }
 
-  static checkBounds(image, x, y) {
-    return x >= 0 && x < image.width && y >= 0 && y < image.height;
+  checkBounds(x, y, minX, minY, maxX, maxY) {
+    return x >= minX && x < maxX && y >= minY && y < maxY;
   }
 
-  static setRGB(image, x, y, r, g, b, a) {
-    let i = (y * image.width + x) * 4;
-    image.data[i] = r;
-    image.data[i + 1] = g;
-    image.data[i + 2] = b;
-    image.data[i + 3] = 255;
+  setRGB(x, y, r, g, b) {
+    let i = (y * this.image.width + x);
+    this.data[i] = (255 << 24) | (b << 16) | (g << 8) | r;
   }
 
-  static setRGBA(image, x, y, r, g, b, a) {
-    let i = (y * image.width + x) * 4;
-    let sr = image.data[i];
-    let sg = image.data[i + 1];
-    let sb = image.data[i + 2];
+  setRGBA(x, y, r, g, b, a) {
+    let i = (y * this.image.width + x);
+    let c = this.data[i];
+
+    let r0 = c & 0xFF;
+    let g0 = (c >> 8) & 0xFF;
+    let b0 = (c >> 16) & 0xFF;
+
     let dst = a / 255;
     let src = 1 - dst;
-    image.data[i] = (sr * src) + (r * dst);
-    image.data[i + 1] = (sg * src) + (g * dst);
-    image.data[i + 2] = (sb * src) + (b * dst);
+
+    r0 = (r0 * src) + (r * dst);
+    g0 = (g0 * src) + (g * dst);
+    b0 = (b0 * src) + (b * dst);
+
+    this.data[i] = (255 << 24) | (b0 << 16) | (g0 << 8) | r0;
   }
 
-  static fill(image, r, g, b) {
-    for (let dz = 0; dz < image.height; dz++) {
-      for (let dx = 0; dx < image.width; dx++) {
-        Buffer.setRGB(image, dx, dz, r, g, b, 255);
-      }
+  fill(r, g, b) {
+    for (let i = 0; i < this.data.length; i++) {
+      this.data[i] = (255 << 24) | (b << 16) | (g << 8) | r;
     }
   }
 
-  static drawLine(image, x0, y0, x1, y1, r, g, b, a) {
+  drawLine(x0, y0, x1, y1, r, g, b, a) {
     for (let x = x0; x <= x1; x++) {
       for (let y = y0; y <= y1; y++) {
-        Buffer.setRGBA(image, x, y, r, g, b, a);
+        this.setRGBA(x, y, r, g, b, a);
       }
     }
   }

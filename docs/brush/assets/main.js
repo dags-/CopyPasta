@@ -1,56 +1,87 @@
-const frameRate = 1000 / 30;
-
 let canvas;
 let context;
-let buffer
+let buffer;
+let command;
 
-let xOffset = Math.random() * 2048;
-let zOffset = Math.random() * 2048;
-let increment = 0;
-let time = 0;
-let animate = true;
+let xIncrement = 0;
+let zIncrement = 0;
+let xOffset = Math.random() * 1024;
+let zOffset = Math.random() * 1024;
 
 function init() {
   console.log('initializing!');
-  canvas = document.getElementById('preview');
+
+  // init canvas & buffer
+  canvas = document.getElementById('canvas');
   context = canvas.getContext('2d');
   buffer = createBuffer();
-  
+
+  // add sliders etc
   let controls = document.getElementById('controls');
-  register(controls);
-  setInterval(loop, 20);
-  draw();
+  let registrar = (child) => controls.appendChild(child);
+
+  // add option controls
+  controls.appendChild(createTitle('Options:'));
+  registerOptions(registrar);
+
+  // add animation controls
+  registrar(createTitle('Animation:'));
+  registrar(createSlider('x-speed', -10, 10, 0, 10, (val) => xIncrement = val));
+  registrar(createSlider('z-speed', -10, 10, 0, 10, (val) => zIncrement = val));
+
+  // add output text area
+  command = createOuputBox();
+  registrar(createTitle('Command:'));
+  registrar(command);
+  writeOutput(command);
+
+  // begin update loop
+  setInterval(update, 20);
+
+  // begin render loop
+  render();
 }
 
-function loop() {
-  zOffset += increment;
-
-  let date = new Date();
-  if (date.getTime() - time > frameRate) {
-    time = date.getTime();
-    draw();
-  }
+function update() {
+  xOffset += xIncrement;
+  zOffset += zIncrement;
 }
 
-function draw() {
-  updatePos(xOffset, zOffset);
-  buffer.setBackground(100, 180, 235);
-  brush.iterate(buffer, buffer.width(), buffer.height());
+function render() {
+  // background
+  buffer.fill(100, 180, 235);
+  // position & draw clouds
+  setPos(xOffset, zOffset);
+  draw(buffer);
+  // draw line on plan where section is taken
   buffer.drawSectionLine(220, 0, 180, 64);
+  // draw space between plan and section views
   buffer.drawSeparator(255, 255, 255, 255);
+  // draw the buffer to the canvas
   buffer.apply(canvas, context);
+  // request next frame
+  window.requestAnimationFrame(render);
 }
 
 function createBuffer() {
-  let planHeight = Math.round(canvas.width / 2) * 2;
-  let planWidth = planHeight + 1;
-  let sectionHeight = canvas.height - planHeight;
-  let plan = context.createImageData(planWidth, planHeight);
-  let section = context.createImageData(planWidth, sectionHeight);
-  return new Buffer(plan, section);
+  let image = context.createImageData(canvas.width + 1, canvas.height);
+  return new Buffer(image, canvas.width - 1);
 }
 
-function slider(id, min, max, val, fact, callback) {
+function createTitle(title) {
+  let heading = document.createElement('h3');
+  heading.innerText = title;
+  return heading;
+}
+
+function createOuputBox() {
+  let box = document.createElement('textArea');
+  box.setAttribute('readonly', 'readonly');
+  box.onclick = () => box.select();
+  return box;
+}
+
+function createSlider(id, min, max, val, fact, callback) {
   let control = document.createElement('div');
   control.classList.add('control');
 
@@ -67,10 +98,12 @@ function slider(id, min, max, val, fact, callback) {
     let val = this.value / fact;
     label.innerText = id + ":" + val;
     callback(val);
+    writeOutput(command);
     if (increment === 0) {
-      draw();
+      render();
     }
   }
+
   control.appendChild(slider);
   control.appendChild(label);
   callback(val / fact);
