@@ -3,75 +3,19 @@
   <title>Cloud Generator</title>
   <script src="../assets/noise.js"></script>
   <script src="../assets/buffer.js"></script>
-  <script src="../assets/brush.js"></script>
+  <script src="../assets/shape.js"></script>
   <script src="../assets/main.js"></script>
-  <script src="cloud.js" defer></script>
-  <style>
-  body {
-    font-family: sans-serif;
-  }
-  .wrapper {
-    position: relative;
-    max-width: 70%;
-    min-width: 560px;
-    height: 100%;
-    margin: auto;
-    text-align: center;
-    background-color: #FAFAFA;
-  }
-  .left {
-    display: inline-block;
-    width: 49%;
-    min-width: 257px;
-    min-height: 512px;
-  }
-  .right {
-    display: block;
-    float: right;
-    width: 49%;
-    min-width: 256px;
-  }
-  canvas {
-    display: inline;
-    width: 100%;
-    max-width: 310px;
-    image-rendering: pixelated;
-  }
-  .controls {
-    text-align: left;
-    width: 100%;
-    padding: 0px;
-  }
-  .control {
-    height: 25px;
-  }
-  h3 {
-    margin: 0;
-  }
-  input {
-    height: 20px;
-    width: 175px;
-  }
-  label {
-    position: relative;
-    display: inline-block;
-    top: -25%;
-    height: 20px;
-    padding-left: 5px;
-    line-height: 20px;
-  }
-  </style>
+  <script src="cloud.js"></script>
+  <link rel="stylesheet" href="style.css"></link>
 </head>
 <body onload="init()">
   <div class="wrapper">
     <h1>Cloud Generator</h1>
     <div class="left">
-      <canvas id="preview" width="81" height="120"></canvas>
+      <canvas id="canvas" width="97" height="144"></canvas>
     </div>
     <div class="right">
-      <div id="controls" class="controls">
-        <h3>Settings</h3>
-      </div>
+      <div id="controls" class="controls"></div>
     </div>
   </div>
 </body>
