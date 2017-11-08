@@ -26,8 +26,8 @@ function init() {
 
   // add animation controls
   registrar(createTitle('Animation:'));
-  registrar(createSlider('x-speed', -10, 10, 0, 10, (val) => xIncrement = val));
-  registrar(createSlider('z-speed', -10, 10, 0, 10, (val) => zIncrement = val));
+  registrar(createSlider('x-speed', -10, 10, -1, 10, (val) => xIncrement = val));
+  registrar(createSlider('z-speed', -10, 10, 2, 10, (val) => zIncrement = val));
 
   // add output text area
   command = createOuputBox();
