@@ -1,6 +1,7 @@
 let shape = new Circle();
+let scale = 64;
 let octaves = 3;
-let frequency = 0.01;
+let frequency = 1 / scale;
 
 let height = 16;
 let heightRange = (2 * height) + 1;
@@ -29,24 +30,24 @@ function perform(buffer, x, z, dist2) {
   let noise0 = getValue(px, 0, pz, frequency, octaves) / maxNoise;
   let elevation = (noise0 * heightRange * hmod);
 
-  let startY = -Math.round(elevation * center);
+  let startY = -Math.max(1, Math.round(elevation * center));
   let endY = startY + elevation;
   let sectionY = offset > 1 ? -1 : 0;
   let feather = getFeather(dist2, shape.featherRadius, shape.featherRange);
 
-  let planAlpha = getAlpha(px, 0, pz, startY, endY, feather);
-  buffer.drawPlan(x, z, 255, 255, 255, planAlpha);
+  let plan = getAlpha(px, 0, pz, startY, endY, feather);
+  buffer.drawPlan(x, z, 255, 255, 255, plan);
 
   if (z === 0) {
     for (let dy = startY; dy <= endY; dy++) {
-      let sectionAlpha = getAlpha(px, dy, pz, startY, endY, feather);
-      buffer.drawSection(x, -dy, 255, 255, 255, sectionAlpha);
+      let section = getAlpha(px, dy, pz, startY, endY, feather);
+      buffer.drawSection(x, -dy, 255, 255, 255, section);
     }
   }
 }
 
-function getAlpha(x, y, z, mn, mx, feather) {
-  let vmod = mod(y, y < 0.5 ? Math.min(-1, mn) : Math.max(1, mx));
+function getAlpha(x, y, z, lower, upper, feather) {
+  let vmod = mod(y, y < 0.5 ? lower : upper);
   let noise = getValue(x * detail, y, z * detail, frequency, octaves) / maxNoise;
   let alpha = (range * noise * feather * vmod) - air;
   return clampAlpha(alpha * 1.5, bitrate);
@@ -77,7 +78,10 @@ function setPos(x, z) {
 }
 
 function registerOptions(register) {
-  register(createSlider('scale', 1, 96, 64, 1, (val) => frequency = 1 / val));
+  register(createSlider('scale', 1, 96, 64, 1, (val) => {
+    scale = val;
+    frequency = 1 / scale;
+  }));
   register(createSlider('octaves', 1, 6, 4, 1, (val) => {
     octaves = val;
     maxNoise = maxValue(octaves);
@@ -99,6 +103,5 @@ function registerOptions(register) {
 }
 
 function writeOutput(output) {
-  let scale = Math.round(1 / frequency);
   output.value = `/set ${scale};${octaves};${shape.radius};${shape.feather};${density};${detail};${height};${center}`;
 }
