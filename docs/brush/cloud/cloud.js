@@ -1,13 +1,13 @@
 let shape = new Circle();
 let scale = 64;
+let scaleFrequency = 1 / scale;
 let octaves = 3;
-let frequency = 1 / scale;
 
 let height = 16;
 let heightRange = (2 * height) + 1;
-let offset = 4;
-let detail = 4;
 let density = 0.5;
+let turbulence = 0.3;
+let turbulenceFrequency = turbulence * 0.1;
 let center = 0.5;
 
 let maxNoise = 1;
@@ -27,28 +27,31 @@ function perform(buffer, x, z, dist2) {
   let pz = z + zOff;
 
   let hmod = mod(dist2, shape.radius2);
-  let noise0 = getValue(px, 0, pz, frequency, octaves) / maxNoise;
-  let elevation = (noise0 * heightRange * hmod);
+  let elevation = getElevation(px, pz, hmod);
 
-  let startY = -Math.max(1, Math.round(elevation * center));
-  let endY = startY + elevation;
-  let sectionY = offset > 1 ? -1 : 0;
+  let lower = -Math.max(1, Math.round(elevation * center));
+  let upper = lower + elevation;
   let feather = getFeather(dist2, shape.featherRadius, shape.featherRange);
 
-  let plan = getAlpha(px, 0, pz, startY, endY, feather);
+  let plan = getAlpha(px, 0, pz, lower, upper, feather);
   buffer.drawPlan(x, z, 255, 255, 255, plan);
 
   if (z === 0) {
-    for (let dy = startY; dy <= endY; dy++) {
-      let section = getAlpha(px, dy, pz, startY, endY, feather);
+    for (let dy = lower; dy <= upper; dy++) {
+      let section = getAlpha(px, dy, pz, lower, upper, feather);
       buffer.drawSection(x, -dy, 255, 255, 255, section);
     }
   }
 }
 
+function getElevation(x, z, hmod) {
+  let noise = getValue(x, 0, z, scaleFrequency, octaves) / maxNoise;
+  return noise * heightRange * hmod;
+}
+
 function getAlpha(x, y, z, lower, upper, feather) {
   let vmod = mod(y, y < 0.5 ? lower : upper);
-  let noise = getValue(x * detail, y, z * detail, frequency, octaves) / maxNoise;
+  let noise = getValue(x, y, z, turbulenceFrequency, octaves) / maxNoise;
   let alpha = (range * noise * feather * vmod) - air;
   return clampAlpha(alpha * 1.5, bitrate);
 }
@@ -78,9 +81,9 @@ function setPos(x, z) {
 }
 
 function registerOptions(register) {
-  register(createSlider('scale', 1, 96, 64, 1, (val) => {
+  register(createSlider('scale', 8, 128, 64, 1, (val) => {
     scale = val;
-    frequency = 1 / scale;
+    scaleFrequency = 1 / scale;
   }));
   register(createSlider('octaves', 1, 6, 4, 1, (val) => {
     octaves = val;
@@ -93,7 +96,10 @@ function registerOptions(register) {
     air = 255 * (1.0 - density);
     range = 255 + air;
   }));
-  register(createSlider('detail', 10, 50, 17, 10, (val) => detail = val));
+  register(createSlider('turbulence', 0, 100, 25, 100, (val) => {
+    turbulence = val;
+    turbulenceFrequency = turbulence * 0.1;
+  }));
   register(createSlider('height', 4, 48, 20, 1, (val) => {
     height = val;
     heightRange = (2 * height) + 1;
@@ -103,5 +109,5 @@ function registerOptions(register) {
 }
 
 function writeOutput(output) {
-  output.value = `/set ${scale};${octaves};${shape.radius};${shape.feather};${density};${detail};${height};${center}`;
+  output.value = `/set ${scale};${octaves};${shape.radius};${shape.feather};${density};${turbulence};${height};${center}`;
 }
