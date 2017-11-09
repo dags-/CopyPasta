@@ -24,7 +24,8 @@ body {
 }
 canvas {
   display: inline;
-  width: 80%;
+  width: 75%;
+  max-width: 384px;
   margin: auto;
   image-rendering: pixelated;
 }
@@ -45,6 +46,7 @@ input {
 }
 textarea {
   resize: vertical;
+  margin-top: 10px;
   width: 256px;
   min-height: 45px;
 }
