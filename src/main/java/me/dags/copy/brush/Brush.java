@@ -17,7 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public interface Brush extends OptionHolder {
 
-    Option<Integer> RANGE = Option.of("range", 128, Checks.range(1, 128));
+    Option<Integer> RANGE = Option.of("range", 128, Checks.range(1, 256));
 
     History getHistory();
 

@@ -8,7 +8,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.BlockVolume;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -38,7 +37,7 @@ public class Callback implements FutureCallback<BlockVolume> {
 
         World world = this.world.get();
         if (world == null) {
-            onFailure(new InvalidStateException("Lost reference to world"));
+            onFailure(new IllegalStateException("Lost reference to world"));
             return;
         }
 

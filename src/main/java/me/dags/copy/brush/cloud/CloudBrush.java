@@ -19,6 +19,7 @@ import me.dags.copy.operation.calculator.Calculator;
 import me.dags.copy.operation.calculator.Volume;
 import me.dags.copy.operation.tester.Tester;
 import me.dags.copy.registry.brush.BrushSupplier;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -81,6 +82,11 @@ public class CloudBrush extends AbstractBrush implements Parsable {
             this.trait = trait;
             this.density = density;
             materials = getVariants(type, trait, density);
+        }
+
+        if (materials.size() <= 0) {
+            fmt.error("No materials match block: %s, trait: %s", type, trait).tell(player);
+            return;
         }
 
         Cloud cloud = Cloud.of(

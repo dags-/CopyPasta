@@ -10,6 +10,8 @@ import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -66,6 +68,7 @@ public class PlayerData {
         return Optional.ofNullable(brushes.get(item));
     }
 
+    @SuppressWarnings("unchecked")
     public Brush apply(Brush brush) {
         if (brush != null) {
             ConfigurationNode node = root.getNode(brush.getType().getId());
@@ -80,6 +83,12 @@ public class PlayerData {
                             value = serializable.getSerializer().deserialize(serializable.getToken(), child);
                         } catch (Exception e) {
                             e.printStackTrace();
+                        }
+                    } else if (CatalogType.class.isAssignableFrom(option.getType())) {
+                        Class<? extends CatalogType> clazz = (Class<? extends CatalogType>) option.getType();
+                        Optional<? extends CatalogType> type = Sponge.getRegistry().getType(clazz, child.getString());
+                        if (type.isPresent()) {
+                            value = type.get();
                         }
                     } else {
                         value = child.getValue();
@@ -102,6 +111,7 @@ public class PlayerData {
         brushes.remove(type);
     }
 
+    @SuppressWarnings("unchecked")
     public void save() {
         for (Brush brush : brushes.values()) {
             brush.getOptions().forEach((option, o) -> {
@@ -121,8 +131,15 @@ public class PlayerData {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (o instanceof CatalogType) {
+                    CatalogType t = (CatalogType) o;
+                    value.setValue(t.getId());
                 } else {
-                    value.setValue(o);
+                    try {
+                        value.setValue(o);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
