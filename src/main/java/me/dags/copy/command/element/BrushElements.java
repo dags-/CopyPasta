@@ -133,9 +133,9 @@ public class BrushElements {
                 .options(option -> factory.getOptions(option.getType()).get())
                 .mapper((input, option) -> {
                     Object value;
-                    
-                    if (!input.hasNext() && (option.getType() == boolean.class || option.getType() == Boolean.class)) {
-                        value = true;
+
+                    if (!input.hasNext()) {
+                        value = option.getDefault().get();
                     } else {
                         ValueParser<?> p = factory.getParser(option.getType());
                         value = p.parse(input);
