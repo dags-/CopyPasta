@@ -1,6 +1,7 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
+import me.dags.copy.util.Unserializable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,7 +13,7 @@ import java.util.Optional;
 /**
  * @author dags <dags@dags.me>
  */
-public class Stencil {
+public class Stencil implements Unserializable {
 
     static final Stencil EMPTY = new Stencil(new BitSet(0), 0, 0);
 

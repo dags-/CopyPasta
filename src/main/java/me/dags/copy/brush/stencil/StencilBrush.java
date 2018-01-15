@@ -22,6 +22,10 @@ public class StencilBrush extends ClipboardBrush {
     public static final Option<Integer> DEPTH = Option.of("depth", 1, Checks.range(1, 16));
     public static final Option<Palette> PALETTE = Palette.OPTION;
 
+    public StencilBrush() {
+        setOption(PASTE_AIR, false);
+    }
+
     @Override
     public String getPermission() {
         return "brush.stencil";

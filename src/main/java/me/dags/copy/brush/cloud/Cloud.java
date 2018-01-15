@@ -29,10 +29,6 @@ public class Cloud {
     private final float featherRange;
     private final float featherRadius2;
 
-    private final int centerX;
-    private final int centerY;
-    private final int centerZ;
-
     private final int total;
     private final List<BlockState> materials;
 
@@ -51,15 +47,12 @@ public class Cloud {
         this.featherRange = radius * featherRadius2;
         this.total = materials.size() - 1;
         this.materials = ImmutableList.copyOf(materials);
-        this.centerX = radius + 1;
-        this.centerY = offset + 1;
-        this.centerZ = radius + 1;
     }
 
     public Runnable createTask(UUID owner, Vector3i pos, FutureCallback<BufferView> callback) {
         return () -> {
             try {
-                BufferView volume = apply(pos, owner).getView();
+                BufferView volume = apply(pos, owner);
                 callback.onSuccess(volume);
             } catch (Throwable t) {
                 callback.onFailure(t);
@@ -67,11 +60,11 @@ public class Cloud {
         };
     }
 
-    public BufferBuilder apply(Vector3i pos, UUID owner) {
+    public BufferView apply(Vector3i pos, UUID owner) {
         int diameter = 1 + radius * 2;
         int maxHeight = this.height + (offset * 2) + 1;
         int volume = diameter * maxHeight * diameter;
-        BufferBuilder buffer = new BufferBuilder(owner, pos, volume);
+        BufferBuilder buffer = new BufferBuilder(owner, Vector3i.ZERO, volume);
 
         for (int dz = 0; dz <= radius; dz++) {
             for (int dx = 0; dx <= radius; dx++) {
@@ -91,7 +84,7 @@ public class Cloud {
             }
         }
 
-        return buffer;
+        return buffer.getView();
     }
 
     private void apply(BufferBuilder buffer, Vector3i pos, int dx, int dz, float distance2) {
@@ -111,7 +104,7 @@ public class Cloud {
         int endY = offset + elevation;
 
         for (int dy = startY; dy <= endY; dy++) {
-            double y1 = y + dy;
+            int y1 = y + dy;
             double vMod = modifier(dy, dy < 0 ? Math.min(-1, startY) : Math.max(1, endY));
             double noise1 = ValueNoise.getValue(x1, y1, z1, seed, frequency, octaves) / max;
 
@@ -119,7 +112,7 @@ public class Cloud {
             index = Math.min(total, Math.max(0, index));
 
             BlockState material = materials.get(index);
-            buffer.addAbsolute(material, centerX + dx, centerY + dy, centerZ + dz);
+            buffer.addAbsolute(material, x, y1, z);
         }
     }
 

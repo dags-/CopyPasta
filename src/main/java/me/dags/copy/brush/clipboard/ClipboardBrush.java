@@ -9,32 +9,31 @@ import me.dags.copy.block.state.State;
 import me.dags.copy.block.volume.VolumeMapper;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.operation.phase.Calculate;
-import me.dags.copy.operation.phase.Modifier;
+import me.dags.copy.operation.modifier.Filter;
+import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Random;
-import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
  */
-@Aliases({"clipboard", "cb"})
+@Aliases({"clipboard", "copy"})
 public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
 
-    public static final Option<Boolean> FLIPX = Option.of("x.flip", false);
-    public static final Option<Boolean> FLIPY = Option.of("y.flip", false);
-    public static final Option<Boolean> FLIPZ = Option.of("z.flip", false);
-    public static final Option<Boolean> AUTO_FLIP = Option.of("auto.flip", true);
-    public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", true);
-    public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.rotate", false);
-    public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", false);
-    public static final Option<Boolean> PASTE_AIR = Option.of("air", false);
+    public static final Option<Boolean> FLIPX = Option.of("flip.x", false);
+    public static final Option<Boolean> FLIPY = Option.of("flip.y", false);
+    public static final Option<Boolean> FLIPZ = Option.of("flip.z", false);
+    public static final Option<Boolean> AUTO_FLIP = Option.of("flip.auto", true);
+    public static final Option<Boolean> RANDOM_FLIPH = Option.of("flip.random", false);
+    public static final Option<Boolean> AUTO_ROTATE = Option.of("rotate.auto", true);
+    public static final Option<Boolean> RANDOM_ROTATE = Option.of("rotate.random", false);
+    public static final Option<Boolean> PASTE_AIR = Option.of("air.paste", false);
+    public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", false);
     public static final Option<PasteMode> MODE = Option.of("mode", PasteMode.NORMAL);
     public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
     public static final Option<MapperSet> REMAPPERS = MapperSet.OPTION;
@@ -89,9 +88,11 @@ public class ClipboardBrush extends AbstractBrush {
             Vector3i offset = getOption(PASTE_OFFSET);
             Vector3i position = pos.add(offset);
             PasteMode mode = getOption(MODE);
-            Modifier modifier = mode.getModifier(pos, offset);
+            Filter from = Filter.replaceAir(getOption(REPLACE_AIR));
+            Filter to = Filter.pasteAir(getOption(PASTE_AIR));
+            Translate translate = mode.getModifier(pos, offset);
             VolumeMapper mapper = getMapper(clipboard, player);
-            clipboard.paste(player, history, position, mapper, modifier);
+            clipboard.paste(player, history, position, mapper, from, to, translate);
         }
     }
 
@@ -126,7 +127,6 @@ public class ClipboardBrush extends AbstractBrush {
             flipZ = RANDOM.nextBoolean();
         }
 
-        Predicate<BlockState> predicate = Calculate.applyAir(getOption(PASTE_AIR));
         MapperSet remappers = getOption(ClipboardBrush.REMAPPERS);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
         mappers.addAll(remappers);
@@ -147,7 +147,7 @@ public class ClipboardBrush extends AbstractBrush {
             mappers.add(me.dags.copy.block.Mappers.getFlipZ());
         }
 
-        return new VolumeMapper(angle, flipX, flipY, flipZ, predicate, mappers.build());
+        return new VolumeMapper(angle, flipX, flipY, flipZ, mappers.build());
     }
 
     public static BrushSupplier supplier() {

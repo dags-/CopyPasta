@@ -6,7 +6,8 @@ import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.volume.VolumeMapper;
 import me.dags.copy.brush.History;
 import me.dags.copy.operation.callback.Callback;
-import me.dags.copy.operation.phase.Modifier;
+import me.dags.copy.operation.modifier.Filter;
+import me.dags.copy.operation.modifier.Translate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
@@ -49,13 +50,13 @@ public class Clipboard {
         return verticalFacing;
     }
 
-    public void paste(Player player, History history, Vector3i pos, VolumeMapper transform, Modifier modifier) {
+    public void paste(Player player, History history, Vector3i pos, VolumeMapper volumeMapper, Filter from, Filter to, Translate translate) {
         if (isPresent()) {
-            Vector3i originOffset = transform.apply(origin); // rotate origin
-            Vector3i volumeOffset = transform.volumeOffset(source); // rotate volume, find min
+            Vector3i originOffset = volumeMapper.apply(origin); // rotate origin
+            Vector3i volumeOffset = volumeMapper.volumeOffset(source); // rotate volume, find min
             Vector3i position = pos.add(originOffset).add(volumeOffset); // apply offsets to paste position
-            Callback callback = Callback.place(player, history, modifier);
-            Runnable task = transform.createTask(source, position, player.getUniqueId(), callback);
+            Callback callback = Callback.place(player, history, from, to, translate);
+            Runnable task = volumeMapper.createTask(source, position, player.getUniqueId(), callback);
             CopyPasta.getInstance().submitAsync(task);
         }
     }

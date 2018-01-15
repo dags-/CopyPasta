@@ -6,9 +6,10 @@ import me.dags.copy.PlayerManager;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.brush.History;
 import me.dags.copy.operation.PlaceOperation;
+import me.dags.copy.operation.modifier.Filter;
+import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.operation.phase.Apply;
 import me.dags.copy.operation.phase.Calculate;
-import me.dags.copy.operation.phase.Modifier;
 import me.dags.copy.operation.phase.Test;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
@@ -66,9 +67,9 @@ public class Callback implements FutureCallback<BufferView> {
         return new Callback(player.getUniqueId(), player.getWorld(), callback);
     }
 
-    public static Callback place(Player player, History history, Modifier modifier) {
-        return of(player, (owner, world, result) -> {
-            Calculate calculate = new Calculate(world, result, modifier);
+    public static Callback place(Player player, History history, Filter fromFilter, Filter toFilter, Translate transform) {
+        return new Callback(player.getUniqueId(), player.getWorld(), (owner, world, result) -> {
+            Calculate calculate = new Calculate(world, result, fromFilter, toFilter, transform);
             Test test = new Test(owner, world, result);
             Apply apply = new Apply(world, result, history);
             PlaceOperation place = new PlaceOperation(owner, calculate, test, apply);

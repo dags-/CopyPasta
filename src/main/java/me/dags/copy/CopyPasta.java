@@ -8,7 +8,6 @@ import me.dags.copy.brush.multi.MultiPointBrush;
 import me.dags.copy.brush.replace.ReplaceBrush;
 import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
-import me.dags.copy.brush.terrain.TerrainBrush;
 import me.dags.copy.command.BrushCommands;
 import me.dags.copy.command.element.BrushElements;
 import me.dags.copy.operation.OperationManager;
@@ -59,7 +58,6 @@ public class CopyPasta {
     public void pre(GamePreInitializationEvent event) {
         BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
         BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
-        BrushRegistry.getInstance().register(TerrainBrush.class, TerrainBrush.supplier());
         BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
         BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
         BrushRegistry.getInstance().register(CloudBrush.class, CloudBrush.supplier());

@@ -11,7 +11,6 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
@@ -23,16 +22,14 @@ public class VolumeMapper {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
-    private final Predicate<BlockState> predicate;
     private final Collection<State.Mapper> mappers;
 
-    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Predicate<BlockState> predicate, Collection<State.Mapper> mappers) {
+    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
         this.flipZ = z;
-        this.predicate = predicate;
         this.mappers = mappers;
     }
 
@@ -61,9 +58,7 @@ public class VolumeMapper {
             for (int z = source.getBlockMin().getZ(); z <= source.getBlockMax().getZ(); z++) {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {
                     BlockState state = source.getBlock(x, y, z);
-                    if (predicate.test(state)) {
-                        visit(state, x, y, z, buffer, min, max);
-                    }
+                    visit(state, x, y, z, buffer, min, max);
                 }
             }
         }

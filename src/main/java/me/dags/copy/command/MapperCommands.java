@@ -4,7 +4,6 @@ import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
-import me.dags.copy.block.Mappers;
 import me.dags.copy.block.state.State;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.MapperSet;
@@ -24,7 +23,7 @@ public class MapperCommands {
     public void clear(@Src Player player) {
         Optional<Brush> brush = getMapperBrush(player);
         if (brush.isPresent()) {
-            brush.get().setOption(MapperSet.OPTION, new Mappers());
+            brush.get().setOption(MapperSet.OPTION, new MapperSet());
             fmt.info("Cleared your re-mappers for brush ").stress(brush.get().getType()).tell(player);
         }
     }

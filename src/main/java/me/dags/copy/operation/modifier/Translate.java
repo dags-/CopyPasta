@@ -1,4 +1,4 @@
-package me.dags.copy.operation.phase;
+package me.dags.copy.operation.modifier;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.block.BlockUtils;
@@ -8,24 +8,26 @@ import org.spongepowered.api.world.World;
 /**
  * @author dags <dags@dags.me>
  */
-public interface Modifier {
+public interface Translate {
 
     void apply(World world, Snapshot snapshot);
 
-    Modifier NONE = (w, s) -> {};
+    Translate NONE = (w, s) -> {};
 
-    static Modifier overlay(Vector3i position, Vector3i offset) {
+    static Translate overlay(Vector3i position, Vector3i offset) {
         return (w, s) -> {
             Vector3i surface = BlockUtils.findSolidFoundation(w, s.getPosition());
+
             int x = s.getPosition().getX() + offset.getX();
-            int y = surface.getY() + position.getY() - s.getPosition().getY();
+            int y = surface.getY() + (s.getPosition().getY() - position.getY()) + offset.getY();
             int z = s.getPosition().getZ() + offset.getZ();
+
             s.setPosition(new Vector3i(x, y, z));
         };
     }
 
-    static Modifier foundation(Vector3i position, Vector3i offset) {
-        return new Modifier() {
+    static Translate foundation(Vector3i position, Vector3i offset) {
+        return new Translate() {
 
             private int surfaceY = -1;
 
@@ -36,8 +38,9 @@ public interface Modifier {
                 }
 
                 int x = snapshot.getPosition().getX() + offset.getX();
-                int y = surfaceY + position.getY() - snapshot.getPosition().getY() + offset.getY();
+                int y = surfaceY + (snapshot.getPosition().getY() - position.getY()) + offset.getY();
                 int z = snapshot.getPosition().getZ() + offset.getZ();
+
                 snapshot.setPosition(new Vector3i(x, y, z));
             }
         };

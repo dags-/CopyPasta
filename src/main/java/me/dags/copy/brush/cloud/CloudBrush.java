@@ -11,7 +11,8 @@ import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Parsable;
 import me.dags.copy.operation.callback.Callback;
-import me.dags.copy.operation.phase.Modifier;
+import me.dags.copy.operation.modifier.Filter;
+import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
@@ -38,7 +39,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     public static final Option<Float> DETAIL = Option.of("detail", 1.95F, Checks.range(0.5F, 5.0F));
     public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
     public static final Option<Float> FEATHER = Option.of("feather", 0.45F, Checks.range(0F, 1F));
-    public static final Option<BlockType> MATERIAL = Option.of("material", CloudBrush.defaultMaterial());
+    public static final Option<BlockType> MATERIAL = Option.of("material", BlockType.class, CloudBrush::defaultMaterial);
     public static final Option<String> TRAIT = Option.of("trait", CloudBrush.defaultTrait());
 
     private List<BlockState> materials = Collections.emptyList();
@@ -81,7 +82,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
         Cloud cloud = new Cloud(this, materials);
         PlayerManager.getInstance().must(player).setOperating(true);
-        Callback callback = Callback.place(player, history, Modifier.NONE);
+        Callback callback = Callback.place(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
         Runnable task = cloud.createTask(player.getUniqueId(), pos, callback);
         CopyPasta.getInstance().submitAsync(task);
     }
@@ -116,7 +117,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     }
 
     public static BlockType defaultMaterial() {
-        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").orElse(BlockTypes.GLASS);
+        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").orElse(BlockTypes.STAINED_GLASS);
     }
 
     public static String defaultTrait() {

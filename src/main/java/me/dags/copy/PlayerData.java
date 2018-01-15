@@ -6,6 +6,7 @@ import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
 import me.dags.copy.util.Serializable;
+import me.dags.copy.util.Unserializable;
 import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
@@ -77,6 +78,10 @@ public class PlayerData {
                 Object value = option.getDefault().get();
 
                 if (!child.isVirtual()) {
+                    if (value instanceof Unserializable) {
+                        continue;
+                    }
+
                     if (value instanceof Serializable) {
                         try {
                             Serializable<?> serializable = Serializable.class.cast(value);

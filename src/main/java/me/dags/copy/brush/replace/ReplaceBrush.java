@@ -12,8 +12,8 @@ import me.dags.copy.brush.MapperSet;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.operation.callback.Callback;
-import me.dags.copy.operation.phase.Calculate;
-import me.dags.copy.operation.phase.Modifier;
+import me.dags.copy.operation.modifier.Filter;
+import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.BlockVolume;
@@ -55,8 +55,8 @@ public class ReplaceBrush extends AbstractBrush {
         BlockVolume relativeView = extent.getBlockView(min, max).getRelativeBlockView();
         ImmutableBlockVolume source = relativeView.getImmutableBlockCopy();
 
-        VolumeMapper mapper = new VolumeMapper(0, false, false, false, Calculate.ANY, rules);
-        Callback callback = Callback.place(player, history, Modifier.NONE);
+        VolumeMapper mapper = new VolumeMapper(0, false, false, false, rules);
+        Callback callback = Callback.place(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
         Runnable task = mapper.createTask(source, position, player.getUniqueId(), callback);
         CopyPasta.getInstance().submitAsync(task);
     }

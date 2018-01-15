@@ -15,6 +15,7 @@ import java.util.UUID;
  */
 public class Snapshot {
 
+    private final BlockState state;
     private final BlockSnapshot.Builder builder = BlockSnapshot.builder();
     private boolean valid = true;
 
@@ -24,13 +25,9 @@ public class Snapshot {
     private Location<World> location;
     private Transaction<BlockSnapshot> transaction;
 
-    public Snapshot(BlockState state, int x, int y, int z, UUID owner) {
-        this(state, new Vector3i(x, y, z), owner);
-    }
-
     public Snapshot(BlockState state, Vector3i position, UUID owner) {
+        this.state = state;
         this.position = position;
-
         this.builder.position(position)
                 .blockState(state)
                 .notifier(owner)
@@ -40,6 +37,10 @@ public class Snapshot {
     public void setPosition(Vector3i position) {
         this.position = position;
         this.builder.position(position);
+    }
+
+    public BlockState getState() {
+        return state;
     }
 
     public Vector3i getPosition() {
