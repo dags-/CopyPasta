@@ -132,11 +132,15 @@ public class BrushElements {
                 .dependency(Option.class)
                 .options(option -> factory.getOptions(option.getType()).get())
                 .mapper((input, option) -> {
-                    ValueParser<?> p = factory.getParser(option.getType());
-                    Object value = p.parse(input);
-                    if (value == null) {
-                        throw new CommandException("Unable to parse value for '%s'", option);
+                    Object value;
+                    
+                    if (!input.hasNext() && (option.getType() == boolean.class || option.getType() == Boolean.class)) {
+                        value = true;
+                    } else {
+                        ValueParser<?> p = factory.getParser(option.getType());
+                        value = p.parse(input);
                     }
+
                     if (!option.validate(value)) {
                         throw new CommandException(
                                 "The value '%s' (%s) is not valid for option '%s' (%s)",
