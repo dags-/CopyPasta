@@ -1,6 +1,7 @@
 package me.dags.copy;
 
 import me.dags.copy.util.Utils;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -55,6 +56,22 @@ public class PlayerManager {
         PlayerData playerData = data.remove(uuid);
         if (playerData != null) {
             playerData.save();
+        }
+    }
+
+    public void handle(Player player, Throwable t) {
+        handle(player.getUniqueId(), t);
+    }
+
+    public void handle(UUID uuid, Throwable t) {
+        PlayerData playerData = data.get(uuid);
+        if (playerData != null) {
+            playerData.setOperating(false);
+            CopyPasta.getInstance().submitSync(() -> {
+                t.printStackTrace();
+                Sponge.getServer().getPlayer(uuid)
+                        .ifPresent(fmt.warn("An error occurred: %s, see console", t.getClass().getSimpleName())::tell);
+            });
         }
     }
 

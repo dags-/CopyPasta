@@ -3,14 +3,14 @@ package me.dags.copy.brush.cloud;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
-import org.spongepowered.api.Sponge;
+import me.dags.copy.block.volume.BufferBuilder;
+import me.dags.copy.block.volume.BufferView;
+import me.dags.copy.brush.Brush;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.extent.BlockVolume;
-import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>
@@ -36,18 +36,19 @@ public class Cloud {
     private final int total;
     private final List<BlockState> materials;
 
-    private Cloud(int seed, int scale, int octaves, int radius, int height, int offset, float detail, float feather, Collection<BlockState> materials) {
-        this.seed = seed;
-        this.octaves = octaves;
-        this.frequency = 1D / scale;
+    public Cloud(Brush brush, Collection<BlockState> materials) {
+        this.seed = brush.getOption(CloudBrush.SEED);
+        this.octaves = brush.getOption(CloudBrush.OCTAVES);
+        this.frequency = 1D / brush.getOption(CloudBrush.SCALE);
         this.max = ValueNoise.maxValue(octaves);
-        this.radius = radius;
+        this.radius = brush.getOption(CloudBrush.RADIUS);
         this.radius2 = radius * radius;
-        this.height = height;
-        this.offset = Math.abs(offset);
-        this.depth = detail;
+        this.height = brush.getOption(CloudBrush.HEIGHT);
+        this.offset = Math.abs(brush.getOption(CloudBrush.OFFSET));
+        this.depth = brush.getOption(CloudBrush.DETAIL);
+        float feather = brush.getOption(CloudBrush.FEATHER);
         this.featherRadius2 = (radius * (1 - feather)) * (radius * (1 - feather));
-        this.featherRange = radius2 - featherRadius2;
+        this.featherRange = radius * featherRadius2;
         this.total = materials.size() - 1;
         this.materials = ImmutableList.copyOf(materials);
         this.centerX = radius + 1;
@@ -55,47 +56,45 @@ public class Cloud {
         this.centerZ = radius + 1;
     }
 
-    public Runnable createTask(FutureCallback<BlockVolume> callback, Vector3i pos, Cause cause) {
+    public Runnable createTask(UUID owner, Vector3i pos, FutureCallback<BufferView> callback) {
         return () -> {
             try {
-                BlockVolume volume = apply(pos, cause).getImmutableBlockCopy();
+                BufferView volume = apply(pos, owner).getView();
                 callback.onSuccess(volume);
             } catch (Throwable t) {
-                t.printStackTrace();
+                callback.onFailure(t);
             }
         };
     }
 
-    public BlockVolume apply(Vector3i pos, Cause cause) {
+    public BufferBuilder apply(Vector3i pos, UUID owner) {
         int diameter = 1 + radius * 2;
-
-        // cloud can extend downwards 'offset' blocks, and upwards 'offset' + 'height' blocks
         int maxHeight = this.height + (offset * 2) + 1;
-        Vector3i size = new Vector3i(diameter, maxHeight, diameter);
-        MutableBlockVolume volume = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
+        int volume = diameter * maxHeight * diameter;
+        BufferBuilder buffer = new BufferBuilder(owner, pos, volume);
 
         for (int dz = 0; dz <= radius; dz++) {
             for (int dx = 0; dx <= radius; dx++) {
                 int dist2 = (dx * dx) + (dz * dz);
                 if (dist2 < radius2) {
-                    apply(volume, pos, dx, dz, dist2, cause);
+                    apply(buffer, pos, dx, dz, dist2);
                     if (dx != 0) {
-                        apply(volume, pos, -dx, dz, dist2, cause);
+                        apply(buffer, pos, -dx, dz, dist2);
                     }
                     if (dz != 0) {
-                        apply(volume, pos, dx, -dz, dist2, cause);
+                        apply(buffer, pos, dx, -dz, dist2);
                     }
                     if (dx != 0 && dz != 0) {
-                        apply(volume, pos, -dx, -dz, dist2, cause);
+                        apply(buffer, pos, -dx, -dz, dist2);
                     }
                 }
             }
         }
 
-        return volume;
+        return buffer;
     }
 
-    private void apply(MutableBlockVolume volume, Vector3i pos, int dx, int dz, float distance2, Cause cause) {
+    private void apply(BufferBuilder buffer, Vector3i pos, int dx, int dz, float distance2) {
         int x = pos.getX() + dx;
         int y = pos.getY();
         int z = pos.getZ() + dz;
@@ -120,7 +119,7 @@ public class Cloud {
             index = Math.min(total, Math.max(0, index));
 
             BlockState material = materials.get(index);
-            volume.setBlock(centerX + dx, centerY + dy, centerZ + dz, material, cause);
+            buffer.addAbsolute(material, centerX + dx, centerY + dy, centerZ + dz);
         }
     }
 
@@ -135,10 +134,5 @@ public class Cloud {
     private static double modifier(double value, double range) {
         double modifier = value / range;
         return 1D - (modifier * modifier);
-    }
-
-    // todo: builder
-    public static Cloud of(int seed, int scale, int octaves, int radius, int height, int offset, float detail, float feather, Collection<BlockState> materials) {
-        return new Cloud(seed, scale, octaves, radius, height, offset, detail, feather, materials);
     }
 }

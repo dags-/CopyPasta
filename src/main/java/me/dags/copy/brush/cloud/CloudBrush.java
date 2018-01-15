@@ -10,24 +10,16 @@ import me.dags.copy.brush.History;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Parsable;
-import me.dags.copy.event.LocatableBlockChange;
-import me.dags.copy.operation.Callback;
-import me.dags.copy.operation.Operation;
-import me.dags.copy.operation.PlaceOperation;
-import me.dags.copy.operation.applier.Applier;
-import me.dags.copy.operation.calculator.Calculator;
-import me.dags.copy.operation.calculator.Volume;
-import me.dags.copy.operation.tester.Tester;
+import me.dags.copy.operation.callback.Callback;
+import me.dags.copy.operation.phase.Modifier;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.*;
 
@@ -46,8 +38,8 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     public static final Option<Float> DETAIL = Option.of("detail", 1.95F, Checks.range(0.5F, 5.0F));
     public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
     public static final Option<Float> FEATHER = Option.of("feather", 0.45F, Checks.range(0F, 1F));
-    public static final Option<BlockType> MATERIAL = Option.of("material", BlockType.class, () -> BlockTypes.STAINED_GLASS);
-    public static final Option<String> TRAIT = Option.of("trait", "color");
+    public static final Option<BlockType> MATERIAL = Option.of("material", CloudBrush.defaultMaterial());
+    public static final Option<String> TRAIT = Option.of("trait", CloudBrush.defaultTrait());
 
     private List<BlockState> materials = Collections.emptyList();
     private BlockType type = BlockTypes.AIR;
@@ -71,8 +63,6 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
     @Override
     public void apply(Player player, Vector3i pos, History history) {
-        Cause cause = PlayerManager.getCause(player);
-
         BlockType type = getOption(MATERIAL);
         String trait = getOption(TRAIT);
         float density = getOption(DENSITY);
@@ -89,47 +79,10 @@ public class CloudBrush extends AbstractBrush implements Parsable {
             return;
         }
 
-        Cloud cloud = Cloud.of(
-                getOption(SEED),
-                getOption(SCALE),
-                getOption(OCTAVES),
-                getOption(RADIUS),
-                getOption(HEIGHT),
-                getOption(OFFSET),
-                getOption(DETAIL),
-                getOption(FEATHER),
-                materials
-        );
-
-        Callback callback = Callback.of(player, (owner, world, result) -> {
-            int offsetX = result.getBlockSize().getX() / 2;
-            int offsetZ = result.getBlockSize().getZ() / 2;
-            List<LocatableBlockChange> changes = new LinkedList<>();
-
-            Calculator calculator = new Volume(world, result);
-            Tester tester = new Tester(world, changes, cause);
-            Applier applier = new Applier(world, owner, changes, history, cause);
-
-            Operation operation = new PlaceOperation(owner, calculator, tester, applier, (w, v, x, y, z) -> {
-                BlockState state = v.getBlock(x, y, z);
-                if (state.getType() != BlockTypes.AIR) {
-                    x += pos.getX() - offsetX;
-                    y += pos.getY();
-                    z += pos.getZ() - offsetZ;
-                    if (w.getBlockType(x, y, z) == BlockTypes.AIR) {
-                        Location<World> location = new Location<>(w, x, y, z);
-                        changes.add(new LocatableBlockChange(location, state));
-                        return 1;
-                    }
-                }
-                return 0;
-            });
-
-            CopyPasta.getInstance().getOperationManager().queueOperation(operation);
-        });
-
+        Cloud cloud = new Cloud(this, materials);
         PlayerManager.getInstance().must(player).setOperating(true);
-        Runnable task = cloud.createTask(callback, pos, cause);
+        Callback callback = Callback.place(player, history, Modifier.NONE);
+        Runnable task = cloud.createTask(player.getUniqueId(), pos, callback);
         CopyPasta.getInstance().submitAsync(task);
     }
 
@@ -160,5 +113,13 @@ public class CloudBrush extends AbstractBrush implements Parsable {
                 .forEach(builder::add);
 
         return builder.build();
+    }
+
+    public static BlockType defaultMaterial() {
+        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").orElse(BlockTypes.GLASS);
+    }
+
+    public static String defaultTrait() {
+        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").map(t -> "opacity").orElse("color");
     }
 }

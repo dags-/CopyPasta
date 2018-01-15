@@ -14,20 +14,20 @@ import java.util.function.Supplier;
 /**
  * @author dags <dags@dags.me>
  */
-public class Mappers implements Iterable<State.Mapper>, Serializable<Mappers> {
+public class MapperSet implements Iterable<State.Mapper>, Serializable<MapperSet> {
 
-    public static final Mappers EMPTY = new Mappers(Collections.emptyList());
-    public static final Option<Mappers> OPTION = Option.of("mapper", Mappers.class, (Supplier<Mappers>) Mappers::new);
+    public static final MapperSet EMPTY = new MapperSet(Collections.emptyList());
+    public static final Option<MapperSet> OPTION = Option.of("mapper", MapperSet.class, (Supplier<MapperSet>) MapperSet::new);
 
-    private static final TypeToken<Mappers> TOKEN = TypeToken.of(Mappers.class);
+    private static final TypeToken<MapperSet> TOKEN = TypeToken.of(MapperSet.class);
 
     private final List<State.Mapper> mappers;
 
-    private Mappers(List<State.Mapper> empty) {
+    private MapperSet(List<State.Mapper> empty) {
         this.mappers = empty;
     }
 
-    public Mappers() {
+    public MapperSet() {
         this.mappers = new LinkedList<>();
     }
 
@@ -53,19 +53,19 @@ public class Mappers implements Iterable<State.Mapper>, Serializable<Mappers> {
     }
 
     @Override
-    public TypeToken<Mappers> getToken() {
+    public TypeToken<MapperSet> getToken() {
         return TOKEN;
     }
 
     @Override
-    public TypeSerializer<Mappers> getSerializer() {
+    public TypeSerializer<MapperSet> getSerializer() {
         return SERIALIZER;
     }
 
-    private static final TypeSerializer<Mappers> SERIALIZER = new TypeSerializer<Mappers>() {
+    private static final TypeSerializer<MapperSet> SERIALIZER = new TypeSerializer<MapperSet>() {
         @Override
-        public Mappers deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-            Mappers mappers = new Mappers();
+        public MapperSet deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+            MapperSet mappers = new MapperSet();
             for (Map.Entry<?, ?> entry : value.getChildrenMap().entrySet()) {
                 State.Mapper mapper = State.mapper(entry.getKey().toString(), entry.getValue().toString());
                 mappers.add(mapper);
@@ -74,7 +74,7 @@ public class Mappers implements Iterable<State.Mapper>, Serializable<Mappers> {
         }
 
         @Override
-        public void serialize(TypeToken<?> type, Mappers obj, ConfigurationNode value) throws ObjectMappingException {
+        public void serialize(TypeToken<?> type, MapperSet obj, ConfigurationNode value) throws ObjectMappingException {
             for (State.Mapper mapper : obj) {
                 value.getNode(mapper.getMatch()).setValue(mapper.getReplace());
             }

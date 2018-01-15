@@ -3,31 +3,20 @@ package me.dags.copy.brush.terrain;
 import com.flowpowered.math.vector.Vector3i;
 import com.flowpowered.noise.module.Module;
 import me.dags.commandbus.fmt.Fmt;
-import me.dags.copy.CopyPasta;
-import me.dags.copy.PlayerManager;
 import me.dags.copy.block.BlockUtils;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Parsable;
-import me.dags.copy.event.LocatableBlockChange;
-import me.dags.copy.operation.Operation;
-import me.dags.copy.operation.PlaceOperation;
-import me.dags.copy.operation.applier.Applier;
-import me.dags.copy.operation.calculator.Calculator;
-import me.dags.copy.operation.calculator.Radius2D;
-import me.dags.copy.operation.tester.Tester;
-import me.dags.copy.operation.visitor.Visitor2D;
+import me.dags.copy.operation.phase.Calculate;
 import me.dags.copy.registry.brush.BrushSupplier;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
@@ -89,30 +78,37 @@ public class TerrainBrush extends AbstractBrush implements Parsable {
         int lift = base - variance + offset;
 
         UUID uuid = player.getUniqueId();
-        Cause cause = PlayerManager.getCause(player);
-        List<LocatableBlockChange> changes = new LinkedList<>();
-
-        Calculator calculator = new Radius2D(player.getWorld(), player.getWorld(), pos, radius);
-        Tester tester = new Tester(player.getWorld(), changes, cause);
-        Applier applier = new Applier(player.getWorld(), uuid, changes, history, cause);
-        Visitor2D visitor = (w, v, x, z) -> {
-            double noise = module.getValue(x, 0, z);
-            int floor = BlockUtils.findSurface(w, x, z, 0, 255);
-            int height = (int) Math.round((variance * noise) + lift);
-            height = Math.min(255, Math.max(0, height));
-
-            for (int y = floor; y < height; y++) {
-                Location<World> location = new Location<>(w, x, y,  z);
-                LocatableBlockChange record = new LocatableBlockChange(location, palette.next());
-                changes.add(record);
-            }
-
-            return Math.abs(height - floor);
-        };
-
-        PlayerManager.getInstance().must(player).setOperating(true);
-        Operation operation = new PlaceOperation(uuid, calculator, tester, applier, visitor);
-        CopyPasta.getInstance().getOperationManager().queueOperation(operation);
+        Predicate<BlockState> predicate = Calculate.applyAir(false);
+//
+//
+//
+//        Modifier modifier = Modifier.NONE;
+//        Calculate calculate = new Calculate(player.getWorld(), )
+//
+//        Cause cause = PlayerManager.getCause(player);
+//        List<LocatableBlockChange> changes = new LinkedList<>();
+//
+//        Calculator calculator = new Radius2D(player.getWorld(), player.getWorld(), pos, radius);
+//        Tester tester = new Tester(player.getWorld(), changes, cause);
+//        Applier applier = new Applier(player.getWorld(), uuid, changes, history, cause);
+//        Visitor2D visitor = (w, v, x, z) -> {
+//            double noise = module.getValue(x, 0, z);
+//            int floor = BlockUtils.findSurface(w, x, z, 0, 255);
+//            int height = (int) Math.round((variance * noise) + lift);
+//            height = Math.min(255, Math.max(0, height));
+//
+//            for (int y = floor; y < height; y++) {
+//                Location<World> location = new Location<>(w, x, y,  z);
+//                LocatableBlockChange record = new LocatableBlockChange(location, palette.next());
+//                changes.add(record);
+//            }
+//
+//            return Math.abs(height - floor);
+//        };
+//
+//        PlayerManager.getInstance().must(player).setOperating(true);
+//        Operation operation = new PlaceOperation(uuid, calculator, tester, applier, visitor);
+//        CopyPasta.getInstance().getOperationManager().queueOperation(operation);
     }
 
     public static BrushSupplier supplier() {

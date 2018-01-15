@@ -1,19 +1,17 @@
-package me.dags.copy.operation;
+package me.dags.copy.block.volume;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.block.state.State;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
-import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
@@ -25,19 +23,21 @@ public class VolumeMapper {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
+    private final Predicate<BlockState> predicate;
     private final Collection<State.Mapper> mappers;
 
-    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
+    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Predicate<BlockState> predicate, Collection<State.Mapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
         this.flipZ = z;
+        this.predicate = predicate;
         this.mappers = mappers;
     }
 
-    public Runnable createTask(ImmutableBlockVolume source, Cause cause, FutureCallback<BlockVolume> callback) {
-        return new Task(cause, source, callback);
+    public Runnable createTask(ImmutableBlockVolume source, Vector3i position, UUID owner, FutureCallback<BufferView> callback) {
+        return new Task(source, position, owner, callback);
     }
 
     public Vector3i volumeOffset(BlockVolume volume) {
@@ -46,33 +46,32 @@ public class VolumeMapper {
         return pos1.min(pos2);
     }
 
-    public BlockVolume apply(ImmutableBlockVolume source, Cause cause) {
+    public BufferView apply(ImmutableBlockVolume source, Vector3i position, UUID owner) {
         Vector3i pos1 = apply(source.getBlockMin());
         Vector3i pos2 = apply(source.getBlockMax());
         Vector3i min = pos1.min(pos2);
         Vector3i max = pos1.max(pos2);
-        Vector3i size = max.sub(min).add(Vector3i.ONE);
-        MutableBlockVolume buffer = Sponge.getRegistry().getExtentBufferFactory().createBlockBuffer(size);
+        Vector3i size = max.sub(min);
+
+        int volume = size.getX() * (1 + size.getY()) * size.getZ();
+        BufferBuilder buffer = new BufferBuilder(owner, position, volume);
 
         // can't use block-calculator off the main thread!
         for (int y = source.getBlockMin().getY(); y <= source.getBlockMax().getY(); y++) {
             for (int z = source.getBlockMin().getZ(); z <= source.getBlockMax().getZ(); z++) {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {
-                    visit(source, buffer, min, x, y, z, cause);
+                    BlockState state = source.getBlock(x, y, z);
+                    if (predicate.test(state)) {
+                        visit(state, x, y, z, buffer, min, max);
+                    }
                 }
             }
         }
 
-        return buffer.getImmutableBlockCopy();
+        return buffer.getView();
     }
 
-    private void visit(BlockVolume src, MutableBlockVolume buffer, Vector3i offset, int x, int y, int z, Cause cause) {
-        BlockState state = src.getBlock(x, y, z);
-
-        if (state.getType() == BlockTypes.AIR) {
-            return;
-        }
-
+    private void visit(BlockState state, int x, int y, int z, BufferBuilder buffer, Vector3i min, Vector3i max) {
         for (State.Mapper mapper : mappers) {
             state = mapper.map(state);
         }
@@ -80,26 +79,24 @@ public class VolumeMapper {
         if (angle != 0) {
             int rx = rotateY(x, z, radians, -1);
             int rz = rotateY(z, x, radians, 1);
-            x = rx - offset.getX();
-            z = rz - offset.getZ();
+            x = rx - min.getX();
+            z = rz - min.getZ();
         }
 
         if (flipY) {
-            y = buffer.getBlockMax().getY() - y;
+            y = max.getY() - y;
             y += getFlipYOffset(state);
         }
 
         if (flipX) {
-            x = buffer.getBlockMax().getX() - x;
+            x = max.getX() - x;
         }
 
         if (flipZ) {
-            z = buffer.getBlockMax().getZ() - z;
+            z = max.getZ() - z;
         }
 
-        if (buffer.containsBlock(x, y, z)) {
-            buffer.setBlock(x, y, z, state, cause);
-        }
+        buffer.addRelative(state, x, y, z);
     }
 
     public Vector3i apply(Vector3i pos) {
@@ -138,23 +135,25 @@ public class VolumeMapper {
 
     private class Task implements Runnable {
 
-        private final Cause cause;
+        private final UUID owner;
+        private final Vector3i position;
         private final ImmutableBlockVolume source;
-        private final FutureCallback<BlockVolume> callback;
+        private final FutureCallback<BufferView> callback;
 
-        private Task(Cause cause, ImmutableBlockVolume source, FutureCallback<BlockVolume> callback) {
-            this.cause = cause;
+        private Task(ImmutableBlockVolume source, Vector3i position, UUID owner, FutureCallback<BufferView> callback) {
+            this.owner = owner;
             this.source = source;
+            this.position = position;
             this.callback = callback;
         }
 
         @Override
         public void run() {
             try {
-                BlockVolume transformed = apply(source, cause);
+                BufferView transformed = apply(source, position, owner);
                 callback.onSuccess(transformed);
-            } catch (Exception e) {
-                callback.onFailure(e);
+            } catch (Throwable t) {
+                callback.onFailure(t);
             }
         }
     }

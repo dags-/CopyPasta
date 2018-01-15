@@ -41,6 +41,7 @@ public interface Brush extends OptionHolder {
 
     default void secondary(Player player, Vector3i pos) {
         if (isOperating(player)) {
+            fmt.error("An operation is already in progress").tell(CopyPasta.NOTICE_TYPE, player);
             return;
         }
         secondary(player, pos, Action.get(player));

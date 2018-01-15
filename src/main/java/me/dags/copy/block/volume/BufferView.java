@@ -1,0 +1,21 @@
+package me.dags.copy.block.volume;
+
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * @author dags <dags@dags.me>
+ */
+public class BufferView implements Iterable<Snapshot> {
+
+    private final List<Snapshot> list;
+
+    public BufferView(List<Snapshot> list) {
+        this.list = list;
+    }
+
+    @Override
+    public Iterator<Snapshot> iterator() {
+        return list.iterator();
+    }
+}

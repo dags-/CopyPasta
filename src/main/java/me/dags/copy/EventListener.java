@@ -24,9 +24,13 @@ public class EventListener {
         if (data.isPresent() && !data.get().isCoolingDown()) {
             Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
-                Vector3i target = targetPosition(player, brush.get().getRange());
-                brush.get().primary(player, target);
-                event.setCancelled(true);
+                try {
+                    Vector3i target = targetPosition(player, brush.get().getRange());
+                    brush.get().primary(player, target);
+                    event.setCancelled(true);
+                } catch (Throwable t) {
+                    PlayerManager.getInstance().handle(player, t);
+                }
             }
         }
     }
@@ -37,9 +41,13 @@ public class EventListener {
         if (data.isPresent() && !data.get().isCoolingDown()) {
             Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
-                Vector3i target = targetPosition(player, brush.get().getRange());
-                brush.get().secondary(player, target);
-                event.setCancelled(true);
+                try {
+                    Vector3i target = targetPosition(player, brush.get().getRange());
+                    brush.get().secondary(player, target);
+                    event.setCancelled(true);
+                } catch (Throwable t) {
+                    PlayerManager.getInstance().handle(player, t);
+                }
             }
         }
     }

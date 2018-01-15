@@ -3,25 +3,21 @@ package me.dags.copy.brush.clipboard;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.PlayerManager;
-import me.dags.copy.block.BlockUtils;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
+import me.dags.copy.block.volume.VolumeMapper;
 import me.dags.copy.brush.*;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.event.LocatableBlockChange;
-import me.dags.copy.operation.VolumeMapper;
-import me.dags.copy.operation.visitor.Visitor3D;
+import me.dags.copy.operation.phase.Calculate;
+import me.dags.copy.operation.phase.Modifier;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
-import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>
@@ -38,10 +34,10 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> AUTO_ROTATE = Option.of("auto.rotate", true);
     public static final Option<Boolean> RANDOM_ROTATE = Option.of("random.rotate", false);
     public static final Option<Boolean> RANDOM_FLIPH = Option.of("random.flip", false);
-    public static final Option<Boolean> AIR = Option.of("air", false);
-    public static final Option<Boolean> REQUIRE_SOLID = Option.of("solid", false);
+    public static final Option<Boolean> PASTE_AIR = Option.of("air", false);
+    public static final Option<PasteMode> MODE = Option.of("mode", PasteMode.NORMAL);
     public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
-    public static final Option<Mappers> REMAPPERS = Mappers.OPTION;
+    public static final Option<MapperSet> REMAPPERS = MapperSet.OPTION;
 
     private SelectorBrush selector = new SelectorBrush(this);
     private Clipboard clipboard = Clipboard.empty();
@@ -88,22 +84,15 @@ public class ClipboardBrush extends AbstractBrush {
 
     @Override
     public void apply(Player player, Vector3i pos, History history) {
-        if (!clipboard.isPresent()) {
-            return;
+        if (clipboard.isPresent()) {
+            PlayerManager.getInstance().must(player).setOperating(true);
+            Vector3i offset = getOption(PASTE_OFFSET);
+            Vector3i position = pos.add(offset);
+            PasteMode mode = getOption(MODE);
+            Modifier modifier = mode.getModifier(pos, offset);
+            VolumeMapper mapper = getMapper(clipboard, player);
+            clipboard.paste(player, history, position, mapper, modifier);
         }
-
-        if (getOption(REQUIRE_SOLID)) {
-            pos = BlockUtils.findSolidFoundation(player.getWorld(), pos);
-            if (pos == Vector3i.ZERO) {
-                return;
-            }
-        }
-
-        PlayerManager.getInstance().must(player).setOperating(true);
-        Vector3i offset = getOption(PASTE_OFFSET);
-        boolean withAir = getOption(AIR);
-        VolumeMapper mapper = getMapper(clipboard, player);
-        clipboard.paste(player, history, pos, offset, mapper, withAir, PlayerManager.getCause(player));
     }
 
     public void setClipboard(Clipboard clipboard) {
@@ -137,9 +126,10 @@ public class ClipboardBrush extends AbstractBrush {
             flipZ = RANDOM.nextBoolean();
         }
 
-        Mappers reMappers = getOption(Mappers.OPTION);
+        Predicate<BlockState> predicate = Calculate.applyAir(getOption(PASTE_AIR));
+        MapperSet remappers = getOption(ClipboardBrush.REMAPPERS);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
-        mappers.addAll(reMappers);
+        mappers.addAll(remappers);
 
         if (angle != 0) {
             mappers.add(me.dags.copy.block.Mappers.getRotationY(angle));
@@ -157,34 +147,10 @@ public class ClipboardBrush extends AbstractBrush {
             mappers.add(me.dags.copy.block.Mappers.getFlipZ());
         }
 
-        return new VolumeMapper(angle, flipX, flipY, flipZ, mappers.build());
+        return new VolumeMapper(angle, flipX, flipY, flipZ, predicate, mappers.build());
     }
 
     public static BrushSupplier supplier() {
         return player -> new ClipboardBrush();
-    }
-
-    public static Visitor3D visitor(Vector3i position, Vector3i offset, boolean air, List<LocatableBlockChange> changes) {
-        return (w, v, x, y, z) -> {
-            BlockState state = v.getBlock(x, y, z);
-            if (state.getType() == BlockTypes.AIR && !air) {
-                return 0;
-            }
-
-            x += position.getX();
-            y += position.getY();
-            z += position.getZ();
-
-            if (!w.containsBlock(x, y, z)) {
-                return 0;
-            }
-
-            Location<World> location = w.getLocation(offset.add(x, y, z));
-            if (location.getBlock() != state) {
-                changes.add(new LocatableBlockChange(location, state));
-            }
-
-            return 1;
-        };
     }
 }
