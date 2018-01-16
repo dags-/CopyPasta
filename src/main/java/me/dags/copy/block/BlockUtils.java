@@ -21,10 +21,36 @@ public class BlockUtils {
                     || b.getProperty(HardnessProperty.class).map(SOFT).orElse(false);
 
     public static Vector3i findSolidFoundation(World world, Vector3i pos) {
-        int y = 255;
-        while (SKIP.test(world.getBlock(pos.getX(), y, pos.getZ()))) {
-            y--;
+        return new Vector3i(pos.getX(), findSurfaceY(world, pos), pos.getZ());
+    }
+
+    // find the nearest surface block from 'start' position
+    // searches upwards & downwards for closest surface position
+    public static int findSurfaceY(World world, Vector3i start) {
+        boolean wasInSolid = !SKIP.test(world.getBlock(start));
+        boolean upWasInSolid = wasInSolid;
+        boolean downWasInSolid = wasInSolid;
+
+        for (int dy = 1; dy < 256; dy++) {
+            int yUp = start.getY() + dy;
+            if (yUp < 256) {
+                boolean inSolid = !SKIP.test(world.getBlock(start.getX(), yUp, start.getZ()));
+                if (upWasInSolid && !inSolid) {
+                    return yUp - 1;
+                }
+                upWasInSolid = inSolid;
+            }
+
+            int yDown = start.getY() - dy;
+            if (yDown >= 0) {
+                boolean inSolid = !SKIP.test(world.getBlock(start.getX(), yUp, start.getZ()));
+                if (!downWasInSolid && inSolid) {
+                    return yDown;
+                }
+                downWasInSolid = inSolid;
+            }
         }
-        return new Vector3i(pos.getX(), y, pos.getZ());
+
+        return start.getY();
     }
 }

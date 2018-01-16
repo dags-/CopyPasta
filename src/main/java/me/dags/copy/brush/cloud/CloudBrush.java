@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
+import me.dags.copy.block.Trait;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.History;
@@ -15,7 +16,6 @@ import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -39,12 +39,12 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     public static final Option<Float> DETAIL = Option.of("detail", 1.95F, Checks.range(0.5F, 5.0F));
     public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
     public static final Option<Float> FEATHER = Option.of("feather", 0.45F, Checks.range(0F, 1F));
-    public static final Option<BlockType> MATERIAL = Option.of("material", BlockType.class, CloudBrush::defaultMaterial);
-    public static final Option<String> TRAIT = Option.of("trait", CloudBrush.defaultTrait());
+    public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
+    public static final Option<Trait> TRAIT = Trait.TRAIT_OPTION;
 
     private List<BlockState> materials = Collections.emptyList();
     private BlockType type = BlockTypes.AIR;
-    private String trait = "";
+    private Trait trait = new Trait("none");
     private float density = 0F;
 
     private CloudBrush() {
@@ -65,14 +65,14 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     @Override
     public void apply(Player player, Vector3i pos, History history) {
         BlockType type = getOption(MATERIAL);
-        String trait = getOption(TRAIT);
+        Trait trait = getOption(TRAIT);
         float density = getOption(DENSITY);
 
         if (type != this.type || !trait.equals(this.trait) || density != this.density) {
             this.type = type;
             this.trait = trait;
             this.density = density;
-            materials = getVariants(type, trait, density);
+            this.materials = getVariants(type, trait.getName(), density);
         }
 
         if (materials.size() <= 0) {
@@ -82,7 +82,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
         Cloud cloud = new Cloud(this, materials);
         PlayerManager.getInstance().must(player).setOperating(true);
-        Callback callback = Callback.place(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
+        Callback callback = Callback.of(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
         Runnable task = cloud.createTask(player.getUniqueId(), pos, callback);
         CopyPasta.getInstance().submitAsync(task);
     }
@@ -114,13 +114,5 @@ public class CloudBrush extends AbstractBrush implements Parsable {
                 .forEach(builder::add);
 
         return builder.build();
-    }
-
-    public static BlockType defaultMaterial() {
-        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").orElse(BlockTypes.STAINED_GLASS);
-    }
-
-    public static String defaultTrait() {
-        return Sponge.getRegistry().getType(BlockType.class, "conquest:cloud_white").map(t -> "opacity").orElse("color");
     }
 }

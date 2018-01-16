@@ -2,15 +2,15 @@ package me.dags.copy.operation.modifier;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.block.BlockUtils;
-import me.dags.copy.block.volume.Snapshot;
+import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.world.World;
+
+import java.util.function.BiConsumer;
 
 /**
  * @author dags <dags@dags.me>
  */
-public interface Translate {
-
-    void apply(World world, Snapshot snapshot);
+public interface Translate extends BiConsumer<World, Snapshot> {
 
     Translate NONE = (w, s) -> {};
 
@@ -32,9 +32,9 @@ public interface Translate {
             private int surfaceY = -1;
 
             @Override
-            public void apply(World world, Snapshot snapshot) {
+            public void accept(World world, Snapshot snapshot) {
                 if (surfaceY == -1) {
-                    surfaceY = BlockUtils.findSolidFoundation(world, position).getY();
+                    surfaceY = BlockUtils.findSurfaceY(world, position);
                 }
 
                 int x = snapshot.getPosition().getX() + offset.getX();

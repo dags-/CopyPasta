@@ -126,33 +126,32 @@ public class BrushElements {
     private static void value(ElementFactory.Builder builder) {
         ElementFactory factory = builder.build();
 
-        ElementProvider provider = (key, priority, options, filter, parser) -> ChainElement.<Option, Value<?>>builder()
-                .key(key)
-                .filter(Filter.CONTAINS)
-                .dependency(Option.class)
-                .options(option -> factory.getOptions(option.getType()).get())
-                .mapper((input, option) -> {
-                    Object value;
-
-                    if (!input.hasNext()) {
-                        value = option.getDefault().get();
-                    } else {
+        ElementProvider provider = (key, priority, options, filter, parser) -> {
+            ChainElement.Builder<Option, Value<?>> chainBuilder = ChainElement.<Option, Value<?>>builder()
+                    .key(key)
+                    .filter(Filter.CONTAINS)
+                    .dependency(Option.class)
+                    .options(option -> factory.getOptions(option.getType()).get())
+                    .mapper((input, option) -> {
                         ValueParser<?> p = factory.getParser(option.getType());
-                        value = p.parse(input);
-                    }
+                        Object value = p.parse(input);
+                        if (value == null) {
+                            throw new CommandException("Unable to parse value");
+                        }
 
-                    if (!option.validate(value)) {
-                        throw new CommandException(
-                                "The value '%s' (%s) is not valid for option '%s' (%s)",
-                                value,
-                                value.getClass().getSimpleName(),
-                                option,
-                                option.getUsage()
-                        );
-                    }
-                    return Value.of(value);
-                })
-                .build();
+                        if (!option.validate(value)) {
+                            throw new CommandException(
+                                    "The value '%s' (%s) is not valid for option '%s' (%s)",
+                                    value,
+                                    value.getClass().getSimpleName(),
+                                    option,
+                                    option.getUsage()
+                            );
+                        }
+                        return Value.of(value);
+                    });
+            return new OptionValueElement(key, chainBuilder);
+        };
 
         builder.provider(Value.class, provider);
     }

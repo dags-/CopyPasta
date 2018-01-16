@@ -1,5 +1,7 @@
 package me.dags.copy.block.volume;
 
+import me.dags.copy.block.Snapshot;
+
 import java.util.Iterator;
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package me.dags.copy.block.volume;
 
 import com.flowpowered.math.vector.Vector3i;
+import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.block.BlockState;
 
 import java.util.ArrayList;

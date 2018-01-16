@@ -54,8 +54,8 @@ public class Clipboard {
         if (isPresent()) {
             Vector3i originOffset = volumeMapper.apply(origin); // rotate origin
             Vector3i volumeOffset = volumeMapper.volumeOffset(source); // rotate volume, find min
-            Vector3i position = pos.add(originOffset).add(volumeOffset); // apply offsets to paste position
-            Callback callback = Callback.place(player, history, from, to, translate);
+            Vector3i position = pos.add(originOffset).add(volumeOffset); // accept offsets to paste position
+            Callback callback = Callback.of(player, history, from, to, translate);
             Runnable task = volumeMapper.createTask(source, position, player.getUniqueId(), callback);
             CopyPasta.getInstance().submitAsync(task);
         }

@@ -1,7 +1,7 @@
 package me.dags.copy.operation.phase;
 
+import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
-import me.dags.copy.block.volume.Snapshot;
 import me.dags.copy.operation.Operation;
 import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
@@ -43,7 +43,7 @@ public class Calculate {
                 continue;
             }
 
-            transform.apply(world, to);
+            transform.accept(world, to);
             BlockState from = world.getBlock(to.getPosition());
 
             if (!fromFilter.test(from)) {

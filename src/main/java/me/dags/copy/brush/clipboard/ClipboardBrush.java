@@ -34,9 +34,9 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> RANDOM_ROTATE = Option.of("rotate.random", false);
     public static final Option<Boolean> PASTE_AIR = Option.of("air.paste", false);
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", false);
-    public static final Option<PasteMode> MODE = Option.of("mode", PasteMode.NORMAL);
     public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
-    public static final Option<MapperSet> REMAPPERS = MapperSet.OPTION;
+    public static final Option<Translation> PASTE_MODE = Option.of("translate", Translation.NONE);
+    public static final Option<MapperSet> MAPPER_SET = MapperSet.OPTION;
 
     private SelectorBrush selector = new SelectorBrush(this);
     private Clipboard clipboard = Clipboard.empty();
@@ -87,7 +87,7 @@ public class ClipboardBrush extends AbstractBrush {
             PlayerManager.getInstance().must(player).setOperating(true);
             Vector3i offset = getOption(PASTE_OFFSET);
             Vector3i position = pos.add(offset);
-            PasteMode mode = getOption(MODE);
+            Translation mode = getOption(PASTE_MODE);
             Filter from = Filter.replaceAir(getOption(REPLACE_AIR));
             Filter to = Filter.pasteAir(getOption(PASTE_AIR));
             Translate translate = mode.getModifier(pos, offset);
@@ -127,7 +127,7 @@ public class ClipboardBrush extends AbstractBrush {
             flipZ = RANDOM.nextBoolean();
         }
 
-        MapperSet remappers = getOption(ClipboardBrush.REMAPPERS);
+        MapperSet remappers = getOption(ClipboardBrush.MAPPER_SET);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
         mappers.addAll(remappers);
 

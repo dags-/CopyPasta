@@ -5,6 +5,7 @@ import me.dags.commandbus.fmt.Fmt;
 import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Palette;
+import me.dags.copy.brush.Translation;
 import me.dags.copy.brush.clipboard.Clipboard;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Checks;
@@ -24,6 +25,7 @@ public class StencilBrush extends ClipboardBrush {
 
     public StencilBrush() {
         setOption(PASTE_AIR, false);
+        setOption(PASTE_MODE, Translation.OVERLAY);
     }
 
     @Override

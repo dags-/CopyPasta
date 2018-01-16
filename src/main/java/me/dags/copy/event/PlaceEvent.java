@@ -1,7 +1,7 @@
 package me.dags.copy.event;
 
 import com.google.common.collect.Lists;
-import me.dags.copy.block.volume.Snapshot;
+import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.cause.Cause;

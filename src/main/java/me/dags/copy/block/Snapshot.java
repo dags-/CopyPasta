@@ -1,4 +1,4 @@
-package me.dags.copy.block.volume;
+package me.dags.copy.block;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockSnapshot;

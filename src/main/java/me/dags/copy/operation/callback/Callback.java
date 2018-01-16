@@ -63,11 +63,7 @@ public class Callback implements FutureCallback<BufferView> {
         });
     }
 
-    public static Callback of(Player player, ResultConsumer callback) {
-        return new Callback(player.getUniqueId(), player.getWorld(), callback);
-    }
-
-    public static Callback place(Player player, History history, Filter fromFilter, Filter toFilter, Translate transform) {
+    public static Callback of(Player player, History history, Filter fromFilter, Filter toFilter, Translate transform) {
         return new Callback(player.getUniqueId(), player.getWorld(), (owner, world, result) -> {
             Calculate calculate = new Calculate(world, result, fromFilter, toFilter, transform);
             Test test = new Test(owner, world, result);

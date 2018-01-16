@@ -1,8 +1,8 @@
 package me.dags.copy.operation.phase;
 
 import me.dags.copy.PlayerManager;
+import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
-import me.dags.copy.block.volume.Snapshot;
 import me.dags.copy.event.PlaceEvent;
 import me.dags.copy.operation.Operation;
 import org.spongepowered.api.Sponge;
