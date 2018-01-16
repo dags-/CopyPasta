@@ -35,7 +35,7 @@ public class OptionValueElement extends ChainElement<Option, Value<?>> {
         OptionValueParser parser = parsers.get(option.getType());
         if (parser != null) {
             Object value = parser.parse(input, context, option);
-            context.add(key, value);
+            context.add(key, new Value<>(value));
         } else {
             super.parse(input, context);
         }

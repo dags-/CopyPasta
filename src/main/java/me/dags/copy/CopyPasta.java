@@ -15,6 +15,7 @@ import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.schematic.SchematicRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -94,6 +95,10 @@ public class CopyPasta {
 
         operationManager.finish();
         operationManager.reset();
+
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            PlayerManager.getInstance().drop(player);
+        }
     }
 
     public Path getConfigDir() {
