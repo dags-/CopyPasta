@@ -39,6 +39,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     public static final Option<Float> DETAIL = Option.of("detail", 1.95F, Checks.range(0.5F, 5.0F));
     public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
     public static final Option<Float> FEATHER = Option.of("feather", 0.45F, Checks.range(0F, 1F));
+    public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", true);
     public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
     public static final Option<Trait> TRAIT = Trait.TRAIT_OPTION;
 
@@ -81,8 +82,9 @@ public class CloudBrush extends AbstractBrush implements Parsable {
         }
 
         Cloud cloud = new Cloud(this, materials);
+        Filter filter = Filter.replaceAir(getOption(REPLACE_AIR));
         PlayerManager.getInstance().must(player).setOperating(true);
-        Callback callback = Callback.of(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
+        Callback callback = Callback.of(player, history, filter, Filter.ANY, Translate.NONE);
         Runnable task = cloud.createTask(player.getUniqueId(), pos, callback);
         CopyPasta.getInstance().submitAsync(task);
     }
