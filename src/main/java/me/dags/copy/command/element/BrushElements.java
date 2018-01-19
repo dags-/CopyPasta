@@ -150,7 +150,7 @@ public class BrushElements {
                         }
                         return Value.of(value);
                     });
-            return new OptionValueElement(key, chainBuilder);
+            return new OptionValueElement(chainBuilder);
         };
 
         builder.provider(Value.class, provider);

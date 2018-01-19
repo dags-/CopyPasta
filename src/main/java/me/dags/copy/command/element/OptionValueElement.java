@@ -20,22 +20,19 @@ import java.util.Map;
  */
 public class OptionValueElement extends ChainElement<Option, Value<?>> {
 
-    private final String key;
-    private final String dependency = Option.class.getCanonicalName();
     private final Map<Class<?>, OptionValueParser> parsers = getParsers();
 
-    public OptionValueElement(String key, ChainElement.Builder<Option, Value<?>> builder) {
+    public OptionValueElement(ChainElement.Builder<Option, Value<?>> builder) {
         super(builder);
-        this.key = key;
     }
 
     @Override
     public void parse(Input input, Context context) throws CommandException {
-        Option<?> option = context.getLast(dependency);
+        Option<?> option = context.getLast(getDependency().getCanonicalName());
         OptionValueParser parser = parsers.get(option.getType());
         if (parser != null) {
             Object value = parser.parse(input, context, option);
-            context.add(key, new Value<>(value));
+            context.add(getKey(), new Value<>(value));
         } else {
             super.parse(input, context);
         }
@@ -43,7 +40,7 @@ public class OptionValueElement extends ChainElement<Option, Value<?>> {
 
     @Override
     public void suggest(Input input, Context context, List<String> suggestions) {
-        Option<?> option = context.getLast(dependency);
+        Option<?> option = context.getLast(getDependency().getCanonicalName());
         OptionValueParser parser = parsers.get(option.getType());
         if (parser != null) {
             suggestions.addAll(parser.suggest(input, context, option));

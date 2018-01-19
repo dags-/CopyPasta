@@ -8,16 +8,12 @@ version '0.3-SNAPSHOT'
 def spongeAPI = '5.2.0'
 def spongeChannel = 'SNAPSHOT'
 
-configurations {
-    compile.extendsFrom shadow
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
+}
+
+configurations {
+    compile.extendsFrom shadow
 }
 
 repositories {
@@ -33,7 +29,7 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
-    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-7'
+    shadow 'com.github.dags-:CommandBus:2.0.0-TEST-8'
 }
 
 shadowJar {
