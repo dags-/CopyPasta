@@ -17,6 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.action.TextActions;
 
 import java.util.Optional;
 
@@ -119,7 +120,10 @@ public class BrushCommands {
             BrushType type = brush.get().getType();
             for (Option<?> option : type.getOptions()) {
                 Object value = instance.getOption(option);
-                page.line().subdued(" - ").stress(option).info("=").stress(value).info(" (%s)", option.getUsage());
+                page.line().subdued(" - ")
+                        .stress(option).info("=").stress(value)
+                        .info(" (%s)", option.getUsage())
+                        .action(TextActions.suggestCommand("/set " + option + " "));
             }
             page.sort(true).build().sendTo(player);
         }
