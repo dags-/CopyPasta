@@ -31,14 +31,14 @@ import java.util.*;
 public class CloudBrush extends AbstractBrush implements Parsable {
 
     public static final Option<Integer> SEED = Option.of("seed", 8008);
-    public static final Option<Integer> SCALE = Option.of("scale", 32, Checks.range(2, 256));
+    public static final Option<Integer> SCALE = Option.of("scale", 24, Checks.range(2, 256));
     public static final Option<Integer> OCTAVES = Option.of("octaves", 4, Checks.range(1, 8));
-    public static final Option<Integer> RADIUS = Option.of("radius", 48, Checks.range(1, 96));
-    public static final Option<Integer> HEIGHT = Option.of("height", 8, Checks.range(1, 48));
-    public static final Option<Integer> OFFSET = Option.of("offset", 3, Checks.range(1, 16));
-    public static final Option<Float> DETAIL = Option.of("detail", 1.95F, Checks.range(0.5F, 5.0F));
-    public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
-    public static final Option<Float> FEATHER = Option.of("feather", 0.45F, Checks.range(0F, 1F));
+    public static final Option<Integer> RADIUS = Option.of("radius", 24, Checks.range(1, 96));
+    public static final Option<Integer> HEIGHT = Option.of("height", 9, Checks.range(1, 48));
+    public static final Option<Integer> OFFSET = Option.of("offset", 4, Checks.range(1, 16));
+    public static final Option<Float> DETAIL = Option.of("detail", 2F, Checks.range(0.5F, 5.0F));
+    public static final Option<Float> DENSITY = Option.of("density", 0.15F, Checks.range(0F, 1F));
+    public static final Option<Float> FEATHER = Option.of("feather", 0.5F, Checks.range(0F, 1F));
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", true);
     public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
     public static final Option<Trait> TRAIT = Trait.TRAIT_OPTION;
@@ -50,17 +50,12 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
     private CloudBrush() {
         super(5);
-        setOption(RANGE, 64);
+        setOption(RANGE, 32);
     }
 
     @Override
     public List<Option<?>> getParseOptions() {
         return Arrays.asList(SCALE, OCTAVES, RADIUS, HEIGHT, OFFSET, DETAIL, DENSITY, FEATHER);
-    }
-
-    @Override
-    public String getPermission() {
-        return "brush.cloud";
     }
 
     @Override

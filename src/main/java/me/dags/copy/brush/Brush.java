@@ -21,8 +21,6 @@ public interface Brush extends OptionHolder {
 
     History getHistory();
 
-    String getPermission();
-
     void primary(Player player, Vector3i pos, Action action);
 
     void secondary(Player player, Vector3i pos, Action action);
@@ -53,6 +51,10 @@ public interface Brush extends OptionHolder {
 
     default BrushType getType() {
         return BrushRegistry.forClass(getClass());
+    }
+
+    default String getPermission() {
+        return getType().getPermission();
     }
 
     default boolean supports(Option option) {

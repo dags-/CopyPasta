@@ -34,11 +34,6 @@ public class ReplaceBrush extends AbstractBrush {
     }
 
     @Override
-    public String getPermission() {
-        return "brush.replace";
-    }
-
-    @Override
     public void apply(Player player, Vector3i pos, History history) {
         int radius = getOption(RADIUS);
         MapperSet mappers = getOption(MAPPERS);

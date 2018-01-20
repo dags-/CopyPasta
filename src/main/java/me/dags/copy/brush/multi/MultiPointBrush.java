@@ -42,7 +42,7 @@ public class MultiPointBrush extends AbstractBrush {
 
     @Override
     public String getPermission() {
-        return delegate.getPermission();
+        return "brush.multi." + delegate.getType();
     }
 
     @Override

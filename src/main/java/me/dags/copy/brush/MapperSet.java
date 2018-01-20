@@ -48,6 +48,11 @@ public class MapperSet implements Iterable<State.Mapper>, Serializable<MapperSet
     }
 
     @Override
+    public String toString() {
+        return "mappers";
+    }
+
+    @Override
     public Iterator<State.Mapper> iterator() {
         return mappers.iterator();
     }

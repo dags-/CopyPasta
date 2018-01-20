@@ -60,11 +60,6 @@ public class SchematicBrush extends ClipboardBrush {
     }
 
     @Override
-    public String getPermission() {
-        return "brush.schematic";
-    }
-
-    @Override
     public void secondary(Player player, Vector3i pos, Action action) {
         if (getOption(MODE) == Mode.PASTE) {
             SchematicList list = mustOption(SCHEMATICS);

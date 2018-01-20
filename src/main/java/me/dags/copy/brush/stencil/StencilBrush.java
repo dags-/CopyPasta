@@ -25,12 +25,7 @@ public class StencilBrush extends ClipboardBrush {
 
     public StencilBrush() {
         setOption(PASTE_AIR, false);
-        setOption(PASTE_MODE, Translation.OVERLAY);
-    }
-
-    @Override
-    public String getPermission() {
-        return "brush.stencil";
+        setOption(TRANSLATE, Translation.OVERLAY);
     }
 
     @Override

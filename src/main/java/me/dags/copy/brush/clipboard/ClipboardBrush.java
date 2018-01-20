@@ -35,7 +35,7 @@ public class ClipboardBrush extends AbstractBrush {
     public static final Option<Boolean> PASTE_AIR = Option.of("air.paste", false);
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", false);
     public static final Option<Vector3i> PASTE_OFFSET = Option.of("offset", Vector3i.ZERO);
-    public static final Option<Translation> PASTE_MODE = Option.of("translate", Translation.NONE);
+    public static final Option<Translation> TRANSLATE = Option.of("translate", Translation.NONE);
     public static final Option<MapperSet> MAPPER_SET = MapperSet.OPTION;
 
     private SelectorBrush selector = new SelectorBrush(this);
@@ -50,11 +50,6 @@ public class ClipboardBrush extends AbstractBrush {
         Clipboard clipboard = Clipboard.of(player, min, max, origin);
         setClipboard(clipboard);
         fmt.info("Copied ").stress(size).info(" blocks").tell(player);
-    }
-
-    @Override
-    public String getPermission() {
-        return "brush.clipboard";
     }
 
     @Override
@@ -87,7 +82,7 @@ public class ClipboardBrush extends AbstractBrush {
             PlayerManager.getInstance().must(player).setOperating(true);
             Vector3i offset = getOption(PASTE_OFFSET);
             Vector3i position = pos.add(offset);
-            Translation mode = getOption(PASTE_MODE);
+            Translation mode = getOption(TRANSLATE);
             Filter from = Filter.replaceAir(getOption(REPLACE_AIR));
             Filter to = Filter.pasteAir(getOption(PASTE_AIR));
             Translate translate = mode.getModifier(pos, offset);

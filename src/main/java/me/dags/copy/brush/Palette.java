@@ -46,6 +46,11 @@ public class Palette extends WeightedList<BlockState> implements Serializable<Pa
     }
 
     @Override
+    public String toString() {
+        return "palette";
+    }
+
+    @Override
     public TypeToken<Palette> getToken() {
         return TOKEN;
     }

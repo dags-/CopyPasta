@@ -25,7 +25,7 @@ public enum Translation implements Serializable<Translation> {
 
     public Translate getModifier(Vector3i position, Vector3i offset) {
         if (this == SURFACE) {
-            return Translate.foundation(position, offset);
+            return Translate.surface(position, offset);
         }
         if (this == OVERLAY) {
             return Translate.overlay(position, offset);

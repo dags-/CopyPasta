@@ -18,12 +18,14 @@ public class BrushType {
     static final BrushType NONE = new BrushType();
 
     private final String name;
+    private final String permission;
     private final List<Option<?>> options;
     private final BrushSupplier supplier;
     private final Class<? extends Brush> type;
 
     private BrushType() {
         name = "none";
+        permission = "wand.none";
         type =  Brush.class;
         supplier = p -> null;
         options = Collections.emptyList();
@@ -31,6 +33,7 @@ public class BrushType {
 
     private BrushType(String name, Class<? extends Brush> type, BrushSupplier supplier, List<Option<?>> options) {
         this.name = name;
+        this.permission = "wand." + name.toLowerCase();
         this.options = options;
         this.type = type;
         this.supplier = supplier;
@@ -63,6 +66,10 @@ public class BrushType {
 
     public String getId() {
         return name;
+    }
+
+    public String getPermission() {
+        return permission;
     }
 
     @Override

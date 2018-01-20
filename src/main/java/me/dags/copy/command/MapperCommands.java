@@ -19,7 +19,7 @@ public class MapperCommands {
 
     @Permission
     @Command("mapper|map clear")
-    @Description("Remove any re-mappers assigned to the brush")
+    @Description("Remove any re-mappers assigned to the wand")
     public void clear(@Src Player player) {
         Optional<Brush> brush = getMapperBrush(player);
         if (brush.isPresent()) {
@@ -30,7 +30,7 @@ public class MapperCommands {
 
     @Permission
     @Command("mapper|map")
-    @Description("Add a new re-mapper to the brush")
+    @Description("Add a new re-mapper to the wand")
     public void mapper(@Src Player player, State.Mapper mapper) {
         Optional<Brush> brush = getMapperBrush(player);
         if (brush.isPresent()) {

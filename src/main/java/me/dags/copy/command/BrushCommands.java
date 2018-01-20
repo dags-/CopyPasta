@@ -53,27 +53,49 @@ public class BrushCommands {
     }
 
     @Permission
-    @Command("wand|w <brush>")
-    @Description("Bind the <brush> to your held item")
+    @Command("wand|w <wand>")
+    @Description("Bind the <wand> to your held item")
     public void brush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
         PlayerData data = PlayerManager.getInstance().must(player);
         if (item == ItemTypes.NONE) {
-            data.removeBrush(item);
-            fmt.sub("Removed %s brush", type).tell(player);
-        } else {
+            fmt.sub("You are not holding an item").tell(player);
+        } else if (player.hasPermission(type.getPermission())) {
             Optional<Brush> brush = type.create(player);
             if (brush.isPresent()) {
                 data.setBrush(item, brush.get());
                 fmt.info("Set brush ").stress(type).info(" to item ").stress(item.getName()).tell(player);
             }
+        } else {
+            fmt.error("You do not have permission to use that wand").tell(player);
+        }
+    }
+
+    @Permission
+    @Command("wand|w reset")
+    @Description("Remove the <wand> from your held item")
+    public void remove(@Src Player player) {
+        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
+        PlayerData data = PlayerManager.getInstance().must(player);
+        if (item == ItemTypes.NONE) {
+            fmt.sub("You are not holding an item").tell(player);
+        } else {
+            Optional<Brush> brush = data.getBrush(item);
+            if (brush.isPresent()) {
+                data.removeBrush(item);
+                fmt.info("Removing wand ").stress(brush.get().getType())
+                        .info(" from item ").stress(item.getType().getName()).tell(player);
+            } else {
+                fmt.error("You do not have a wand bound to that item").tell(player);
+            }
+            data.removeBrush(item);
         }
     }
 
     @Flag("a")
     @Permission
     @Command("wand|w list")
-    @Description("List all brush types")
+    @Description("List all wand types")
     public void list(@Src CommandSource source, Flags flags) {
         boolean aliases = flags.has("a");
         PagFormatter page = fmt.page();
@@ -87,7 +109,7 @@ public class BrushCommands {
 
     @Permission
     @Command("wand|w options")
-    @Description("List all options and their values for the current brush")
+    @Description("List all options and their values for the current wand")
     public void options(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
@@ -105,7 +127,7 @@ public class BrushCommands {
 
     @Permission
     @Command("wand|w reset")
-    @Description("Reset all options for your current brush to their defaults")
+    @Description("Reset all options for your current wand to their defaults")
     public void reset(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {
@@ -116,7 +138,7 @@ public class BrushCommands {
 
     @Permission
     @Command("set|s <option> <value>")
-    @Description("Set an option for your current brush")
+    @Description("Set an option for your current wand")
     public void option(@Src Player player, Option<?> option, Value<?> value) {
         Optional<Brush> brush = getBrush(player);
         if (brush.isPresent()) {

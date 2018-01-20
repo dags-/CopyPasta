@@ -26,7 +26,7 @@ public interface Translate extends BiConsumer<World, Snapshot> {
         };
     }
 
-    static Translate foundation(Vector3i position, Vector3i offset) {
+    static Translate surface(Vector3i position, Vector3i offset) {
         return new Translate() {
 
             private int surfaceY = -1;
