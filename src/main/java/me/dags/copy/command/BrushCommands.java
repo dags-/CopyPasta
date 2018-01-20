@@ -74,6 +74,17 @@ public class BrushCommands {
 
     @Permission
     @Command("wand|w reset")
+    @Description("Reset all options for your current wand to their defaults")
+    public void reset(@Src Player player) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            fmt.info("Reset brush ").stress(brush.get().getType()).tell(player);
+            brush.get().getOptions().reset();
+        }
+    }
+
+    @Permission
+    @Command("wand|w remove")
     @Description("Remove the <wand> from your held item")
     public void remove(@Src Player player) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
@@ -126,17 +137,6 @@ public class BrushCommands {
                         .action(TextActions.suggestCommand("/set " + option + " "));
             }
             page.sort(true).build().sendTo(player);
-        }
-    }
-
-    @Permission
-    @Command("wand|w reset")
-    @Description("Reset all options for your current wand to their defaults")
-    public void reset(@Src Player player) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            fmt.info("Reset brush ").stress(brush.get().getType()).tell(player);
-            brush.get().getOptions().reset();
         }
     }
 

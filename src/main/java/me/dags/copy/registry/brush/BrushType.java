@@ -25,7 +25,7 @@ public class BrushType {
 
     private BrushType() {
         name = "none";
-        permission = "wand.none";
+        permission = "copypasta.wand.none";
         type =  Brush.class;
         supplier = p -> null;
         options = Collections.emptyList();
