@@ -1,10 +1,12 @@
 package me.dags.copy.brush.cloud;
 
+import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.Trait;
+import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.AbstractBrush;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.History;
@@ -30,15 +32,17 @@ import java.util.*;
 @Aliases({"cloud"})
 public class CloudBrush extends AbstractBrush implements Parsable {
 
-    public static final Option<Integer> SEED = Option.of("seed", 8008);
-    public static final Option<Integer> SCALE = Option.of("scale", 24, Checks.range(2, 256));
+    public static final Option<Integer> SEED = Option.of("seed", 4);
+    public static final Option<Float> FREQUENCY = Option.of("frequency", 0.25F, Checks.range(0F, 1F));
     public static final Option<Integer> OCTAVES = Option.of("octaves", 4, Checks.range(1, 8));
-    public static final Option<Integer> RADIUS = Option.of("radius", 24, Checks.range(1, 96));
-    public static final Option<Integer> HEIGHT = Option.of("height", 9, Checks.range(1, 48));
-    public static final Option<Integer> OFFSET = Option.of("offset", 4, Checks.range(1, 16));
-    public static final Option<Float> DETAIL = Option.of("detail", 2F, Checks.range(0.5F, 5.0F));
-    public static final Option<Float> DENSITY = Option.of("density", 0.15F, Checks.range(0F, 1F));
+    public static final Option<Integer> RADIUS = Option.of("radius", 45, Checks.range(1, 96));
     public static final Option<Float> FEATHER = Option.of("feather", 0.5F, Checks.range(0F, 1F));
+    public static final Option<Float> OPACITY = Option.of("opacity", 0.8F, Checks.range(0F, 1F));
+    public static final Option<Float> DENSITY = Option.of("density", 0.8F, Checks.range(0F, 1F));
+    public static final Option<Float> SCALE = Option.of("scale", 0.5F, Checks.range(0F, 1F));
+    public static final Option<Integer> HEIGHT = Option.of("height", 16, Checks.range(2, 48));
+    public static final Option<Float> CENTER = Option.of("center", 0.25F, Checks.range(0F, 1F));
+    public static final Option<Float> ROTATION = Option.of("rotation", 0F, Checks.range(-1F, 1F));
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", true);
     public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
     public static final Option<Trait> TRAIT = Trait.TRAIT_OPTION;
@@ -55,7 +59,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
     @Override
     public List<Option<?>> getParseOptions() {
-        return Arrays.asList(SCALE, OCTAVES, RADIUS, HEIGHT, OFFSET, DETAIL, DENSITY, FEATHER);
+        return Arrays.asList(FREQUENCY, OCTAVES, RADIUS, FEATHER, OPACITY, DENSITY, SCALE, HEIGHT, CENTER, ROTATION);
     }
 
     @Override
@@ -76,12 +80,14 @@ public class CloudBrush extends AbstractBrush implements Parsable {
             return;
         }
 
-        Cloud cloud = new Cloud(this, materials);
+        Vector2f facing = Facing.getFacingF(player);
+        Cloud2 cloud = new Cloud2(this, materials, facing);
         Filter filter = Filter.replaceAir(getOption(REPLACE_AIR));
         PlayerManager.getInstance().must(player).setOperating(true);
         Callback callback = Callback.of(player, history, filter, Filter.ANY, Translate.NONE);
         Runnable task = cloud.createTask(player.getUniqueId(), pos, callback);
         CopyPasta.getInstance().submitAsync(task);
+        fmt.sub("Pasting...").tell(CopyPasta.NOTICE_TYPE, player);
     }
 
     public static BrushSupplier supplier() {

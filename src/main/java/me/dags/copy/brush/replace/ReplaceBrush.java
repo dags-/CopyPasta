@@ -15,6 +15,7 @@ import me.dags.copy.operation.callback.Callback;
 import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.Extent;
@@ -54,6 +55,7 @@ public class ReplaceBrush extends AbstractBrush {
         Callback callback = Callback.of(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
         Runnable task = mapper.createTask(source, position, player.getUniqueId(), callback);
         CopyPasta.getInstance().submitAsync(task);
+        fmt.sub("Replacing...").tell(CopyPasta.NOTICE_TYPE, player);
     }
 
     public static BrushSupplier supplier() {

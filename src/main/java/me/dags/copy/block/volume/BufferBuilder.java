@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * @author dags <dags@dags.me>
  */
-public class BufferBuilder {
+public class BufferBuilder implements Buffer<BlockState, Snapshot> {
 
     private final List<Snapshot> list;
     private final Vector3i position;
@@ -23,6 +23,7 @@ public class BufferBuilder {
         this.list = new ArrayList<>(size);
     }
 
+    @Override
     public void addRelative(BlockState state, int x, int y, int z) {
         addRelative(state, this.position.add(x, y, z));
     }
@@ -33,6 +34,7 @@ public class BufferBuilder {
         }
     }
 
+    @Override
     public void addAbsolute(BlockState state, int x, int y, int z) {
         addAbsolute(state, new Vector3i(x, y, z));
     }
@@ -43,6 +45,7 @@ public class BufferBuilder {
         }
     }
 
+    @Override
     public BufferView getView() {
         return new BufferView(list);
     }

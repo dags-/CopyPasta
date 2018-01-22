@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-public class BufferView implements Iterable<Snapshot> {
+public class BufferView implements Buffer.View<Snapshot> {
 
     private final List<Snapshot> list;
 

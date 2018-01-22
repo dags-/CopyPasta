@@ -2,6 +2,7 @@ package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.commandbus.fmt.Fmt;
+import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Palette;
@@ -11,6 +12,7 @@ import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushSupplier;
+import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 
 /**
@@ -26,6 +28,16 @@ public class StencilBrush extends ClipboardBrush {
     public StencilBrush() {
         setOption(PASTE_AIR, false);
         setOption(TRANSLATE, Translation.OVERLAY);
+    }
+
+    @Override
+    public void primary(Player player, Vector3i pos, Action action) {
+        if (action == Action.SECONDARY) {
+            setClipboard(Clipboard.empty());
+            fmt.info("Cleared stencil").tell(player);
+        } else {
+            undo(player, getHistory());
+        }
     }
 
     @Override
@@ -47,6 +59,7 @@ public class StencilBrush extends ClipboardBrush {
         Clipboard clipboard = Clipboard.stencil(player, volume, stencil.getOffset());
         setClipboard(clipboard);
         apply(player, pos, getHistory());
+        fmt.sub("Pasting...").tell(CopyPasta.NOTICE_TYPE, player);
     }
 
     public static BrushSupplier supplier() {

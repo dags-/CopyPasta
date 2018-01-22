@@ -1,6 +1,7 @@
 package me.dags.copy.block.property;
 
 import com.flowpowered.math.imaginary.Quaterniond;
+import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
@@ -123,6 +124,14 @@ public enum Facing implements Property<Facing> {
             }
         }
         return -1;
+    }
+
+    public static Vector2f getFacingF(Player player) {
+        Vector3d rotation = getRotation(player);
+        double total = Math.abs(rotation.getX()) + Math.abs(rotation.getFloorZ());
+        double x = rotation.getX() / total;
+        double z = rotation.getZ() / total;
+        return new Vector2f(x, z);
     }
 
     public static Facing getFacing(Player player) {

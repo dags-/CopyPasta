@@ -33,7 +33,7 @@ public class BrushType {
 
     private BrushType(String name, Class<? extends Brush> type, BrushSupplier supplier, List<Option<?>> options) {
         this.name = name;
-        this.permission = "wand." + name.toLowerCase();
+        this.permission = "copypasta.wand." + name.toLowerCase();
         this.options = options;
         this.type = type;
         this.supplier = supplier;

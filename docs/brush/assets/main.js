@@ -59,8 +59,11 @@ function render() {
   buffer.drawSeparator(255, 255, 255, 255);
   // draw the buffer to the canvas
   buffer.apply(canvas, context);
-  // request next frame
-  window.requestAnimationFrame(render);
+
+  if (xIncrement !== 0 || zIncrement !== 0) {
+    // request next frame
+    window.requestAnimationFrame(render);
+  }
 }
 
 function createBuffer() {
@@ -95,12 +98,16 @@ function createSlider(id, min, max, val, fact, callback) {
   slider.setAttribute('max', max);
   slider.setAttribute('value', val);
   slider.oninput = function() {
+    let rerender = xIncrement === 0 && zIncrement === 0;
     let val = this.value / fact;
+    if (fact > 1) {
+        val = val.toFixed(2);
+    }
     label.innerText = id + ":" + val;
     callback(val);
     writeOutput(command);
-    if (increment === 0) {
-      render();
+    if (rerender) {
+        render();
     }
   }
 

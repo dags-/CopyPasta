@@ -2,6 +2,7 @@ package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
+import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
@@ -71,6 +72,9 @@ public class ClipboardBrush extends AbstractBrush {
     public void secondary(Player player, Vector3i pos, Action action) {
         if (clipboard.isPresent()) {
             apply(player, pos, getHistory());
+            if (PlayerManager.getInstance().must(player).isOperating()) {
+                fmt.sub("Pasting...").tell(CopyPasta.NOTICE_TYPE, player);
+            }
         } else {
             selector.secondary(player, pos, action);
         }

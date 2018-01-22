@@ -24,6 +24,6 @@
 - `air.paste` - paste air contained in the clipboard
 - `offset` - adjust the paste position by some x, y, z vector
 - `paste` - change the 'paste mode' for the clipboard:
- - `normal` - pastes the clipboard at the position you are targeting
- - `surface` - finds the closest surface block and pastes the clipboard relative to it
- - `overlay` - overlays the clipboard on the surface
+  - `normal` - pastes the clipboard at the position you are targeting
+  - `surface` - finds the closest surface block and pastes the clipboard relative to it
+  - `overlay` - overlays the clipboard on the surface

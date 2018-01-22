@@ -75,6 +75,7 @@ public class MultiPointBrush extends AbstractBrush {
     @Override
     public void apply(Player player, Vector3i pos, History history) {
         delegate.apply(player, pos, history);
+        fmt.sub("Pasting...").tell(CopyPasta.NOTICE_TYPE, player);
     }
 
     @Override
