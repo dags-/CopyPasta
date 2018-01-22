@@ -1,4 +1,6 @@
 # Stencil
+The stencil brush converts an image to a line stencil that can then be pasted into the world with varying materials
+ and heights.
 
 ## Actions
 - Left-click - undo

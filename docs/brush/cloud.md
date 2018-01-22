@@ -1,4 +1,6 @@
-# Clipboard
+# Cloud
+The cloud brush uses a 3D noise algorithm to produce cloud-like blobs of a certain material, varying properties of that
+ material such it's opacity or color.
 
 ## Actions
 ### Paste Mode

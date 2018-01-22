@@ -1,4 +1,6 @@
 # Clipboard
+The clipboard brush is used for copying and pasting parts of the world from one place to another.
+Once copied, the clipboard can be rotated, flipped, translated, and have blocks replaced for others.
 
 ## Actions
 ### Copy Mode
