@@ -25,4 +25,4 @@ The following page demonstrates how the various options work together to produce
 The upper image shows a plan-view of the cloud.  
 The lower image shows a cross-section of the cloud (taken at the purple line on plan).
 
-http://copypasta.dags.me/brush/cloud
+[http://copypasta.dags.me/preview/cloud](http://copypasta.dags.me/preview/cloud)
