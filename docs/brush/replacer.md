@@ -1,6 +1,6 @@
 # Replace
 The replacer brush matches certain blocks/blockstates and replaces them with others, whilst keeping common properties
- the same. This allows you to replace stairs from one type to another without messing up their orientation, in one go.
+ the same. This allows you to replace stairs from one type to another, without messing up their orientation, in one go.
 
 ## Actions
 - Left-click - under
