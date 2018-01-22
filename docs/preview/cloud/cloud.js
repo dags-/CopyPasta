@@ -115,5 +115,5 @@ function registerOptions(register) {
 }
 
 function writeOutput(output) {
-  output.value = `/set ${frequency};${octaves};${shape.radius};${shape.feather};${opacity};${density};${scale};${height};${center}`;
+  output.value = `/wand parse ${frequency};${octaves};${shape.radius};${shape.feather};${opacity};${density};${scale};${height};${center}`;
 }

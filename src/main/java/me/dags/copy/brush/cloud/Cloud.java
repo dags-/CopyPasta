@@ -9,14 +9,13 @@ import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.brush.option.OptionHolder;
 import org.spongepowered.api.block.BlockState;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class Cloud2 {
+public class Cloud {
 
     private final int seed;
     private final int octaves;
@@ -32,42 +31,42 @@ public class Cloud2 {
     private final float scaleFrequency;
     private final int heightRange;
     private final float center;
-    private final float rotation;
+    private final float incline;
     private final Vector2f facing;
 
     private final List<BlockState> materials;
 
-    public Cloud2(OptionHolder brush, Collection<BlockState> materials, Vector2f facing) {
-        this.seed = brush.mustOption(CloudBrush.SEED);
+    public Cloud(OptionHolder brush, ImmutableList<BlockState> materials, Vector2f facing) {
+        this.seed = brush.getOption(CloudBrush.SEED);
 
-        this.frequency = brush.mustOption(CloudBrush.FREQUENCY) * 0.1D;
-        this.octaves = brush.mustOption(CloudBrush.OCTAVES);
+        this.frequency = brush.getOption(CloudBrush.FREQUENCY) * 0.1D;
+        this.octaves = brush.getOption(CloudBrush.OCTAVES);
         this.max = ValueNoise.maxValue(octaves);
 
-        this.radius = brush.mustOption(CloudBrush.RADIUS);
+        this.radius = brush.getOption(CloudBrush.RADIUS);
         this.radius2 = radius * radius;
 
-        float feather = brush.mustOption(CloudBrush.FEATHER);
+        float feather = brush.getOption(CloudBrush.FEATHER);
         this.featherDist2 = (radius * feather) * (radius * feather);
         this.featherStart2 = radius2 - featherDist2;
 
-        this.opacity = brush.mustOption(CloudBrush.OPACITY);
+        this.opacity = brush.getOption(CloudBrush.OPACITY);
 
-        float density = brush.mustOption(CloudBrush.DENSITY);
+        float density = brush.getOption(CloudBrush.DENSITY);
         this.materialAir = Math.round(materials.size() * (1 - density));
         this.materialRange = materials.size() - 1 + materialAir;
 
-        float scale = brush.mustOption(CloudBrush.SCALE);
-        this.scaleFrequency = (1 - scale) * 0.1F;
+        float scale = brush.getOption(CloudBrush.SCALE);
+        this.scaleFrequency = (1 - (scale * 0.01F)) * 0.1F;
 
-        int height = brush.mustOption(CloudBrush.HEIGHT);
+        int height = brush.getOption(CloudBrush.HEIGHT);
         this.heightRange = (2 * height) + 1;
 
-        this.center = brush.mustOption(CloudBrush.CENTER);
-        this.rotation = brush.mustOption(CloudBrush.ROTATION);
+        this.center = brush.getOption(CloudBrush.CENTER);
+        this.incline = brush.getOption(CloudBrush.INCLINE);
         this.facing = facing;
 
-        this.materials = ImmutableList.copyOf(materials);
+        this.materials = materials;
     }
 
     public Runnable createTask(UUID owner, Vector3i pos, FutureCallback<BufferView> callback) {
@@ -112,9 +111,9 @@ public class Cloud2 {
         int y = pos.getY();
         int z = pos.getZ() + dz;
 
-        // amount of vertical offset based on distance from center, rotation amount, and facing x,z ratio
-        int rx = Math.round(dx * rotation * facing.getX());
-        int rz = Math.round(dz * rotation * facing.getY());
+        // amount of vertical offset based on distance from center, incline, and facing x,z ratio
+        int rx = Math.round(dx * incline * facing.getX());
+        int rz = Math.round(dz * incline * facing.getY());
 
         // height based on perlin(x,z) modified by distance from center & getFeatherMod amount
         double hMod = modifier(distance2, radius2);
