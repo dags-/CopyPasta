@@ -18,7 +18,7 @@ The cloud brush uses a 3D noise algorithm to produce cloud-like blobs of a certa
 - `feather` - the amount of fade applied to the edges of the brush
 - `opacity` - the overall opacity/strength of the brush
 - `density` - the balance of cloud material to air in the brush
-- `rotation` - the amount of rotation to apply depending on the view direction
+- `incline` - tilts the plane of the cloud in the direction you're looking by the amount specified
 
 ## Preview
 The following page demonstrates how the various options work together to produce the cloud.  
