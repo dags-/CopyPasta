@@ -57,7 +57,7 @@ public class Cloud {
         this.materialRange = materials.size() - 1 + materialAir;
 
         float scale = brush.getOption(CloudBrush.SCALE);
-        this.scaleFrequency = (1 - (scale * 0.01F)) * 0.1F;
+        this.scaleFrequency = (1 - scale) * 0.125F;
 
         int height = brush.getOption(CloudBrush.HEIGHT);
         this.heightRange = (2 * height) + 1;

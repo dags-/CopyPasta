@@ -38,13 +38,13 @@ public class CloudBrush extends AbstractBrush implements Parsable {
     public static final Option<Integer> SEED = Option.of("seed", 1);
     public static final Option<Float> FREQUENCY = Option.of("frequency", 0.5F, Checks.range(0F, 1F));
     public static final Option<Integer> OCTAVES = Option.of("octaves", 4, Checks.range(1, 8));
-    public static final Option<Integer> RADIUS = Option.of("radius", 48, Checks.range(1, 96));
-    public static final Option<Float> FEATHER = Option.of("feather", 0.6F, Checks.range(0F, 1F));
-    public static final Option<Float> OPACITY = Option.of("opacity", 0.3F, Checks.range(0F, 1F));
-    public static final Option<Float> DENSITY = Option.of("density", 0.25F, Checks.range(0F, 1F));
-    public static final Option<Float> SCALE = Option.of("scale", 0.2F, Checks.range(0F, 1F));
+    public static final Option<Integer> RADIUS = Option.of("radius", 38, Checks.range(1, 96));
+    public static final Option<Float> FEATHER = Option.of("feather", 0.4F, Checks.range(0F, 1F));
+    public static final Option<Float> OPACITY = Option.of("opacity", 0.5F, Checks.range(0F, 1F));
+    public static final Option<Float> DENSITY = Option.of("density", 0.6F, Checks.range(0F, 1F));
+    public static final Option<Float> SCALE = Option.of("scale", 0.1F, Checks.range(0F, 1F));
     public static final Option<Integer> HEIGHT = Option.of("height", 10, Checks.range(2, 48));
-    public static final Option<Float> CENTER = Option.of("center", 0.25F, Checks.range(0F, 1F));
+    public static final Option<Float> CENTER = Option.of("center", 0.3F, Checks.range(0F, 1F));
     public static final Option<Float> INCLINE = Option.of("incline", 0F, Checks.range(-1F, 1F));
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", true);
     public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
@@ -105,6 +105,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
     private static ImmutableList<BlockState> getVariants(BlockType type, BlockTrait<?> trait) {
         ImmutableList.Builder<BlockState> builder = ImmutableList.builder();
+        builder.add(BlockTypes.AIR.getDefaultState());
         BlockState baseState = type.getDefaultState();
         trait.getPossibleValues().stream()
                 .sorted()
