@@ -73,6 +73,11 @@ public class BrushCommands {
         }
     }
 
+    @Command("wand|w preset <name>")
+    public void preset(@Src Player player) {
+
+    }
+
     @Permission
     @Command("wand|w reset")
     @Description("Reset all options for your current wand to their defaults")

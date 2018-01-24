@@ -40,11 +40,20 @@ public class BrushType {
     }
 
     public Optional<Brush> create(Player player) {
-        Brush brush = supplier.create(player);
-        if (brush == null) {
-            return Optional.empty();
+        return create(player, true);
+    }
+
+    public Optional<Brush> create(Player player, boolean load) {
+        if (player.hasPermission(permission)) {
+            Brush brush = supplier.create(player);
+            if (brush != null) {
+                if (load) {
+                    PlayerManager.getInstance().must(player).load(brush);
+                }
+                return Optional.of(brush);
+            }
         }
-        return Optional.of(PlayerManager.getInstance().must(player).apply(brush));
+        return Optional.empty();
     }
 
     public Class<? extends Brush> getType() {

@@ -3,16 +3,11 @@ package me.dags.copy;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import me.dags.copy.brush.Brush;
-import me.dags.copy.brush.option.Option;
-import me.dags.copy.brush.option.Value;
-import me.dags.copy.util.IgnoreSerialization;
-import me.dags.copy.util.Serializable;
+import me.dags.copy.brush.Preset;
 import me.dags.copy.util.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -69,45 +64,6 @@ public class PlayerData {
         return Optional.ofNullable(brushes.get(item));
     }
 
-    @SuppressWarnings("unchecked")
-    public Brush apply(Brush brush) {
-        if (brush != null) {
-            ConfigurationNode node = root.getNode(brush.getType().getId());
-            for (Option<?> option : brush.getType().getOptions()) {
-                ConfigurationNode child = node.getNode(option.getId());
-                Object value = option.getDefault().get();
-
-                if (!child.isVirtual()) {
-                    if (value instanceof IgnoreSerialization) {
-                        continue;
-                    }
-
-                    if (value instanceof Serializable) {
-                        try {
-                            Serializable<?> serializable = Serializable.class.cast(value);
-                            value = serializable.getSerializer().deserialize(serializable.getToken(), child);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else if (CatalogType.class.isAssignableFrom(option.getType())) {
-                        Class<? extends CatalogType> clazz = (Class<? extends CatalogType>) option.getType();
-                        Optional<? extends CatalogType> type = Sponge.getRegistry().getType(clazz, child.getString());
-                        if (type.isPresent()) {
-                            value = type.get();
-                        }
-                    } else {
-                        value = child.getValue();
-                    }
-                }
-
-                if (option.accepts(value)) {
-                    brush.setOption(option, value);
-                }
-            }
-        }
-        return brush;
-    }
-
     public void setBrush(ItemType item, Brush brush) {
         brushes.put(item, brush);
     }
@@ -117,36 +73,16 @@ public class PlayerData {
     }
 
     @SuppressWarnings("unchecked")
+    public void load(Brush brush) {
+        ConfigurationNode node = root.getNode(brush.getType().getId());
+        Preset.read(brush, node);
+    }
+
+    @SuppressWarnings("unchecked")
     public void save() {
         for (Brush brush : brushes.values()) {
-            brush.getOptions().forEach((option, o) -> {
-                ConfigurationNode node = root.getNode(brush.getType().getId());
-                node.removeChild(option.getId());
-
-                Value def = option.getDefault();
-                if (def.isPresent() && def.get().equals(o)) {
-                    return;
-                }
-
-                ConfigurationNode value = node.getNode(option.getId());
-                if (o instanceof Serializable) {
-                    try {
-                        Serializable serializable = Serializable.class.cast(o);
-                        serializable.getSerializer().serialize(serializable.getToken(), o, value);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (o instanceof CatalogType) {
-                    CatalogType t = (CatalogType) o;
-                    value.setValue(t.getId());
-                } else {
-                    try {
-                        value.setValue(o);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            ConfigurationNode node = root.getNode(brush.getType().getId());
+            Preset.write(brush, node);
         }
         Utils.writeNode(loader, root);
     }
