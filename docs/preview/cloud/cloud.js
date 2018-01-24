@@ -105,7 +105,7 @@ function registerOptions(register) {
   }));
   register(createSlider('scale', 0, 100, 50, 100, (val) => {
     scale = val;
-    scaleFrequency = (1 - scale) * 0.1;
+    scaleFrequency = (1 - scale) * 0.125;
   }));
   register(createSlider('height', 4, 48, 16, 1, (val) => {
     height = val;
@@ -115,5 +115,5 @@ function registerOptions(register) {
 }
 
 function writeOutput(output) {
-  output.value = `/set ${frequency};${octaves};${shape.radius};${shape.feather};${opacity};${density};${scale};${height};${center}`;
+  output.value = `/wand parse ${frequency};${octaves};${shape.radius};${shape.feather};${opacity};${density};${scale};${height};${center}`;
 }

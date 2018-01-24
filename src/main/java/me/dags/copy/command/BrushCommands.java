@@ -121,6 +121,18 @@ public class BrushCommands {
     }
 
     @Permission
+    @Command("wand|w parse <options>")
+    @Description("Parse a raw options string")
+    public void parse(@Src Player player, @Join String raw) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent() && brush.get() instanceof Parsable) {
+            ((Parsable) brush.get()).parse(raw);
+            fmt.info("Parsed options:").tell(player);
+            options(player);
+        }
+    }
+
+    @Permission
     @Command("wand|w options")
     @Description("List all options and their values for the current wand")
     public void options(@Src Player player) {
@@ -150,18 +162,6 @@ public class BrushCommands {
             BrushType type = brush.get().getType();
             brush.get().setOption(option, value.get());
             fmt.info("Set ").stress(option).info("=").stress(value).info(" for brush ").stress(type).tell(player);
-        }
-    }
-
-    @Permission
-    @Command("set|s")
-    @Description("Parse a raw options string")
-    public void parse(@Src Player player, @Join String raw) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent() && brush.get() instanceof Parsable) {
-            ((Parsable) brush.get()).parse(raw);
-            fmt.info("Parsed options:").tell(player);
-            options(player);
         }
     }
 }

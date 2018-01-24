@@ -24,7 +24,10 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
@@ -32,22 +35,24 @@ import java.util.*;
 @Aliases({"cloud"})
 public class CloudBrush extends AbstractBrush implements Parsable {
 
-    public static final Option<Integer> SEED = Option.of("seed", 4);
-    public static final Option<Float> FREQUENCY = Option.of("frequency", 0.25F, Checks.range(0F, 1F));
+    public static final Option<Integer> SEED = Option.of("seed", 1);
+    public static final Option<Float> FREQUENCY = Option.of("frequency", 0.5F, Checks.range(0F, 1F));
     public static final Option<Integer> OCTAVES = Option.of("octaves", 4, Checks.range(1, 8));
-    public static final Option<Integer> RADIUS = Option.of("radius", 45, Checks.range(1, 96));
-    public static final Option<Float> FEATHER = Option.of("feather", 0.5F, Checks.range(0F, 1F));
-    public static final Option<Float> OPACITY = Option.of("opacity", 0.8F, Checks.range(0F, 1F));
-    public static final Option<Float> DENSITY = Option.of("density", 0.8F, Checks.range(0F, 1F));
-    public static final Option<Float> SCALE = Option.of("scale", 0.5F, Checks.range(0F, 1F));
-    public static final Option<Integer> HEIGHT = Option.of("height", 16, Checks.range(2, 48));
-    public static final Option<Float> CENTER = Option.of("center", 0.25F, Checks.range(0F, 1F));
-    public static final Option<Float> ROTATION = Option.of("rotation", 0F, Checks.range(-1F, 1F));
+    public static final Option<Integer> RADIUS = Option.of("radius", 38, Checks.range(1, 96));
+    public static final Option<Float> FEATHER = Option.of("feather", 0.4F, Checks.range(0F, 1F));
+    public static final Option<Float> OPACITY = Option.of("opacity", 0.5F, Checks.range(0F, 1F));
+    public static final Option<Float> DENSITY = Option.of("density", 0.6F, Checks.range(0F, 1F));
+    public static final Option<Float> SCALE = Option.of("scale", 0.1F, Checks.range(0F, 1F));
+    public static final Option<Integer> HEIGHT = Option.of("height", 10, Checks.range(2, 48));
+    public static final Option<Float> CENTER = Option.of("center", 0.3F, Checks.range(0F, 1F));
+    public static final Option<Float> INCLINE = Option.of("incline", 0F, Checks.range(-1F, 1F));
     public static final Option<Boolean> REPLACE_AIR = Option.of("air.replace", true);
     public static final Option<BlockType> MATERIAL = Trait.MATERIAL_OPTION;
     public static final Option<Trait> TRAIT = Trait.TRAIT_OPTION;
 
-    private List<BlockState> materials = Collections.emptyList();
+    private static final ImmutableList<BlockState> EMPTY = ImmutableList.copyOf(Collections.emptyList());
+
+    private ImmutableList<BlockState> materials = EMPTY;
     private BlockType type = BlockTypes.AIR;
     private Trait trait = new Trait("none");
     private float density = 0F;
@@ -59,7 +64,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
 
     @Override
     public List<Option<?>> getParseOptions() {
-        return Arrays.asList(FREQUENCY, OCTAVES, RADIUS, FEATHER, OPACITY, DENSITY, SCALE, HEIGHT, CENTER, ROTATION);
+        return Arrays.asList(FREQUENCY, OCTAVES, RADIUS, FEATHER, OPACITY, DENSITY, SCALE, HEIGHT, CENTER, INCLINE);
     }
 
     @Override
@@ -72,7 +77,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
             this.type = type;
             this.trait = trait;
             this.density = density;
-            this.materials = getVariants(type, trait.getName(), density);
+            this.materials = getVariants(type, trait.getName());
         }
 
         if (materials.size() <= 0) {
@@ -81,7 +86,7 @@ public class CloudBrush extends AbstractBrush implements Parsable {
         }
 
         Vector2f facing = Facing.getFacingF(player);
-        Cloud2 cloud = new Cloud2(this, materials, facing);
+        Cloud cloud = new Cloud(this, materials, facing);
         Filter filter = Filter.replaceAir(getOption(REPLACE_AIR));
         PlayerManager.getInstance().must(player).setOperating(true);
         Callback callback = Callback.of(player, history, filter, Filter.ANY, Translate.NONE);
@@ -94,28 +99,20 @@ public class CloudBrush extends AbstractBrush implements Parsable {
         return p -> new CloudBrush();
     }
 
-    private static List<BlockState> getVariants(BlockType type, String trait, float density) {
-        return type.getTrait(trait).map(t -> getVariants(type, t, density)).orElse(Collections.emptyList());
+    private static ImmutableList<BlockState> getVariants(BlockType type, String trait) {
+        return type.getTrait(trait).map(t -> getVariants(type, t)).orElse(EMPTY);
     }
 
-    private static List<BlockState> getVariants(BlockType type, BlockTrait<?> trait, float density) {
+    private static ImmutableList<BlockState> getVariants(BlockType type, BlockTrait<?> trait) {
         ImmutableList.Builder<BlockState> builder = ImmutableList.builder();
-        Collection<? extends Comparable<?>> values = trait.getPossibleValues();
-
-        // pad with air blocks according to the density
-        for (int i = Math.round(values.size() * (1 - density)); i > 0; i--) {
-            builder.add(BlockTypes.AIR.getDefaultState());
-        }
-
-        // fill with variants of the given trait, sorted
+        builder.add(BlockTypes.AIR.getDefaultState());
         BlockState baseState = type.getDefaultState();
-        values.stream()
+        trait.getPossibleValues().stream()
                 .sorted()
                 .map(value -> baseState.withTrait(trait, value))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(builder::add);
-
         return builder.build();
     }
 }
