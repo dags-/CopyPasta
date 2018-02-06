@@ -26,6 +26,8 @@ import java.util.function.Supplier;
 public class StencilCommands {
 
     @Command("stencil load <stencil>")
+    @Permission("copypasta.command.stencil.load")
+    @Description("Load a stencil from file and add to the stencil wand")
     public void load(@Src Player player, String name) {
         Optional<StencilBrush> brush = BrushCommands.getBrush(player, StencilBrush.class);
         if (brush.isPresent()) {
@@ -38,6 +40,8 @@ public class StencilCommands {
     }
 
     @Command("stencil save <stencil>")
+    @Permission("copypasta.command.stencil.save")
+    @Description("Save the stencil attached to your wand to file")
     public void save(@Src Player player, String name) {
         Optional<StencilBrush> brush = BrushCommands.getBrush(player, StencilBrush.class);
         if (brush.isPresent()) {
@@ -51,8 +55,8 @@ public class StencilCommands {
         }
     }
 
-    @Permission
     @Command("stencil <url> <samples> <threshold>")
+    @Permission("copypasta.command.stencil.create")
     @Description("Create a line stencil from an image at the given url")
     public void stencil(@Src Player player, String url, int samples, float threshold) {
         Optional<Brush> brush = BrushCommands.getBrush(player);

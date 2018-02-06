@@ -1,9 +1,13 @@
 package me.dags.copy.registry.brush;
 
 import com.google.common.collect.ImmutableList;
+import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.text.Text;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -47,6 +51,11 @@ public class BrushRegistry {
         for (String alias : aliases) {
             registry.put(alias, brushType);
         }
+
+        PermissionService service = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
+        service.newDescriptionBuilder(CopyPasta.getInstance()).ifPresent(builder -> builder.id(brushType.getPermission())
+                .description(Text.of("Allows use of the " + brushType.getId() + " wand"))
+                .register());
     }
 
     public Optional<BrushType> getById(String id) {

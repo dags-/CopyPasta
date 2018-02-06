@@ -1,6 +1,7 @@
 package me.dags.copy.command;
 
 import me.dags.commandbus.annotation.Command;
+import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
 import me.dags.copy.brush.schematic.SchematicBrush;
@@ -17,8 +18,9 @@ import java.util.Optional;
  */
 public class SchemCommands {
 
-    @Permission
     @Command("schem|sch clear")
+    @Permission("copypasta.command.schem.clear")
+    @Description("Remove all schematics from your wand")
     public void clear(@Src Player player) {
         Optional<SchematicBrush> brush = BrushCommands.getBrush(player, SchematicBrush.class);
         if (brush.isPresent()) {
@@ -27,14 +29,16 @@ public class SchemCommands {
         }
     }
 
-    @Permission
     @Command("schem|sch <path> <weight>")
+    @Permission("copypasta.command.schem.load")
+    @Description("Load all schematics from the given path onto your wand")
     public void schem(@Src Player player, Collection<SchematicEntry> entries) {
         schem(player, entries, 1D);
     }
 
-    @Permission
     @Command("schem|sch <path> <weight>")
+    @Permission("copypasta.command.schem.load")
+    @Description("Load all schematics from the given path onto your wand with the given weight")
     public void schem(@Src Player player, Collection<SchematicEntry> entries, double weight) {
         Optional<SchematicBrush> brush = BrushCommands.getBrush(player, SchematicBrush.class);
         if (brush.isPresent()) {

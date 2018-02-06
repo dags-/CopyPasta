@@ -17,8 +17,8 @@ import java.util.Optional;
  */
 public class MapperCommands {
 
-    @Permission
     @Command("mapper|map clear")
+    @Permission("copypasta.command.map")
     @Description("Remove any re-mappers assigned to the wand")
     public void clear(@Src Player player) {
         Optional<Brush> brush = getMapperBrush(player);
@@ -28,8 +28,8 @@ public class MapperCommands {
         }
     }
 
-    @Permission
     @Command("mapper|map")
+    @Permission("copypasta.command.map")
     @Description("Add a new re-mapper to the wand")
     public void mapper(@Src Player player, State.Mapper mapper) {
         Optional<Brush> brush = getMapperBrush(player);

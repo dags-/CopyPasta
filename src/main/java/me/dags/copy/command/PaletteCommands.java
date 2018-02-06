@@ -1,6 +1,7 @@
 package me.dags.copy.command;
 
 import me.dags.commandbus.annotation.Command;
+import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
 import me.dags.copy.brush.Brush;
@@ -16,8 +17,9 @@ import java.util.Optional;
  */
 public class PaletteCommands {
 
-    @Permission
     @Command("palette clear")
+    @Permission("copypasta.command.palette.clear")
+    @Description("Remove all materials from the current wand's palette")
     public void paletteClear(@Src Player player) {
         Optional<Brush> brush = getPaletteBrush(player);
         if (brush.isPresent()) {
@@ -26,8 +28,9 @@ public class PaletteCommands {
         }
     }
 
-    @Permission
     @Command("palette reset")
+    @Permission("copypasta.command.palette.reset")
+    @Description("Reset the current wand's palette to wool")
     public void paletteReset(@Src Player player) {
         Optional<Brush> brush = getPaletteBrush(player);
         if (brush.isPresent()) {
@@ -36,14 +39,16 @@ public class PaletteCommands {
         }
     }
 
-    @Permission
     @Command("palette <blockstate> <weight>")
+    @Permission("copypasta.command.palette.add")
+    @Description("Add a material to the current wand's palette")
     public void stencilPalette(@Src Player player, BlockState block) {
         stencilMaterial(player, block, 1D);
     }
 
-    @Permission
     @Command("palette <blockstate> <weight>")
+    @Permission("copypasta.command.palette.add")
+    @Description("Add a weighted material to the current wand's palette")
     public void stencilMaterial(@Src Player player, BlockState block, double weight) {
         Optional<Brush> brush = getPaletteBrush(player);
         if (brush.isPresent()) {

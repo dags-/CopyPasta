@@ -54,8 +54,8 @@ public class BrushCommands {
         return brush;
     }
 
-    @Permission
     @Command("wand|w <wand>")
+    @Permission("copypasta.command.wand")
     @Description("Bind the <wand> to your held item")
     public void brush(@Src Player player, BrushType type) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
@@ -78,8 +78,8 @@ public class BrushCommands {
 
     }
 
-    @Permission
     @Command("wand|w reset")
+    @Permission("copypasta.command.wand")
     @Description("Reset all options for your current wand to their defaults")
     public void reset(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
@@ -89,8 +89,8 @@ public class BrushCommands {
         }
     }
 
-    @Permission
     @Command("wand|w remove")
+    @Permission("copypasta.command.wand")
     @Description("Remove the <wand> from your held item")
     public void remove(@Src Player player) {
         ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(ItemTypes.NONE);
@@ -111,8 +111,8 @@ public class BrushCommands {
     }
 
     @Flag("a")
-    @Permission
     @Command("wand|w list")
+    @Permission("copypasta.command.wand")
     @Description("List all wand types")
     public void list(@Src CommandSource source, Flags flags) {
         boolean aliases = flags.has("a");
@@ -125,8 +125,8 @@ public class BrushCommands {
         page.sort(true).build().sendTo(source);
     }
 
-    @Permission
     @Command("wand|w parse <options>")
+    @Permission("copypasta.command.wand")
     @Description("Parse a raw options string")
     public void parse(@Src Player player, @Join String raw) {
         Optional<Brush> brush = getBrush(player);
@@ -137,8 +137,8 @@ public class BrushCommands {
         }
     }
 
-    @Permission
     @Command("wand|w options")
+    @Permission("copypasta.command.wand")
     @Description("List all options and their values for the current wand")
     public void options(@Src Player player) {
         Optional<Brush> brush = getBrush(player);
@@ -158,8 +158,8 @@ public class BrushCommands {
         }
     }
 
-    @Permission
     @Command("set|s <option> <value>")
+    @Permission("copypasta.command.set")
     @Description("Set an option for your current wand")
     public void option(@Src Player player, Option<?> option, Value<?> value) {
         Optional<Brush> brush = getBrush(player);
