@@ -1,6 +1,5 @@
 package me.dags.copy.operation.phase;
 
-import me.dags.copy.PlayerManager;
 import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.event.PlaceEvent;
@@ -36,7 +35,10 @@ public class Test {
             if (!player.isPresent()) {
                 return Operation.Phase.CANCELLED;
             }
-            cause = PlayerManager.getCause(player.get());
+            cause = Cause.source(player.get())
+                    .notifier(player.get())
+                    .owner(player.get())
+                    .build();
         }
 
         if (iterator == null) {

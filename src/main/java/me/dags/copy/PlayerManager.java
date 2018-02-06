@@ -5,7 +5,6 @@ import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.nio.file.Path;
@@ -77,12 +76,5 @@ public class PlayerManager {
 
     public static PlayerManager getInstance() {
         return INSTANCE;
-    }
-
-    public static Cause getCause(Player player) {
-        return Cause.source(getInstance().container)
-                .notifier(player)
-                .owner(player)
-                .build();
     }
 }
