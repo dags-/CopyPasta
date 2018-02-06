@@ -54,8 +54,8 @@ public class VolumeMapper {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {
                     BlockState state = source.getBlock(x, y, z);
                     int relX = x - origin.getX();
-                    int relY = y - origin.getX();
-                    int relZ = z - origin.getX();
+                    int relY = y - origin.getY();
+                    int relZ = z - origin.getZ();
                     visit(state, relX, relY, relZ, buffer);
                 }
             }
@@ -69,13 +69,6 @@ public class VolumeMapper {
             state = mapper.map(state);
         }
 
-        if (angle != 0) {
-            int rx = rotateY(x, z, radians, -1);
-            int rz = rotateY(z, x, radians, 1);
-            x = rx;
-            z = rz;
-        }
-
         if (flipY) {
             y = -y;
             y += getFlipYOffset(state);
@@ -87,6 +80,13 @@ public class VolumeMapper {
 
         if (flipZ) {
             z = -z;
+        }
+
+        if (angle != 0) {
+            int rx = rotateY(x, z, radians, -1);
+            int rz = rotateY(z, x, radians, 1);
+            x = rx;
+            z = rz;
         }
 
         buffer.addRelative(state, x, y, z);

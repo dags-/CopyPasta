@@ -67,11 +67,10 @@ public class Clipboard {
     }
 
     public static Clipboard of(Player player, Vector3i min, Vector3i max, Vector3i origin) {
-        Vector3i offset = min.sub(origin);
         Facing verticalFacing = Facing.getVertical(player);
         Facing horizontalFacing = Facing.getHorizontal(player);
         BlockVolume backing = player.getWorld().getBlockView(min, max).getRelativeBlockView();
-        return new Clipboard(backing.getImmutableBlockCopy(), offset, horizontalFacing, verticalFacing);
+        return new Clipboard(backing.getImmutableBlockCopy(), origin.sub(min), horizontalFacing, verticalFacing);
     }
 
     public static Clipboard stencil(Player player, ImmutableBlockVolume volume, Vector3i origin) {

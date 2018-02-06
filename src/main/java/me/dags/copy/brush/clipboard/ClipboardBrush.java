@@ -10,6 +10,7 @@ import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
 import me.dags.copy.block.volume.VolumeMapper;
 import me.dags.copy.brush.*;
+import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
@@ -27,6 +28,7 @@ public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
 
+    public static final Option<Integer> SELECT_RANGE = Option.of("range", 128, Checks.range(1, 256));
     public static final Option<Boolean> FLIPX = Option.of("flip.x", false);
     public static final Option<Boolean> FLIPY = Option.of("flip.y", false);
     public static final Option<Boolean> FLIPZ = Option.of("flip.z", false);

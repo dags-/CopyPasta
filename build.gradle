@@ -8,10 +8,6 @@ version '0.3.1-SNAPSHOT'
 def spongeAPI = '5.2.0'
 def spongeChannel = 'SNAPSHOT'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
-}
-
 configurations {
     compile.extendsFrom shadow
 }

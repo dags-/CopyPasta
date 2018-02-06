@@ -15,18 +15,20 @@ import java.util.Optional;
  */
 public class Stencil implements IgnoreSerialization {
 
-    static final Stencil EMPTY = new Stencil(new BitSet(0), 0, 0);
+    static final Stencil EMPTY = new Stencil("none", new BitSet(0), 0, 0);
 
+    private final String description;
     private final BitSet pixels;
     private final Vector3i offset;
     private final int width;
     private final int height;
 
-    private Stencil(BitSet pixels, int width, int height) {
+    private Stencil(String description, BitSet pixels, int width, int height) {
+        this.description = description;
         this.pixels = pixels;
         this.width = width;
         this.height = height;
-        this.offset = new Vector3i(-width / 2, 0, -height / 2);
+        this.offset = new Vector3i(width / 2, 0, height / 2);
     }
 
     public boolean isPresent() {
@@ -50,9 +52,15 @@ public class Stencil implements IgnoreSerialization {
         return index > -1 && index < pixels.size() && pixels.get(index);
     }
 
+    @Override
+    public String toString() {
+        return description;
+    }
+
     public static void write(Stencil stencil, OutputStream outputStream) throws IOException {
         try (DataOutputStream out = new DataOutputStream(outputStream)) {
             byte[] pixels = stencil.pixels.toByteArray();
+            out.writeUTF(stencil.description);
             out.writeInt(stencil.width);
             out.writeInt(stencil.height);
             out.writeInt(pixels.length);
@@ -62,26 +70,28 @@ public class Stencil implements IgnoreSerialization {
 
     public static Stencil read(InputStream inputStream) throws IOException {
         try (DataInputStream in = new DataInputStream(inputStream)) {
+            String desc = in.readUTF();
             int width = in.readInt();
             int height = in.readInt();
             int len = in.readInt();
             byte[] pixels = new byte[len];
             in.readFully(pixels);
-            return new Stencil(BitSet.valueOf(pixels), width, height);
+            return new Stencil(desc, BitSet.valueOf(pixels), width, height);
         }
     }
 
     public static Optional<Stencil> fromUrl(String url, int samples, float threshold) {
         try {
-            return Optional.of(readStencil(read(url), samples, threshold));
+            return Optional.of(readStencil(url, read(url), samples, threshold));
         } catch (IOException e) {
             return Optional.empty();
         }
     }
 
-    private static Stencil readStencil(BufferedImage image, int samples, float threshold) {
+    private static Stencil readStencil(String url, BufferedImage image, int samples, float threshold) {
         int width = image.getWidth() / samples;
         int height = image.getHeight() / samples;
+        String desc = String.format("%s %s %.2f", getImageName(url), samples, threshold);
         BitSet pixels = new BitSet(width * height);
 
         for (int y = 0; y < width; y++) {
@@ -108,7 +118,15 @@ public class Stencil implements IgnoreSerialization {
             }
         }
 
-        return new Stencil(pixels, width, height);
+        return new Stencil(desc, pixels, width, height);
+    }
+
+    private static String getImageName(String url) {
+        int last = url.lastIndexOf('/');
+        if (last == url.length()) {
+            last = url.lastIndexOf('/', last);
+        }
+        return url.substring(last + 1);
     }
 
     private static BufferedImage read(String url) throws IOException {

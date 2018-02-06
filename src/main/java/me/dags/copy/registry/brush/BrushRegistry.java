@@ -44,18 +44,12 @@ public class BrushRegistry {
         }
 
         String[] aliases = type.isAnnotationPresent(Aliases.class) ? type.getAnnotation(Aliases.class).value() : new String[]{type.getSimpleName().toLowerCase()};
-
         BrushType brushType = BrushType.of(aliases[0], type, supplier, options.build());
         types.put(type, brushType);
 
         for (String alias : aliases) {
             registry.put(alias, brushType);
         }
-
-        PermissionService service = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
-        service.newDescriptionBuilder(CopyPasta.getInstance()).ifPresent(builder -> builder.id(brushType.getPermission())
-                .description(Text.of("Allows use of the " + brushType.getId() + " wand"))
-                .register());
     }
 
     public Optional<BrushType> getById(String id) {
@@ -72,6 +66,17 @@ public class BrushRegistry {
 
     public Stream<String> getAliases() {
         return registry.keySet().stream();
+    }
+
+    public void registerPermissions() {
+        PermissionService service = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
+        for (BrushType type : types.values()) {
+            service.newDescriptionBuilder(CopyPasta.getInstance()).ifPresent(builder -> {
+                builder.id(type.getId());
+                builder.description(Text.of("Allows use of the ", type.getId(), " wand"));
+                builder.register();
+            });
+        }
     }
 
     public static BrushRegistry getInstance() {

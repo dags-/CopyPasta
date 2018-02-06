@@ -17,6 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -70,6 +71,11 @@ public class CopyPasta {
         BrushElements.getCommandBus(this).registerPackage(false, BrushCommands.class).submit();
         Mappers.init();
         SchematicRegistry.getInstance();
+    }
+
+    @Listener
+    public void post(GamePostInitializationEvent event) {
+        BrushRegistry.getInstance().registerPermissions();
     }
 
     @Listener
