@@ -51,7 +51,7 @@ public class ReplaceBrush extends AbstractBrush {
         BlockVolume relativeView = extent.getBlockView(min, max).getRelativeBlockView();
         ImmutableBlockVolume source = relativeView.getImmutableBlockCopy();
 
-        VolumeMapper mapper = new VolumeMapper(0, false, false, false, rules);
+        VolumeMapper mapper = new VolumeMapper(Vector3i.ZERO, 0, false, false, false, rules);
         Callback callback = Callback.of(player, history, Filter.ANY, Filter.ANY, Translate.NONE);
         Runnable task = mapper.createTask(source, position, player.getUniqueId(), callback);
         CopyPasta.getInstance().submitAsync(task);

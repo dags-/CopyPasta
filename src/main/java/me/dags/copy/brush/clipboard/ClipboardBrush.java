@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
+import me.dags.copy.block.Mappers;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
@@ -126,27 +127,27 @@ public class ClipboardBrush extends AbstractBrush {
             flipZ = RANDOM.nextBoolean();
         }
 
-        MapperSet remappers = getOption(ClipboardBrush.MAPPER_SET);
+        MapperSet mapperSet = getOption(ClipboardBrush.MAPPER_SET);
         ImmutableList.Builder<State.Mapper> mappers = ImmutableList.builder();
-        mappers.addAll(remappers);
+        mappers.addAll(mapperSet);
 
         if (angle != 0) {
-            mappers.add(me.dags.copy.block.Mappers.getRotationY(angle));
+            mappers.add(Mappers.getRotationY(angle));
         }
 
         if (flipX) {
-            mappers.add(me.dags.copy.block.Mappers.getFlipX());
+            mappers.add(Mappers.getFlipX());
         }
 
         if (flipY) {
-            mappers.add(me.dags.copy.block.Mappers.getFlipY());
+            mappers.add(Mappers.getFlipY());
         }
 
         if (flipZ) {
-            mappers.add(me.dags.copy.block.Mappers.getFlipZ());
+            mappers.add(Mappers.getFlipZ());
         }
 
-        return new VolumeMapper(angle, flipX, flipY, flipZ, mappers.build());
+        return new VolumeMapper(clipboard.getOrigin(), angle, flipX, flipY, flipZ, mappers.build());
     }
 
     public static BrushSupplier supplier() {

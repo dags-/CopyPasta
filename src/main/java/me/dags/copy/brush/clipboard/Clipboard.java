@@ -42,6 +42,10 @@ public class Clipboard {
         return this != EMPTY;
     }
 
+    public Vector3i getOrigin() {
+        return origin;
+    }
+
     public Facing getHorizontalFacing() {
         return horizontalFacing;
     }
@@ -50,11 +54,8 @@ public class Clipboard {
         return verticalFacing;
     }
 
-    public void paste(Player player, History history, Vector3i pos, VolumeMapper volumeMapper, Filter from, Filter to, Translate translate) {
+    public void paste(Player player, History history, Vector3i position, VolumeMapper volumeMapper, Filter from, Filter to, Translate translate) {
         if (isPresent()) {
-            Vector3i originOffset = volumeMapper.apply(origin); // rotate origin
-            Vector3i volumeOffset = volumeMapper.volumeOffset(source); // rotate volume, find min
-            Vector3i position = pos.add(originOffset).add(volumeOffset); // accept offsets to paste position
             Callback callback = Callback.of(player, history, from, to, translate);
             Runnable task = volumeMapper.createTask(source, position, player.getUniqueId(), callback);
             CopyPasta.getInstance().submitAsync(task);

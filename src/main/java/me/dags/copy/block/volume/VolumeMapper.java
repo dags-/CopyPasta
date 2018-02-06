@@ -5,7 +5,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import me.dags.copy.block.state.State;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 
 import java.util.Collection;
@@ -22,25 +21,21 @@ public class VolumeMapper {
     private final boolean flipX;
     private final boolean flipY;
     private final boolean flipZ;
+    private final Vector3i origin;
     private final Collection<State.Mapper> mappers;
 
-    public VolumeMapper(int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
+    public VolumeMapper(Vector3i origin, int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
         this.angle = angle;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
         this.flipZ = z;
         this.mappers = mappers;
+        this.origin = origin;
     }
 
     public Runnable createTask(ImmutableBlockVolume source, Vector3i position, UUID owner, FutureCallback<BufferView> callback) {
         return new Task(source, position, owner, callback);
-    }
-
-    public Vector3i volumeOffset(BlockVolume volume) {
-        Vector3i pos1 = apply(volume.getBlockMin());
-        Vector3i pos2 = apply(volume.getBlockMax());
-        return pos1.min(pos2);
     }
 
     public BufferView apply(ImmutableBlockVolume source, Vector3i position, UUID owner) {
@@ -58,7 +53,10 @@ public class VolumeMapper {
             for (int z = source.getBlockMin().getZ(); z <= source.getBlockMax().getZ(); z++) {
                 for (int x = source.getBlockMin().getX(); x <= source.getBlockMax().getX(); x++) {
                     BlockState state = source.getBlock(x, y, z);
-                    visit(state, x, y, z, buffer, min, max);
+                    int relX = x - origin.getX();
+                    int relY = y - origin.getX();
+                    int relZ = z - origin.getX();
+                    visit(state, relX, relY, relZ, buffer);
                 }
             }
         }
@@ -66,7 +64,7 @@ public class VolumeMapper {
         return buffer.getView();
     }
 
-    private void visit(BlockState state, int x, int y, int z, BufferBuilder buffer, Vector3i min, Vector3i max) {
+    private void visit(BlockState state, int x, int y, int z, BufferBuilder buffer) {
         for (State.Mapper mapper : mappers) {
             state = mapper.map(state);
         }
@@ -74,21 +72,21 @@ public class VolumeMapper {
         if (angle != 0) {
             int rx = rotateY(x, z, radians, -1);
             int rz = rotateY(z, x, radians, 1);
-            x = rx - min.getX();
-            z = rz - min.getZ();
+            x = rx;
+            z = rz;
         }
 
         if (flipY) {
-            y = max.getY() - y;
+            y = -y;
             y += getFlipYOffset(state);
         }
 
         if (flipX) {
-            x = max.getX() - x;
+            x = -x;
         }
 
         if (flipZ) {
-            z = max.getZ() - z;
+            z = -z;
         }
 
         buffer.addRelative(state, x, y, z);
