@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Brush;
+import me.dags.copy.brush.BrushType;
 import me.dags.copy.brush.option.Option;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.permission.PermissionService;

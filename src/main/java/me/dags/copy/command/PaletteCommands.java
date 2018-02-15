@@ -5,7 +5,7 @@ import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
 import me.dags.copy.brush.Brush;
-import me.dags.copy.brush.Palette;
+import me.dags.copy.brush.option.value.Palette;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.entity.living.player.Player;

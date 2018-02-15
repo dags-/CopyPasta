@@ -1,8 +1,6 @@
 package me.dags.copy.util;
 
 import me.dags.commandbus.command.Input;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.DataTranslators;
@@ -14,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author dags <dags@dags.me>
@@ -42,34 +39,6 @@ public class Utils {
             e.printStackTrace();
         }
         return p;
-    }
-
-    public static Path ensure(Path root, String... path) {
-        Path p0 = Paths.get(root.toAbsolutePath().toString(), path);
-        try {
-            Files.createDirectories(p0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return p0;
-    }
-
-    public static ConfigurationNode getRootNode(HoconConfigurationLoader loader) {
-        try {
-            return loader.load();
-        } catch (IOException e) {
-            ConfigurationNode node = loader.createEmptyNode();
-            writeNode(loader, node);
-            return node;
-        }
-    }
-
-    public static void writeNode(HoconConfigurationLoader loader, ConfigurationNode node) {
-        try {
-            loader.save(node);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void convertLegacySchematic(Path dir, boolean recurse) {

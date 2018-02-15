@@ -9,9 +9,14 @@ import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.state.State;
 import me.dags.copy.block.volume.VolumeMapper;
-import me.dags.copy.brush.*;
-import me.dags.copy.brush.option.Checks;
+import me.dags.copy.brush.AbstractBrush;
+import me.dags.copy.brush.Action;
+import me.dags.copy.brush.Aliases;
+import me.dags.copy.brush.History;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.brush.option.value.Flip;
+import me.dags.copy.brush.option.value.MapperSet;
+import me.dags.copy.brush.option.value.Translation;
 import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
@@ -28,12 +33,7 @@ public class ClipboardBrush extends AbstractBrush {
 
     protected static final Random RANDOM = new Random();
 
-    public static final Option<Integer> SELECT_RANGE = Option.of("range", 128, Checks.range(1, 256));
-    public static final Option<Boolean> FLIPX = Option.of("flip.x", false);
-    public static final Option<Boolean> FLIPY = Option.of("flip.y", false);
-    public static final Option<Boolean> FLIPZ = Option.of("flip.z", false);
-    public static final Option<Boolean> AUTO_FLIP = Option.of("flip.auto", true);
-    public static final Option<Boolean> RANDOM_FLIPH = Option.of("flip.random", false);
+    public static final Option<Flip> FLIP = Flip.OPTION;
     public static final Option<Boolean> AUTO_ROTATE = Option.of("rotate.auto", true);
     public static final Option<Boolean> RANDOM_ROTATE = Option.of("rotate.random", false);
     public static final Option<Boolean> PASTE_AIR = Option.of("air.paste", false);
@@ -107,9 +107,10 @@ public class ClipboardBrush extends AbstractBrush {
         Facing pvFacing = Facing.getVertical(player);
 
         int angle = 0;
-        boolean flipX = getOption(FLIPX);
-        boolean flipY = getOption(FLIPY);
-        boolean flipZ = getOption(FLIPZ);
+        Flip flip = getOption(FLIP);
+        boolean flipX = flip.flipX();
+        boolean flipY = flip.flipY();
+        boolean flipZ = flip.flipZ();
 
         if (getOption(AUTO_ROTATE)) {
             angle = clipboard.getHorizontalFacing().angle(phFacing, Axis.y);
@@ -120,11 +121,11 @@ public class ClipboardBrush extends AbstractBrush {
             angle = turns * 90;
         }
 
-        if (getOption(AUTO_FLIP) && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
+        if (flip.auto() && pvFacing != Facing.none && clipboard.getVerticalFacing() != Facing.none) {
             flipY = pvFacing != clipboard.getVerticalFacing();
         }
 
-        if (getOption(RANDOM_FLIPH)) {
+        if (flip.random()) {
             flipX = RANDOM.nextBoolean();
             flipZ = RANDOM.nextBoolean();
         }

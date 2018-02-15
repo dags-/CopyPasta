@@ -1,7 +1,8 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
-import me.dags.copy.brush.Palette;
+import me.dags.copy.brush.option.value.Palette;
+import me.dags.copy.brush.option.value.Stencil;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;

@@ -30,4 +30,24 @@ public interface OptionValueParser {
         }
         return Optional.empty();
     }
+
+    default Brush brush(Context context, Option<?> option) throws CommandException {
+        Optional<Player> source = context.getSource(Player.class);
+        if (!source.isPresent()) {
+            throw new CommandException("No player present");
+        }
+
+        Player player = source.get();
+        Optional<Brush> br = PlayerManager.getInstance().get(player).flatMap(data -> data.getBrush(player));
+        if (!br.isPresent()) {
+            throw new CommandException("No brush present");
+        }
+
+        Brush brush = br.get();
+        if (!brush.supports(option)) {
+            throw new CommandException("Brush '%s' does not support option '%s'", brush.getType(), option);
+        }
+
+        return brush;
+    }
 }

@@ -2,12 +2,11 @@ package me.dags.copy;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
+import me.dags.config.Config;
+import me.dags.config.Node;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.Preset;
-import me.dags.copy.util.Utils;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -25,19 +24,13 @@ public class PlayerData {
 
     private static final ConfigurationOptions options = ConfigurationOptions.defaults().setShouldCopyDefaults(true);
     private final Map<ItemType, Brush> brushes = Maps.newHashMap();
-    private final HoconConfigurationLoader loader;
-    private final ConfigurationNode root;
+    private final Config root;
 
     private boolean operating = false;
     private Stopwatch coolDown = Stopwatch.createStarted();
 
     public PlayerData(Path path) {
-        loader = HoconConfigurationLoader.builder()
-                .setDefaultOptions(options)
-                .setPath(path)
-                .build();
-
-        root = Utils.getRootNode(loader);
+        root = Config.must(path);
     }
 
     public boolean isCoolingDown() {
@@ -72,18 +65,16 @@ public class PlayerData {
         brushes.remove(type);
     }
 
-    @SuppressWarnings("unchecked")
     public void load(Brush brush) {
-        ConfigurationNode node = root.getNode(brush.getType().getId());
+        Node node = root.node(brush.getType().getId());
         Preset.read(brush, node);
     }
 
-    @SuppressWarnings("unchecked")
     public void save() {
         for (Brush brush : brushes.values()) {
-            ConfigurationNode node = root.getNode(brush.getType().getId());
+            Node node = root.node(brush.getType().getId());
             Preset.write(brush, node);
         }
-        Utils.writeNode(loader, root);
+        root.save();
     }
 }

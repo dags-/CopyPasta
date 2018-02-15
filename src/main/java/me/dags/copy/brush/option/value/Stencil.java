@@ -1,4 +1,4 @@
-package me.dags.copy.brush.stencil;
+package me.dags.copy.brush.option.value;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.dags.copy.util.IgnoreSerialization;
@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public class Stencil implements IgnoreSerialization {
 
-    static final Stencil EMPTY = new Stencil("none", new BitSet(0), 0, 0);
+    public static final Stencil EMPTY = new Stencil("none", new BitSet(0), 0, 0);
 
     private final String description;
     private final BitSet pixels;

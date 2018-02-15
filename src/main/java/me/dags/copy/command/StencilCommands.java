@@ -6,7 +6,7 @@ import me.dags.commandbus.annotation.Permission;
 import me.dags.commandbus.annotation.Src;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.Brush;
-import me.dags.copy.brush.stencil.Stencil;
+import me.dags.copy.brush.option.value.Stencil;
 import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;

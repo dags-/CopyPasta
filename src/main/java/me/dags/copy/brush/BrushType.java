@@ -1,8 +1,10 @@
-package me.dags.copy.registry.brush;
+package me.dags.copy.brush;
 
+import me.dags.config.Node;
 import me.dags.copy.PlayerManager;
-import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.registry.brush.BrushRegistry;
+import me.dags.copy.registry.brush.BrushSupplier;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
@@ -13,9 +15,9 @@ import java.util.Optional;
 /**
  * @author dags <dags@dags.me>
  */
-public class BrushType {
+public class BrushType implements Node.Value<BrushType> {
 
-    static final BrushType NONE = new BrushType();
+    public static final BrushType NONE = new BrushType();
 
     private final String name;
     private final String permission;
@@ -79,6 +81,17 @@ public class BrushType {
 
     public String getPermission() {
         return permission;
+    }
+
+    @Override
+    public BrushType fromNode(Node node) {
+        String id = node.get("");
+        return BrushRegistry.getInstance().getById(id).orElse(NONE);
+    }
+
+    @Override
+    public void toNode(Node node) {
+        node.set(getId());
     }
 
     @Override

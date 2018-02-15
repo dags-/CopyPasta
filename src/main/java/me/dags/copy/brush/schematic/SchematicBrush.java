@@ -7,6 +7,7 @@ import me.dags.copy.brush.Action;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.option.Option;
+import me.dags.copy.brush.option.value.SchematicList;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.registry.schematic.CachedSchematic;
 import me.dags.copy.registry.schematic.Repository;
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
 @Aliases({"schematic", "schem"})
 public class SchematicBrush extends ClipboardBrush {
 
-    public static final Option<SchematicList> SCHEMATICS = Option.of("schematics", SchematicList.class, SchematicList::new);
+    public static final Option<SchematicList> SCHEMATICS = SchematicList.OPTION;
     public static final Option<Mode> MODE = Option.of("mode", Mode.SAVE);
     public static final Option<String> NAME = Option.of("name", "schem");
     public static final Option<String> DIR = Option.of("dir", "");

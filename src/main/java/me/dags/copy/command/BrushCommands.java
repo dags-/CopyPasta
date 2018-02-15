@@ -6,11 +6,11 @@ import me.dags.commandbus.fmt.PagFormatter;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
+import me.dags.copy.brush.BrushType;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Parsable;
 import me.dags.copy.brush.option.Value;
 import me.dags.copy.registry.brush.BrushRegistry;
-import me.dags.copy.registry.brush.BrushType;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.HandTypes;
@@ -26,33 +26,6 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 public class BrushCommands {
-
-    static  <T extends Brush> Optional<T> getBrush(Player player, Class<T> type) {
-        Optional<Brush> brush = getBrush(player);
-        if (brush.isPresent()) {
-            if (type.isInstance(brush.get())) {
-                return brush.map(type::cast);
-            }
-            fmt.error("Current brush is not a %s", type.getSimpleName());
-        }
-        return Optional.empty();
-    }
-
-    static Optional<Brush> getBrush(Player player) {
-        Optional<ItemType> item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
-        if (!item.isPresent()) {
-            fmt.error("You are not holding an item").tell(player);
-            return Optional.empty();
-        }
-
-        Optional<Brush> brush = PlayerManager.getInstance().get(player).flatMap(data -> data.getBrush(player));
-        if (!brush.isPresent()) {
-            fmt.error("You have not bound a brush to item %s", item.get().getName()).tell(player);
-            return Optional.empty();
-        }
-
-        return brush;
-    }
 
     @Command("wand|w <wand>")
     @Permission("copypasta.command.wand")
@@ -168,5 +141,32 @@ public class BrushCommands {
             brush.get().setOption(option, value.get());
             fmt.info("Set ").stress(option).info("=").stress(value).info(" for brush ").stress(type).tell(player);
         }
+    }
+
+    static  <T extends Brush> Optional<T> getBrush(Player player, Class<T> type) {
+        Optional<Brush> brush = getBrush(player);
+        if (brush.isPresent()) {
+            if (type.isInstance(brush.get())) {
+                return brush.map(type::cast);
+            }
+            fmt.error("Current brush is not a %s", type.getSimpleName());
+        }
+        return Optional.empty();
+    }
+
+    static Optional<Brush> getBrush(Player player) {
+        Optional<ItemType> item = player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem);
+        if (!item.isPresent()) {
+            fmt.error("You are not holding an item").tell(player);
+            return Optional.empty();
+        }
+
+        Optional<Brush> brush = PlayerManager.getInstance().get(player).flatMap(data -> data.getBrush(player));
+        if (!brush.isPresent()) {
+            fmt.error("You have not bound a brush to item %s", item.get().getName()).tell(player);
+            return Optional.empty();
+        }
+
+        return brush;
     }
 }

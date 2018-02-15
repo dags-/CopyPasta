@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.Location;
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * @author dags <dags@dags.me>
  */
-public class PlaceEvent extends AbstractEvent implements BrushEvent {
+public class PlaceEvent extends AbstractEvent implements ChangeBlockEvent.Place {
 
     private final Cause cause;
     private final World world;
@@ -31,6 +32,7 @@ public class PlaceEvent extends AbstractEvent implements BrushEvent {
         this.world = world;
         this.view = view;
     }
+
     @Override
     public List<Transaction<BlockSnapshot>> getTransactions() {
         if (transactions == null) {

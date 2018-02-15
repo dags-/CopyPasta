@@ -8,7 +8,6 @@ import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.OptionHolder;
 import me.dags.copy.registry.brush.BrushRegistry;
-import me.dags.copy.registry.brush.BrushType;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
 

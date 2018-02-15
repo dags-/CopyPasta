@@ -6,8 +6,8 @@ import me.dags.commandbus.command.Input;
 import me.dags.commandbus.element.ChainElement;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
+import me.dags.copy.brush.BrushType;
 import me.dags.copy.brush.option.Option;
-import me.dags.copy.registry.brush.BrushType;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
