@@ -79,6 +79,23 @@ public class Flip implements Node.Value<Flip> {
 
     @Override
     public String toString() {
-        return "x=" + x + ", y=" + y + ", z=" + z;
+        StringBuilder sb = new StringBuilder();
+        append(sb, x, "x");
+        append(sb, y, "y");
+        append(sb, z, "z");
+        append(sb, auto, "auto");
+        append(sb, random, "random");
+        append(sb, sb.length() == 0, "none");
+        return sb.toString();
+    }
+
+    private static void append(StringBuilder sb, boolean predicate, String next) {
+        if (!predicate) {
+            return;
+        }
+        if (sb.length() > 0) {
+            sb.append(",");
+        }
+        sb.append(next);
     }
 }

@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(id = CopyPasta.ID, name = "CopyPasta", version = "0.3.1", description = "copy and paste things")
+@Plugin(id = CopyPasta.ID)
 public class CopyPasta {
 
     public static final String ID = "copypasta";

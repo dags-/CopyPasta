@@ -7,6 +7,8 @@ import me.dags.commandbus.element.ChainElement;
 import me.dags.copy.block.Trait;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.Value;
+import me.dags.copy.brush.option.value.Flip;
+import me.dags.copy.command.parser.FlipParser;
 import me.dags.copy.command.parser.OptionValueParser;
 import me.dags.copy.command.parser.ToggleBoolParser;
 import me.dags.copy.command.parser.TraitParser;
@@ -51,6 +53,7 @@ public class OptionValueElement extends ChainElement<Option, Value<?>> {
 
     private static Map<Class<?>, OptionValueParser> getParsers() {
         return new HashMap<Class<?>, OptionValueParser>(){{
+            put(Flip.class, new FlipParser());
             put(Trait.class, new TraitParser());
             put(Boolean.class, new ToggleBoolParser());
         }};
