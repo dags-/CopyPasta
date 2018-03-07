@@ -45,10 +45,10 @@ public class FlipParser implements OptionValueParser {
                     flip.setX(!flip.flipX());
                     break;
                 case y:
-                    flip.setX(!flip.flipY());
+                    flip.setY(!flip.flipY());
                     break;
                 case z:
-                    flip.setX(!flip.flipZ());
+                    flip.setZ(!flip.flipZ());
                     break;
             }
         }
@@ -88,36 +88,27 @@ public class FlipParser implements OptionValueParser {
 
     private static void parse(String input, Flip flip) throws CommandException {
         switch (input) {
-            case "r":
             case "rand":
             case "random":
                 flip.setRandom(!flip.random());
                 return;
-            case "a":
             case "auto":
                 flip.setAuto(!flip.auto());
                 return;
-            case "n":
-            case "s":
-            case "z":
-            case "north":
-            case "south":
-                flip.setZ(!flip.flipZ());
-                return;
-            case "e":
-            case "w":
             case "x":
             case "east":
             case "west":
                 flip.setX(!flip.flipX());
                 return;
-            case "u":
-            case "d":
             case "y":
             case "up":
             case "down":
                 flip.setY(!flip.flipY());
                 return;
+            case "z":
+            case "north":
+            case "south":
+                flip.setZ(!flip.flipZ());
             default:
                 throw new CommandException("Invalid input " + input);
         }

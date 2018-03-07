@@ -73,9 +73,10 @@ public class Preset {
     public static void read(Brush brush, Node node) {
         for (Option<?> option : brush.getType().getOptions()) {
             Node child = node.node(option.getId());
-            Object value = option.getDefault().get();
+            Object def = option.getDefault().get();
+            Object value = def;
 
-            if (!child.isEmpty()) {
+            if (!child.backing().isVirtual()) {
                 if (value instanceof IgnoreSerialization) {
                     continue;
                 }
@@ -94,17 +95,15 @@ public class Preset {
                 }
             }
 
-            if (option.accepts(value)) {
+            if (value != def && option.accepts(value)) {
                 brush.setOption(option, value);
             }
         }
     }
 
-    public static void write(Brush brush, Node root) {
+    public static void write(Brush brush, Node node) {
+        node.clear();
         brush.getOptions().forEach((option, o) -> {
-            Node node = root.node(brush.getType().getId());
-            node.clear();
-
             Value def = option.getDefault();
             if (def.isPresent() && def.get().equals(o)) {
                 return;
