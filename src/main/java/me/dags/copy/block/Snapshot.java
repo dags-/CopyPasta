@@ -1,14 +1,13 @@
 package me.dags.copy.block;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.UUID;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

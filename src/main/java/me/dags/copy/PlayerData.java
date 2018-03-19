@@ -2,6 +2,10 @@ package me.dags.copy;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import me.dags.config.Config;
 import me.dags.config.Node;
 import me.dags.copy.brush.Brush;
@@ -11,11 +15,6 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author dags <dags@dags.me>

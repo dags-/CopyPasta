@@ -1,9 +1,8 @@
 package me.dags.copy.operation.modifier;
 
+import java.util.function.Predicate;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-
-import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,6 +1,7 @@
 package me.dags.copy.brush;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.LinkedList;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
@@ -9,8 +10,6 @@ import me.dags.copy.operation.UndoOperation;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.LinkedList;
 
 /**
  * @author dags <dags@dags.me>

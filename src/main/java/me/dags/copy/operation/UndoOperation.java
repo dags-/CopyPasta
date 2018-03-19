@@ -1,5 +1,7 @@
 package me.dags.copy.operation;
 
+import java.util.LinkedList;
+import java.util.UUID;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.History;
@@ -7,9 +9,6 @@ import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
-
-import java.util.LinkedList;
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

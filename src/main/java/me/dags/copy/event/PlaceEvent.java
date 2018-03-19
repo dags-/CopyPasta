@@ -1,6 +1,10 @@
 package me.dags.copy.event;
 
 import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
 import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
@@ -9,11 +13,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>

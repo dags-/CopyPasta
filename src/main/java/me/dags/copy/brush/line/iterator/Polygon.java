@@ -7,22 +7,17 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-public class PolygonIterator extends PathIterator {
+public class Polygon extends Path {
 
-    public PolygonIterator(Vector3i center, Vector3i point1, int sides) {
-        super(getCorners(center, point1, sides));
-    }
-
-    @Override
-    public boolean close() {
-        return true;
+    public Polygon(Vector3i center, Vector3i point1, int sides) {
+        super(getCorners(center, point1, sides), true);
     }
 
     private static List<Vector3i> getCorners(Vector3i center, Vector3i p1, int sides) {
         List<Vector3i> corners = new LinkedList<>();
         Vector3i dist = p1.sub(center);
 
-        float radius = PositionIterator.dist(dist.getX(), dist.getY(), dist.getZ());
+        float radius = LineIterator.dist(dist.getX(), dist.getY(), dist.getZ());
         float startRads = (float) Math.asin(dist.getX() / radius);
         float segmentRads = 2F / sides;
 

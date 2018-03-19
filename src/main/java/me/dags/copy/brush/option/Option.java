@@ -1,10 +1,9 @@
 package me.dags.copy.brush.option;
 
-import me.dags.commandbus.utils.ClassUtils;
-
-import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
+import me.dags.commandbus.utils.ClassUtils;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,7 +1,6 @@
 package me.dags.copy.block.volume;
 
 import com.flowpowered.math.vector.Vector3i;
-
 import java.util.UUID;
 
 /**

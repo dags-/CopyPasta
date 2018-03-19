@@ -1,5 +1,8 @@
 package me.dags.copy.block.state;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import me.dags.copy.block.property.Axis;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.block.property.Half;
@@ -9,10 +12,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeMapper;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author dags <dags@dags.me>

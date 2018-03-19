@@ -1,5 +1,6 @@
 package me.dags.copy.command.element;
 
+import java.util.Optional;
 import me.dags.commandbus.CommandBus;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.element.ChainElement;
@@ -18,8 +19,6 @@ import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.schematic.SchematicEntry;
 import me.dags.copy.registry.schematic.SchematicRegistry;
 import org.spongepowered.api.block.BlockState;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

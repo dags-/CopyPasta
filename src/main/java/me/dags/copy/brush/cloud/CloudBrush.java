@@ -3,6 +3,10 @@ package me.dags.copy.brush.cloud;
 import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.Trait;
@@ -23,11 +27,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

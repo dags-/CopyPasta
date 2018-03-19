@@ -1,8 +1,7 @@
 package me.dags.copy.block.property;
 
-import me.dags.copy.block.state.State;
-
 import java.util.Collection;
+import me.dags.copy.block.state.State;
 
 /**
  * @author dags <dags@dags.me>

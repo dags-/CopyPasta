@@ -1,6 +1,11 @@
 package me.dags.copy.command.parser;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
@@ -11,8 +16,6 @@ import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.brush.option.value.Flip;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.*;
 
 /**
  * @author dags <dags@dags.me>

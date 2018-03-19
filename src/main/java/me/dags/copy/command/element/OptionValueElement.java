@@ -1,5 +1,8 @@
 package me.dags.copy.command.element;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
@@ -12,10 +15,6 @@ import me.dags.copy.command.parser.FlipParser;
 import me.dags.copy.command.parser.OptionValueParser;
 import me.dags.copy.command.parser.ToggleBoolParser;
 import me.dags.copy.command.parser.TraitParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author dags <dags@dags.me>

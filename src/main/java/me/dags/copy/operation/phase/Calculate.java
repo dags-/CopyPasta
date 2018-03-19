@@ -1,5 +1,6 @@
 package me.dags.copy.operation.phase;
 
+import java.util.Iterator;
 import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.operation.Operation;
@@ -7,8 +8,6 @@ import me.dags.copy.operation.modifier.Filter;
 import me.dags.copy.operation.modifier.Translate;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.world.World;
-
-import java.util.Iterator;
 
 /**
  * @author dags <dags@dags.me>

@@ -2,14 +2,13 @@ package me.dags.copy.block.volume;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.util.concurrent.FutureCallback;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 import me.dags.copy.block.state.State;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
-
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

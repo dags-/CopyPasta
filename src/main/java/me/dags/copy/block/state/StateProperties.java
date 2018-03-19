@@ -1,13 +1,12 @@
 package me.dags.copy.block.state;
 
 import com.google.common.collect.ImmutableMap;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,15 +1,14 @@
 package me.dags.copy.block;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.world.World;
-
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * @author dags <dags@dags.me>

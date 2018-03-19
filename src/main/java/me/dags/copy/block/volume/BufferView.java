@@ -1,9 +1,8 @@
 package me.dags.copy.block.volume;
 
-import me.dags.copy.block.Snapshot;
-
 import java.util.Iterator;
 import java.util.List;
+import me.dags.copy.block.Snapshot;
 
 /**
  * @author dags <dags@dags.me>

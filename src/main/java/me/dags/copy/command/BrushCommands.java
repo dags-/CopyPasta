@@ -1,6 +1,12 @@
 package me.dags.copy.command;
 
-import me.dags.commandbus.annotation.*;
+import java.util.Optional;
+import me.dags.commandbus.annotation.Command;
+import me.dags.commandbus.annotation.Description;
+import me.dags.commandbus.annotation.Flag;
+import me.dags.commandbus.annotation.Join;
+import me.dags.commandbus.annotation.Permission;
+import me.dags.commandbus.annotation.Src;
 import me.dags.commandbus.command.Flags;
 import me.dags.commandbus.fmt.PagFormatter;
 import me.dags.copy.PlayerData;
@@ -19,8 +25,6 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.action.TextActions;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

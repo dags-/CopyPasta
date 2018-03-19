@@ -1,5 +1,8 @@
 package me.dags.copy.brush;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import me.dags.config.Config;
 import me.dags.config.Node;
 import me.dags.copy.brush.option.Option;
@@ -9,10 +12,6 @@ import me.dags.copy.util.IgnoreSerialization;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

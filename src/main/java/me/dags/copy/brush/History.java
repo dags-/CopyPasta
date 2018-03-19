@@ -1,8 +1,7 @@
 package me.dags.copy.brush;
 
-import org.spongepowered.api.block.BlockSnapshot;
-
 import java.util.LinkedList;
+import org.spongepowered.api.block.BlockSnapshot;
 
 /**
  * @author dags <dags@dags.me>

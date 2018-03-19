@@ -1,5 +1,7 @@
 package me.dags.copy.command.parser;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
@@ -7,9 +9,6 @@ import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

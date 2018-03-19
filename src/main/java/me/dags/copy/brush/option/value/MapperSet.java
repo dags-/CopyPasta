@@ -1,14 +1,13 @@
 package me.dags.copy.brush.option.value;
 
-import me.dags.config.Node;
-import me.dags.copy.block.state.State;
-import me.dags.copy.brush.option.Option;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
+import me.dags.config.Node;
+import me.dags.copy.block.state.State;
+import me.dags.copy.brush.option.Option;
 
 /**
  * @author dags <dags@dags.me>

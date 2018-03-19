@@ -1,5 +1,10 @@
 package me.dags.copy.command.parser;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
@@ -9,8 +14,6 @@ import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.Option;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
-
-import java.util.*;
 
 /**
  * @author dags <dags@dags.me>

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-public class PathIterator implements PositionIterator {
+public class BezierPath implements LineIterator {
 
     private final List<Vector3i> path;
 
@@ -14,12 +14,8 @@ public class PathIterator implements PositionIterator {
     private LineIterator iterator = null;
     private Vector3i position = Vector3i.ZERO;
 
-    public PathIterator(List<Vector3i> path) {
+    public BezierPath(List<Vector3i> path) {
         this.path = path;
-    }
-
-    public boolean close() {
-        return false;
     }
 
     @Override
@@ -32,22 +28,16 @@ public class PathIterator implements PositionIterator {
     @Override
     public boolean hasNext() {
         if (iterator == null) {
-            if (pos >= path.size()) {
+            if (pos + 2 >= path.size()) {
                 return false;
             }
 
-            Vector3i from = path.get(pos++);
-            Vector3i to;
+            Vector3i p0 = path.get(pos);
+            Vector3i p1 = path.get(pos + 1);
+            Vector3i p2 = path.get(pos + 2);
+            pos += 2;
 
-            if (pos < path.size()) {
-                to = path.get(pos);
-            } else if (close()) {
-                to = path.get(0);
-            } else {
-                return false;
-            }
-
-            iterator = new LineIterator(from, to);
+            iterator = new Bezier(p0, p1, p2);
         }
 
         boolean hasNext = iterator.hasNext();

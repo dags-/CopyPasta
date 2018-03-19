@@ -1,6 +1,7 @@
 package me.dags.copy;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.Optional;
 import me.dags.copy.brush.Brush;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -10,8 +11,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.World;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

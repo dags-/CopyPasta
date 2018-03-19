@@ -1,18 +1,17 @@
 package me.dags.copy;
 
-import me.dags.copy.util.Utils;
-import me.dags.copy.util.fmt;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigRoot;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
-
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import me.dags.copy.util.Utils;
+import me.dags.copy.util.fmt;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.config.ConfigRoot;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.plugin.PluginContainer;
 
 /**
  * @author dags <dags@dags.me>

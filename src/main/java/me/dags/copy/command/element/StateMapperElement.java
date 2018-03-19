@@ -1,5 +1,8 @@
 package me.dags.copy.command.element;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Context;
 import me.dags.commandbus.command.Input;
@@ -11,10 +14,6 @@ import me.dags.copy.block.state.State;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

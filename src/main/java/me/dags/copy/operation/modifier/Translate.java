@@ -1,11 +1,10 @@
 package me.dags.copy.operation.modifier;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.function.BiConsumer;
 import me.dags.copy.block.BlockUtils;
 import me.dags.copy.block.Snapshot;
 import org.spongepowered.api.world.World;
-
-import java.util.function.BiConsumer;
 
 /**
  * @author dags <dags@dags.me>

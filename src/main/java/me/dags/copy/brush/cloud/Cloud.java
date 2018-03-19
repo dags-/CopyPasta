@@ -4,13 +4,12 @@ import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
+import java.util.List;
+import java.util.UUID;
 import me.dags.copy.block.volume.BufferBuilder;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.brush.option.OptionHolder;
 import org.spongepowered.api.block.BlockState;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

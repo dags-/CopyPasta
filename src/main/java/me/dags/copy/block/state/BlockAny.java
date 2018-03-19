@@ -1,5 +1,8 @@
 package me.dags.copy.block.state;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -8,10 +11,6 @@ import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

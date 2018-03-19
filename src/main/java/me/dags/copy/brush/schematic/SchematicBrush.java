@@ -1,6 +1,9 @@
 package me.dags.copy.brush.schematic;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.function.Supplier;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.block.property.Facing;
 import me.dags.copy.brush.Action;
@@ -17,10 +20,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.schematic.BlockPaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
-
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>

@@ -111,6 +111,7 @@ public class Viewer extends JFrame implements KeyListener {
             label.setIcon(icon);
             label.repaint();
             rendering = false;
+            pack();
         });
     }
 

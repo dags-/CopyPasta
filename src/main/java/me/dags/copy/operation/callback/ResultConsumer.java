@@ -1,9 +1,8 @@
 package me.dags.copy.operation.callback;
 
+import java.util.UUID;
 import me.dags.copy.block.volume.BufferView;
 import org.spongepowered.api.world.World;
-
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

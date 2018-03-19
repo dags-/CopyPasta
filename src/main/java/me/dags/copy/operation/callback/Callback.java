@@ -1,6 +1,9 @@
 package me.dags.copy.operation.callback;
 
 import com.google.common.util.concurrent.FutureCallback;
+import java.lang.ref.WeakReference;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.volume.BufferView;
@@ -15,10 +18,6 @@ import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

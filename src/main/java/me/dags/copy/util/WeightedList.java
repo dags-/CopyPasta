@@ -1,7 +1,6 @@
 package me.dags.copy.util;
 
 import com.google.common.collect.Maps;
-
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;

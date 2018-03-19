@@ -1,16 +1,15 @@
 package me.dags.copy.brush;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import me.dags.config.Node;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.registry.brush.BrushRegistry;
 import me.dags.copy.registry.brush.BrushSupplier;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

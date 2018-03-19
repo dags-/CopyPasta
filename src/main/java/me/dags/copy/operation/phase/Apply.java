@@ -1,14 +1,13 @@
 package me.dags.copy.operation.phase;
 
+import java.util.Iterator;
+import java.util.List;
 import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.brush.History;
 import me.dags.copy.operation.Operation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.World;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>

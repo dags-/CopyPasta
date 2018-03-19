@@ -1,5 +1,13 @@
 package me.dags.copy.command;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
@@ -10,15 +18,6 @@ import me.dags.copy.brush.option.value.Stencil;
 import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>

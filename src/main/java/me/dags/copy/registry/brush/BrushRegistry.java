@@ -1,6 +1,13 @@
 package me.dags.copy.registry.brush;
 
 import com.google.common.collect.ImmutableList;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.Aliases;
 import me.dags.copy.brush.Brush;
@@ -9,14 +16,6 @@ import me.dags.copy.brush.option.Option;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 /**
  * @author dags <dags@dags.me>

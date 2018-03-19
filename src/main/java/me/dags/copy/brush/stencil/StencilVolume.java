@@ -1,6 +1,7 @@
 package me.dags.copy.brush.stencil;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.function.BiFunction;
 import me.dags.copy.brush.option.value.Palette;
 import me.dags.copy.brush.option.value.Stencil;
 import org.spongepowered.api.block.BlockState;
@@ -8,14 +9,16 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.world.extent.*;
+import org.spongepowered.api.world.extent.BlockVolume;
+import org.spongepowered.api.world.extent.ImmutableBlockVolume;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
+import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeMapper;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeMerger;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeReducer;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeVisitor;
-
-import java.util.function.BiFunction;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,5 +1,6 @@
 package me.dags.copy.command;
 
+import java.util.Optional;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
@@ -9,8 +10,6 @@ import me.dags.copy.brush.Brush;
 import me.dags.copy.brush.option.value.MapperSet;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

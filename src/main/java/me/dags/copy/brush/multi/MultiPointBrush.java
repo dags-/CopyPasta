@@ -1,10 +1,19 @@
 package me.dags.copy.brush.multi;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerData;
 import me.dags.copy.PlayerManager;
-import me.dags.copy.brush.*;
+import me.dags.copy.brush.AbstractBrush;
+import me.dags.copy.brush.Action;
+import me.dags.copy.brush.Aliases;
+import me.dags.copy.brush.Brush;
+import me.dags.copy.brush.History;
 import me.dags.copy.brush.option.Checks;
 import me.dags.copy.brush.option.Option;
 import me.dags.copy.operation.UndoOperation;
@@ -12,8 +21,6 @@ import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.*;
 
 /**
  * @author dags <dags@dags.me>

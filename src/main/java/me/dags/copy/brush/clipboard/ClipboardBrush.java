@@ -2,6 +2,7 @@ package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
+import java.util.Random;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.block.Mappers;
@@ -22,8 +23,6 @@ import me.dags.copy.operation.modifier.Translate;
 import me.dags.copy.registry.brush.BrushSupplier;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Random;
 
 /**
  * @author dags <dags@dags.me>

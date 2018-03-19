@@ -1,5 +1,10 @@
 package me.dags.copy.operation.phase;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.event.PlaceEvent;
@@ -8,8 +13,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
-
-import java.util.*;
 
 /**
  * @author dags <dags@dags.me>

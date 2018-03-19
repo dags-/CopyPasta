@@ -1,11 +1,10 @@
 package me.dags.copy.brush.option;
 
+import java.util.List;
 import me.dags.commandbus.command.CommandException;
 import me.dags.commandbus.command.Input;
 import me.dags.copy.command.element.BrushElements;
 import me.dags.copy.util.Utils;
-
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>

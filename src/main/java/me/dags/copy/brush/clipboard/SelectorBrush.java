@@ -1,6 +1,7 @@
 package me.dags.copy.brush.clipboard;
 
 import com.flowpowered.math.vector.Vector3i;
+import java.util.Optional;
 import me.dags.commandbus.fmt.Formatter;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.brush.AbstractBrush;
@@ -15,8 +16,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.permission.PermissionService;
-
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

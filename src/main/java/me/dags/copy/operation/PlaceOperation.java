@@ -1,5 +1,6 @@
 package me.dags.copy.operation;
 
+import java.util.UUID;
 import me.dags.copy.CopyPasta;
 import me.dags.copy.PlayerManager;
 import me.dags.copy.operation.phase.Apply;
@@ -7,8 +8,6 @@ import me.dags.copy.operation.phase.Calculate;
 import me.dags.copy.operation.phase.Test;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
-
-import java.util.UUID;
 
 /**
  * @author dags <dags@dags.me>

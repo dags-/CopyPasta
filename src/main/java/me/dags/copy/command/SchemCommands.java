@@ -1,5 +1,7 @@
 package me.dags.copy.command;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.Description;
 import me.dags.commandbus.annotation.Permission;
@@ -9,9 +11,6 @@ import me.dags.copy.brush.schematic.SchematicBrush;
 import me.dags.copy.registry.schematic.SchematicEntry;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>

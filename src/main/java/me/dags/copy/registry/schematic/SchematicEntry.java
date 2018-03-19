@@ -1,11 +1,10 @@
 package me.dags.copy.registry.schematic;
 
-import org.spongepowered.api.data.persistence.DataTranslator;
-import org.spongepowered.api.world.schematic.Schematic;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import org.spongepowered.api.data.persistence.DataTranslator;
+import org.spongepowered.api.world.schematic.Schematic;
 
 /**
  * @author dags <dags@dags.me>

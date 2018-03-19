@@ -1,9 +1,14 @@
 package me.dags.copy;
 
 import com.google.inject.Inject;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import me.dags.copy.block.Mappers;
 import me.dags.copy.brush.clipboard.ClipboardBrush;
 import me.dags.copy.brush.cloud.CloudBrush;
+import me.dags.copy.brush.line.LineBrush;
 import me.dags.copy.brush.replace.ReplaceBrush;
 import me.dags.copy.brush.stencil.StencilBrush;
 import me.dags.copy.command.BrushCommands;
@@ -25,11 +30,6 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
-
-import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author dags <dags@dags.me>
@@ -56,12 +56,13 @@ public class CopyPasta {
 
     @Listener
     public void pre(GamePreInitializationEvent event) {
-        BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
-//        BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
 //        BrushRegistry.getInstance().register(MultiPointBrush.class, MultiPointBrush.supplier());
+//        BrushRegistry.getInstance().register(SchematicBrush.class, SchematicBrush.supplier());
+        BrushRegistry.getInstance().register(ClipboardBrush.class, ClipboardBrush.supplier());
         BrushRegistry.getInstance().register(StencilBrush.class, StencilBrush.supplier());
-        BrushRegistry.getInstance().register(CloudBrush.class, CloudBrush.supplier());
         BrushRegistry.getInstance().register(ReplaceBrush.class, ReplaceBrush.supplier());
+        BrushRegistry.getInstance().register(CloudBrush.class, CloudBrush.supplier());
+        BrushRegistry.getInstance().register(LineBrush.class, LineBrush.supplier());
         asyncExecutor = Sponge.getScheduler().createAsyncExecutor(this);
     }
 
