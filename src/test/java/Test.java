@@ -13,14 +13,23 @@ public class Test {
         viewer.setRenderer((buffer, xOff, zOff) -> {
             int x = 256 + xOff;
             int z = 256 + zOff;
-            int inset = 64;
+            LineIterator iterator;
 
             Viewer.clear(buffer);
 
-            LineIterator iterator = new Bezier(
-                    new Vector3i(inset, 0, inset),
+//            Random random = new Random();
+//            List<Vector3i> points = new LinkedList<>();
+//            for (int i = 0; i < 25; i++) {
+//                int px = random.nextInt(512);
+//                int pz = random.nextInt(512);
+//                points.add(new Vector3i(px, 0, pz));
+//            }
+//            iterator = new BezierPath(points);
+
+            iterator = new Bezier(
+                    new Vector3i(64, 0, 64),
                     new Vector3i(x, 0, z),
-                    new Vector3i(buffer.getWidth() - inset, 0, buffer.getHeight() - inset)
+                    new Vector3i(buffer.getWidth() - 64, 0, buffer.getHeight() - 64)
             );
 
             while (iterator.hasNext()) {

@@ -5,6 +5,7 @@ import java.util.List;
 import me.dags.config.Node;
 import me.dags.copy.brush.line.iterator.Bezier;
 import me.dags.copy.brush.line.iterator.BezierPath;
+import me.dags.copy.brush.line.iterator.Line;
 import me.dags.copy.brush.line.iterator.LineIterator;
 import me.dags.copy.brush.line.iterator.Path;
 import me.dags.copy.brush.line.iterator.Polygon;
@@ -12,30 +13,32 @@ import me.dags.copy.brush.line.iterator.Polygon;
 /**
  * @author dags <dags@dags.me>
  */
-public enum Line implements Node.Value<Line> {
-    LINE(2),
-    BEZIER(3),
-    POLYGON(2),
-    ;
+public enum LineType implements Node.Value<LineType> {
+    LINE("line", 2),
+    BEZIER("curve", 3),
+    POLYGON("poly", 2),;
 
     public final int points;
+    private final String name;
 
-    Line(int minPoints) {
+    LineType(String name, int minPoints) {
+        this.name = name;
         this.points = minPoints;
     }
 
     @Override
     public void toNode(Node node) {
-        node.set(toString().toLowerCase());
+        node.set(name);
     }
 
     @Override
-    public Line fromNode(Node node) {
-        String name = node.get("");
-        if (name.isEmpty()) {
-            return LINE;
-        }
-        return valueOf(name.toUpperCase());
+    public LineType fromNode(Node node) {
+        return from(node.get(""));
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 
     public LineIterator newIterator(List<Vector3i> points, int sides, boolean closed) {
@@ -49,7 +52,7 @@ public enum Line implements Node.Value<Line> {
             }
             Vector3i p0 = points.get(0);
             Vector3i p1 = points.get(1);
-            return new me.dags.copy.brush.line.iterator.Line(p0, p1);
+            return new Line(p0, p1);
         }
 
         if (this == BEZIER) {
@@ -69,5 +72,18 @@ public enum Line implements Node.Value<Line> {
         }
 
         return LineIterator.EMPTY;
+    }
+
+    private static LineType from(String name) {
+        switch (name) {
+            case "line":
+                return LINE;
+            case "curve":
+                return BEZIER;
+            case "poly":
+                return POLYGON;
+            default:
+                return LINE;
+        }
     }
 }
