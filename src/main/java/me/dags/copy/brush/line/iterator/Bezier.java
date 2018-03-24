@@ -28,7 +28,7 @@ public class Bezier implements LineIterator {
         // close together, but that we don't spend too much time gradually incrementing to get there.
         // if the line were straight, inc would be something like: 1 / (dist(p1-p0) + dist(p2-p1))
         // to account for curvature we use some 'magic' value to increase the distance a little, and decrease the increment
-        float magic = 1.5F;
+        float magic = 2.5F;
         this.inc = 1F / ((p0.distance(p1) + p1.distance(p2)) * magic);
     }
 
