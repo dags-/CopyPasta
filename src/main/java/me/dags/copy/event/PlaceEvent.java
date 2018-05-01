@@ -69,11 +69,6 @@ public class PlaceEvent extends AbstractEvent implements ChangeBlockEvent.Place 
     }
 
     @Override
-    public World getTargetWorld() {
-        return world;
-    }
-
-    @Override
     public Cause getCause() {
         return cause;
     }

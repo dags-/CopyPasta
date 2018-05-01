@@ -74,11 +74,8 @@ public class IterateOperation implements Operation {
             return Phase.CANCELLED;
         }
 
-        // create new even cause
-        Cause cause = Cause.source(player.get())
-                .notifier(player.get())
-                .owner(player.get())
-                .build();
+        // create new event cause
+        Cause cause = PlayerManager.getInstance().getCause(player.get());
 
         // post event
         PlaceEvent event = new PlaceEvent(cause, world, snapshots);

@@ -26,6 +26,7 @@ import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.chat.ChatType;
@@ -43,6 +44,7 @@ public class CopyPasta {
     private static CopyPasta instance;
 
     private final Path configDir;
+    private final PluginContainer container;
     private final EventListener eventListener = new EventListener();
     private final OperationManager operationManager = new OperationManager(48000, 16000);
 
@@ -52,6 +54,7 @@ public class CopyPasta {
     public CopyPasta(@ConfigDir(sharedRoot = false) Path configDir) {
         CopyPasta.instance = this;
         this.configDir = configDir;
+        this.container = Sponge.getPluginManager().getPlugin(CopyPasta.ID).orElseThrow(IllegalStateException::new);
     }
 
     @Listener

@@ -43,6 +43,11 @@ class BlockAny implements BlockType {
     }
 
     @Override
+    public Collection<BlockState> getAllBlockStates() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Optional<ItemType> getItem() {
         return Optional.empty();
     }

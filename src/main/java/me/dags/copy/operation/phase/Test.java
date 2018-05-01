@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import me.dags.copy.PlayerManager;
 import me.dags.copy.block.Snapshot;
 import me.dags.copy.block.volume.BufferView;
 import me.dags.copy.event.PlaceEvent;
@@ -38,10 +39,7 @@ public class Test {
             if (!player.isPresent()) {
                 return Operation.Phase.CANCELLED;
             }
-            cause = Cause.source(player.get())
-                    .notifier(player.get())
-                    .owner(player.get())
-                    .build();
+            cause = PlayerManager.getInstance().getCause(player.get());
         }
 
         if (iterator == null) {

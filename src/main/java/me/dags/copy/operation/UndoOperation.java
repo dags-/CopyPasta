@@ -8,7 +8,7 @@ import me.dags.copy.brush.History;
 import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 
 /**
  * @author dags <dags@dags.me>
@@ -39,7 +39,7 @@ public class UndoOperation implements Operation {
     public Phase apply(int limit) {
         while (!snapshots.isEmpty() && limit-- > 0) {
             BlockSnapshot snapshot = snapshots.pollLast();
-            snapshot.restore(true, BlockChangeFlag.NONE);
+            snapshot.restore(true, BlockChangeFlags.NONE);
         }
 
         if (!snapshots.isEmpty()) {

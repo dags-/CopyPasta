@@ -7,7 +7,7 @@ plugins {
 group 'me.dags'
 version '0.3.2'
 description 'copy and paste things'
-def api = '5.2.0'
+def api = '7.1.0'
 def channel = 'SNAPSHOT'
 
 configurations {

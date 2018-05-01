@@ -71,11 +71,10 @@ public class BrushRegistry {
     public void registerPermissions() {
         PermissionService service = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
         for (BrushType type : types.values()) {
-            service.newDescriptionBuilder(CopyPasta.getInstance()).ifPresent(builder -> {
-                builder.id(type.getId());
-                builder.description(Text.of("Allows use of the ", type.getId(), " wand"));
-                builder.register();
-            });
+            service.newDescriptionBuilder(CopyPasta.getInstance())
+                    .id(type.getId())
+                    .description(Text.of("Allows use of the ", type.getId(), " wand"))
+                    .register();
         }
     }
 

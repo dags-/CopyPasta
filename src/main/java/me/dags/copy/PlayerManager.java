@@ -11,6 +11,9 @@ import me.dags.copy.util.fmt;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 
 /**
@@ -71,6 +74,14 @@ public class PlayerManager {
                         .ifPresent(fmt.warn("An error occurred: %s, see console", t.getClass().getSimpleName())::tell);
             });
         }
+    }
+
+    public Cause getCause(Player player) {
+        EventContext context = EventContext.builder()
+                .add(EventContextKeys.NOTIFIER, player)
+                .add(EventContextKeys.OWNER, player)
+                .build();
+        return Cause.of(context, container);
     }
 
     public static PlayerManager getInstance() {

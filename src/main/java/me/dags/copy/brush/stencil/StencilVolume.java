@@ -7,7 +7,6 @@ import me.dags.copy.brush.option.value.Stencil;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
@@ -94,7 +93,7 @@ public class StencilVolume implements ImmutableBlockVolume {
     }
 
     @Override
-    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker(Cause cause) {
+    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker() {
         return new BlockVolumeWorker<ImmutableBlockVolume>() {
             @Override
             public ImmutableBlockVolume getVolume() {
