@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'me.dags'
-version '0.3.2'
+version '0.4.0'
 description 'copy and paste things'
 def api = '7.1.0'
 def channel = 'SNAPSHOT'
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     shade('com.github.dags-:Config:master-SNAPSHOT') { transitive = false }
-    shade 'com.github.dags-:CommandBus:2.0.0-TEST-9'
+    shade 'com.github.dags-:CommandBus:2.0.1'
     compile "org.spongepowered:spongeapi:${api}-${channel}"
 }
 
