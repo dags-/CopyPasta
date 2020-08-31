@@ -3,7 +3,7 @@ The replacer brush matches certain blocks/blockstates and replaces them with oth
  the same. This allows you to replace stairs from one type to another, without messing up their orientation, in one go.
 
 ## Actions
-- Left-click - under
+- Left-click - undo
 - Right-click - apply
 
 ## Options
