@@ -33,7 +33,7 @@ shadowJar {
     exclude 'generated'
     relocate 'me.dags.config.', 'me.dags.copy.config.'
     relocate 'me.dags.commandbus.', 'me.dags.copy.commandbus.'
-    archiveName = "${baseName}-${version}-${channel}-Sponge-${api}.jar"
+    archiveName = "${baseName}-${api}-${version}-${channel}.jar"
 }
 
 jar.dependsOn shadowJar
