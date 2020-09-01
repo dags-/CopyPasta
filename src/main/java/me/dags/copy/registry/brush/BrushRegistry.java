@@ -35,7 +35,7 @@ public class BrushRegistry {
             int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers) && field.getType() == Option.class) {
                 try {
-                    Option option = (Option) field.get(null);
+                    Option<?> option = (Option<?>) field.get(null);
                     options.add(option);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

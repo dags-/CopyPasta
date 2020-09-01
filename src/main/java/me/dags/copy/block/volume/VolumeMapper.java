@@ -16,6 +16,7 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 public class VolumeMapper {
 
     private final int angle;
+    private final boolean first;
     private final double radians;
     private final boolean flipX;
     private final boolean flipY;
@@ -24,7 +25,12 @@ public class VolumeMapper {
     private final Collection<State.Mapper> mappers;
 
     public VolumeMapper(Vector3i origin, int angle, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
+        this(origin, angle, true, x, y, z, mappers);
+    }
+
+    public VolumeMapper(Vector3i origin, int angle, boolean first, boolean x, boolean y, boolean z, Collection<State.Mapper> mappers) {
         this.angle = angle;
+        this.first = first;
         this.radians = Math.toRadians(angle);
         this.flipX = x;
         this.flipY = y;
@@ -65,7 +71,13 @@ public class VolumeMapper {
 
     private void visit(BlockState state, int x, int y, int z, BufferBuilder buffer) {
         for (State.Mapper mapper : mappers) {
-            state = mapper.map(state);
+            BlockState result = mapper.map(state);
+            if (result != state) {
+                state = result;
+                if (first) {
+                    break;
+                }
+            }
         }
 
         if (flipY) {

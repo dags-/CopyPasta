@@ -27,7 +27,7 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 @Aliases({"replace"})
 public class ReplaceBrush extends AbstractBrush {
 
-    public static final Option<Integer> RADIUS = Option.of("radius", 8, Checks.range(1, 48));
+    public static final Option<Integer> RADIUS = Option.of("radius", 8, Checks.range(0, 48));
     public static final Option<MapperSet> MAPPERS = MapperSet.OPTION;
 
     private ReplaceBrush() {
