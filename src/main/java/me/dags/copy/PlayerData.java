@@ -32,12 +32,12 @@ public class PlayerData {
         root = Config.must(path);
     }
 
-    public boolean isCoolingDown() {
+    public boolean hasCooledDown() {
         if (coolDown.elapsed(TimeUnit.MILLISECONDS) > 250) {
             coolDown.reset().start();
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public boolean isOperating() {

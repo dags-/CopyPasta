@@ -20,7 +20,7 @@ public class EventListener {
     @Listener
     public void interactPrimary(InteractItemEvent.Primary.MainHand event, @Root Player player) {
         Optional<PlayerData> data = PlayerManager.getInstance().get(player);
-        if (data.isPresent() && !data.get().isCoolingDown()) {
+        if (data.isPresent() && data.get().hasCooledDown()) {
             Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
                 try {
@@ -37,7 +37,7 @@ public class EventListener {
     @Listener
     public void interactSecondary(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
         Optional<PlayerData> data = PlayerManager.getInstance().get(player);
-        if (data.isPresent() && !data.get().isCoolingDown()) {
+        if (data.isPresent() && data.get().hasCooledDown()) {
             Optional<Brush> brush = data.get().getBrush(player);
             if (brush.isPresent() && player.hasPermission(brush.get().getPermission())) {
                 try {
